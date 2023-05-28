@@ -4,7 +4,7 @@ class Matrix:
     # - the elements of the matrix as a list of lists
     #   Matrix([[1.0, 2.0], [3.0, 4.0]])
     # - the shape of the matrix as a tuple
-    #   Matrix((2, 2))
+    #   Matrix((2, 2)) -> [[0.0, 0.0], [0.0, 0.0]]
     def __init__(self,
                  data: 'list[list[float]]' = None,
                  shape: 'tuple[int, int]' = None):
@@ -125,6 +125,8 @@ class Matrix:
 
     # __str__
     def __str__(self):
+        for row in self.data:
+            print(", ".join(str(val) for val in row))
         return str(self.data)
 
     # __repr__
