@@ -1,20 +1,15 @@
+from matrix import Matrix  # , Vector
 import unittest
-from matrix import Matrix
 
 
 class TestMatrix(unittest.TestCase):
 
-    def setUp(self):
-        self.matrix1 = Matrix([[1, 2], [3, 4]])
-        self.matrix2 = Matrix([[5, 6], [7, 8]])
-        self.scalar1 = 2
-
     def test_init_with_data(self):
         # Test initializing matrix with data
         data = [[1, 2], [3, 4]]
-        matrix = Matrix(data=data)
-        self.assertEqual(matrix.data, data)
-        self.assertEqual(matrix.shape, (2, 2))
+        mx = Matrix(data=data)
+        self.assertEqual(mx.data, data)
+        self.assertEqual(mx.shape, (2, 2))
 
         # Test initializing matrix with invalid data
         with self.assertRaises(TypeError):
@@ -29,9 +24,9 @@ class TestMatrix(unittest.TestCase):
     def test_init_with_shape(self):
         # Test initializing matrix with shape
         shape = (2, 2)
-        matrix = Matrix(shape=shape)
-        self.assertEqual(matrix.data, [[0.0, 0.0], [0.0, 0.0]])
-        self.assertEqual(matrix.shape, shape)
+        mx = Matrix(shape=shape)
+        self.assertEqual(mx.data, [[0.0, 0.0], [0.0, 0.0]])
+        self.assertEqual(mx.shape, shape)
 
         # Test initializing matrix with invalid shape
         with self.assertRaises(TypeError):
@@ -119,36 +114,40 @@ class TestMatrix(unittest.TestCase):
 
     def test_mul(self):
 
-        self.matrix1 = Matrix([[1, 2], [3, 4]])
-        self.matrix2 = Matrix([[5, 6], [7, 8]])
-        self.scalar1 = 2
+        matrix1 = Matrix([[1, 2], [3, 4]])
+        matrix2 = Matrix([[5, 6], [7, 8]])
+        scalar1 = 2
 
         # Test matrix * matrix multiplication
-        result = self.matrix1 * self.matrix2
+        result = matrix1 * matrix2
         expected = Matrix([[19, 22], [43, 50]])
         self.assertEqual(result, expected)
 
         # Test matrix * scalar multiplication
-        result = self.matrix1 * self.scalar1
+        result = matrix1 * scalar1
         expected = Matrix([[2, 4], [6, 8]])
         self.assertEqual(result, expected)
 
         # Test invalid input type
         with self.assertRaises(TypeError):
-            self.matrix1 * "string"
+            matrix1 * "string"
 
         # Test invalid matrix dimensions
-        print(self.matrix1 * self.matrix1.T())
+        print(matrix1 * matrix1.T())
 
     def test_rmul(self):
+
+        matrix1 = Matrix([[1, 2], [3, 4]])
+        scalar1 = 2
+
         # Test scalar * matrix multiplication
-        result = self.scalar1 * self.matrix1
+        result = scalar1 * matrix1
         expected = Matrix([[2, 4], [6, 8]])
         self.assertEqual(result, expected)
 
         # Test invalid input type
         with self.assertRaises(TypeError):
-            "string" * self.matrix1
+            "string" * matrix1
 
     def test_div(self):
         matrix1 = Matrix(data=[[1, 2], [3, 4]])
@@ -165,7 +164,7 @@ class TestMatrix(unittest.TestCase):
             matrix1 / "invalid"
 
         with self.assertRaises(ZeroDivisionError):
-            self.matrix1 / 0
+            matrix1 / 0
 
     def test_rdiv(self):
         matrix1 = Matrix(data=[[1, 2], [3, 4]])
