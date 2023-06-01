@@ -1,206 +1,246 @@
-from matrix import Matrix  # , Vector
+from matrix import Matrix, Vector
 import unittest
+
+
+class TestVector(unittest.TestCase):
+
+    def test_init_by_data(self):
+        data = [[1], [2], [3]]
+        vec = Vector(data)
+        self.assertEqual(vec.data, [[1.0], [2.0], [3.0]])
+        self.assertEqual(vec.shape, (3, 1))
+        data = [[1, 2, 3]]
+        vec = Vector(data)
+        self.assertEqual(vec.data, [[1., 2., 3.]])
+        self.assertEqual(vec.shape, (1, 3))
+
+    def test_init_by_shape(self):
+        shape = (3, 1)
+        vec = Vector(shape=shape)
+        self.assertEqual(vec.data, [[0.0], [0.0], [0.0]])
+        self.assertEqual(vec.shape, shape)
+
+        shape = (1, 3)
+        vec = Vector(shape=shape)
+        self.assertEqual(vec.data, [[0., 0., 0.]])
+        self.assertEqual(vec.shape, shape)
+
+    def test_init_with_invalid_data(self):
+        with self.assertRaises(TypeError):
+            Vector()
+        with self.assertRaises(TypeError):
+            Vector(foo="bar")
+        with self.assertRaises(ValueError):
+            Vector([])
+        with self.assertRaises(ValueError):
+            Vector([[]])
+        with self.assertRaises(TypeError):
+            Vector([['a']])
+        with self.assertRaises(ValueError):
+            Vector([[1, 2], [3, 4]])
+        with self.assertRaises(TypeError):
+            Vector([1, 2, 3])
+        with self.assertRaises(TypeError):
+            Vector([[1, 2, 3]], shape=(3, 1))
+
+    def test_init_with_invalid_shape(self):
+        with self.assertRaises(TypeError):
+            Vector(shape=1)
+        with self.assertRaises(TypeError):
+            Vector(shape=('1', 3))
+        with self.assertRaises(TypeError):
+            Vector(shape=(3, '1'))
+        with self.assertRaises(TypeError):
+            Vector(shape=3)
+        with self.assertRaises(ValueError):
+            Vector(shape=(3, 1, 1))
+        with self.assertRaises(ValueError):
+            Vector(shape=(3, -1))
+        with self.assertRaises(ValueError):
+            Vector(shape=(0, 0))
+        with self.assertRaises(ValueError):
+            Vector(shape=(3, 0))
+
+    def test_add(self):
+        vec1 = Vector([[1, 2, 3]])
+        vec2 = Vector([[4, 5, 6]])
+        vec3 = vec1 + vec2
+        self.assertEqual(vec3.data, [[5.0, 7.0, 9.0]])
+        self.assertEqual(vec3.shape, (1, 3))
+
+        vec4 = Vector([[1], [2], [3]])
+        vec5 = Vector([[4], [5], [6]])
+        vec6 = vec4 + vec5
+        self.assertEqual(vec6.data, [[5.0], [7.0], [9.0]])
+
+        with self.assertRaises(ValueError):
+            vec1 + vec4
+
+        with self.assertRaises(TypeError):
+            vec4 + 2
+
+    def test_sub(self):
+        vec1 = Vector([[1, 2, 3]])
+        vec2 = Vector([[4, 5, 6]])
+        vec3 = vec1 - vec2
+        self.assertEqual(vec3.data, [[-3.0, -3.0, -3.0]])
+        self.assertEqual(vec3.shape, (1, 3))
+
+        vec4 = Vector([[1], [2], [3]])
+        vec5 = Vector([[4], [5], [6]])
+        vec6 = vec4 - vec5
+        self.assertEqual(vec6.data, [[-3.0], [-3.0], [-3.0]])
+
+        with self.assertRaises(ValueError):
+            vec1 - vec4
+
+        with self.assertRaises(TypeError):
+            vec4 - 2
+
+    def test_scale(self):
+        mat1 = Matrix([[1, 2], [3, 4]])
+        mat2 = mat1 * 2
+        self.assertEqual(mat2.data, [[2.0, 4.0], [6.0, 8.0]])
+        self.assertEqual(mat2.shape, (2, 2))
+
+    def test_scale_with_invalid_factor(self):
+        mat1 = Matrix([[1, 2], [3, 4]])
+        with self.assertRaises(TypeError):
+            mat1.scale('2')
 
 
 class TestMatrix(unittest.TestCase):
 
-    def test_init_with_data(self):
-        # Test initializing matrix with data
-        data = [[1, 2], [3, 4]]
-        mx = Matrix(data=data)
-        self.assertEqual(mx.data, data)
-        self.assertEqual(mx.shape, (2, 2))
+    def test_init_by_data(self):
+        data = [[1], [2], [3]]
+        vec = Matrix(data)
+        self.assertEqual(vec.data, [[1.0], [2.0], [3.0]])
+        self.assertEqual(vec.shape, (3, 1))
+        self.assertEqual(type(vec), Vector)
 
-        # Test initializing matrix with invalid data
+        data = [[1, 2, 3]]
+        vec = Matrix(data)
+        self.assertEqual(vec.data, [[1., 2., 3.]])
+        self.assertEqual(vec.shape, (1, 3))
+        self.assertEqual(type(vec), Vector)
+
+        data = [[1, 2, 3], [4, 5, 6]]
+        mat = Matrix(data)
+        self.assertEqual(mat.data, [[1., 2., 3.], [4., 5., 6.]])
+        self.assertEqual(mat.shape, (2, 3))
+        self.assertEqual(type(mat), Matrix)
+
+    def test_init_by_shape(self):
+        shape = (3, 1)
+        vec = Matrix(shape=shape)
+        self.assertEqual(vec.data, [[0.0], [0.0], [0.0]])
+        self.assertEqual(vec.shape, shape)
+        self.assertEqual(type(vec), Vector)
+
+        shape = (1, 3)
+        vec = Matrix(shape=shape)
+        self.assertEqual(vec.data, [[0., 0., 0.]])
+        self.assertEqual(vec.shape, shape)
+        self.assertEqual(type(vec), Vector)
+
+        shape = (2, 3)
+        mat = Matrix(shape=shape)
+        self.assertEqual(mat.data, [[0., 0., 0.], [0., 0., 0.]])
+        self.assertEqual(mat.shape, shape)
+        self.assertEqual(type(mat), Matrix)
+
+    def test_init_with_invalid_data(self):
         with self.assertRaises(TypeError):
-            Matrix(data="invalid")
-
+            Matrix()
+        with self.assertRaises(TypeError):
+            Matrix(foo="bar")
         with self.assertRaises(ValueError):
-            Matrix(data=[[1, 2], [3]])
-
-        with self.assertRaises(TypeError):
-            Matrix(data=[[1, 2], [3, "invalid"]])
-
-    def test_init_with_shape(self):
-        # Test initializing matrix with shape
-        shape = (2, 2)
-        mx = Matrix(shape=shape)
-        self.assertEqual(mx.data, [[0.0, 0.0], [0.0, 0.0]])
-        self.assertEqual(mx.shape, shape)
-
-        # Test initializing matrix with invalid shape
-        with self.assertRaises(TypeError):
-            Matrix(shape="invalid")
-
-        with self.assertRaises(TypeError):
-            Matrix(shape=(2, "invalid"))
-
+            Matrix([])
         with self.assertRaises(ValueError):
-            Matrix(shape=(-1, 2))
+            Matrix([[]])
+        with self.assertRaises(TypeError):
+            Matrix([['a']])
+        with self.assertRaises(TypeError):
+            Matrix([1, 2, 3])
+        with self.assertRaises(TypeError):
+            Matrix([[1, 2, 3]], shape=(3, 1))
+        with self.assertRaises(ValueError):
+            Matrix([[1, 2], [3, 4, 5]])
+        with self.assertRaises(TypeError):
+            Matrix([[1, 2], [3, '4']])
+        with self.assertRaises(TypeError):
+            Matrix([[1, 2], [3, [4]]])
+
+    def test_init_with_invalid_shape(self):
+        with self.assertRaises(TypeError):
+            Matrix(shape=1)
+        with self.assertRaises(TypeError):
+            Matrix(shape=('1', 3))
+        with self.assertRaises(TypeError):
+            Matrix(shape=(3, '1'))
+        with self.assertRaises(TypeError):
+            Matrix(shape=3)
+        with self.assertRaises(ValueError):
+            Matrix(shape=(3, 1, 1))
+        with self.assertRaises(ValueError):
+            Matrix(shape=(3, -1))
+        with self.assertRaises(ValueError):
+            Matrix(shape=(0, 0))
+        with self.assertRaises(ValueError):
+            Matrix(shape=(3, 0))
 
     def test_add(self):
-        # Test adding matrices of same dimensions
-        matrix1 = Matrix(data=[[1, 2], [3, 4]])
-        matrix2 = Matrix(data=[[5, 6], [7, 8]])
-        result = matrix1 + matrix2
-        self.assertEqual(result.data, [[6, 8], [10, 12]])
-        self.assertEqual(result.shape, (2, 2))
-
-        # Test adding matrices of different dimensions
-        matrix3 = Matrix(data=[[1, 2], [3, 4]])
-        matrix4 = Matrix(data=[[5, 6, 7], [8, 9, 10]])
-        with self.assertRaises(ValueError):
-            matrix3 + matrix4
-
-    def test_add_with_scalar(self):
-        # Test adding a scalar to a matrix
-        matrix1 = Matrix(data=[[1, 2], [3, 4]])
-        with self.assertRaises(TypeError):
-            matrix1 + 2
-
-        # Test adding a scalar to an invalid type
-        with self.assertRaises(TypeError):
-            matrix1 + "invalid"
-
-    def test_radd(self):
-        # Test right addition with a matrix
-        matrix1 = Matrix(data=[[1, 2], [3, 4]])
-        matrix2 = Matrix(data=[[2, 3], [4, 5]])
-        result = matrix2 + matrix1
-        self.assertEqual(result.data, [[3, 5], [7, 9]])
-        self.assertEqual(result.shape, (2, 2))
-
-        # Test right addition with a scalar
-        with self.assertRaises(TypeError):
-            2 + matrix1
-
-        # Test right addition with an invalid type
-        with self.assertRaises(TypeError):
-            "invalid" + matrix1
+        mat1 = Matrix([[1, 2], [3, 4]])
+        mat2 = Matrix([[5, 6], [7, 8]])
+        mat3 = mat1 + mat2
+        self.assertEqual(mat3.data, [[6.0, 8.0], [10.0, 12.0]])
+        self.assertEqual(mat3.shape, (2, 2))
 
     def test_sub(self):
-        # Test subtracting matrices of same dimensions
-        matrix1 = Matrix(data=[[1, 2], [3, 4]])
-        matrix2 = Matrix(data=[[5, 6], [7, 8]])
-        result = matrix1 - matrix2
-        self.assertEqual(result.data, [[-4, -4], [-4, -4]])
-        self.assertEqual(result.shape, (2, 2))
+        mat1 = Matrix([[1, 2], [3, 4]])
+        mat2 = Matrix([[5, 6], [7, 8]])
+        mat3 = mat1 - mat2
+        self.assertEqual(mat3.data, [[-4.0, -4.0], [-4.0, -4.0]])
+        self.assertEqual(mat3.shape, (2, 2))
 
-        # Test subtracting matrices of different dimensions
-        matrix3 = Matrix(data=[[1, 2], [3, 4]])
-        matrix4 = Matrix(data=[[5, 6, 7], [8, 9, 10]])
-        with self.assertRaises(ValueError):
-            matrix3 - matrix4
+    def test_scale(self):
+        vec1 = Vector([[1, 2, 3]])
+        vec2 = vec1 * 2.
+        self.assertEqual(vec2.data, [[2.0, 4.0, 6.0]])
+        self.assertEqual(vec2.shape, (1, 3))
 
-        # Test subtracting an invalid type
+    def test_scale_with_invalid_factor(self):
+        vec1 = Vector([[1, 2, 3]])
         with self.assertRaises(TypeError):
-            matrix1 - "invalid"
+            vec1.scale('2')
 
-    def test_rsub(self):
-        # Test right subtraction with a matrix
-        matrix1 = Matrix(data=[[1, 2], [3, 4]])
-        matrix2 = Matrix(data=[[2, 3], [4, 5]])
-        result = matrix2 - matrix1
-        self.assertEqual(result.data, [[1, 1], [1, 1]])
-        self.assertEqual(result.shape, (2, 2))
+    def test_matrix_vector_multiplication(self):
+        mat1 = Matrix([[1, 2], [3, 4]])
+        vec1 = Vector([[1], [2]])
+        vec2 = mat1 * vec1
+        self.assertEqual(vec2.data, [[5.0], [11.0]])
+        self.assertEqual(vec2.shape, (2, 1))
 
-        # Test right subtraction with a scalar
-        with self.assertRaises(TypeError):
-            2 - matrix1
+        mat2 = Matrix([[1]])
+        vec3 = Vector([[1, 2, 3]])
+        vec4 = mat2 * vec3
+        self.assertEqual(vec4.data, [[14.0, 32.0]])
+        self.assertEqual(vec4.shape, (1, 2))
 
-        # Test right subtraction with an invalid type
-        with self.assertRaises(TypeError):
-            "invalid" - matrix1
+    def test_matrix_matrix_multiplication(self):
+        mat1 = Matrix([[1, 2], [3, 4]])
+        mat2 = Matrix([[5, 6], [7, 8]])
+        mat3 = mat1 * mat2
+        self.assertEqual(mat3.data, [[19.0, 22.0], [43.0, 50.0]])
+        self.assertEqual(mat3.shape, (2, 2))
 
-    def test_mul(self):
+        mat4 = Matrix([[1, 2, 3], [4, 5, 6]])
+        mat5 = Matrix([[1, 2], [3, 4], [5, 6]])
+        mat6 = mat4 * mat5
+        self.assertEqual(mat6.data, [[22.0, 28.0], [49.0, 64.0]])
+        self.assertEqual(mat6.shape, (2, 2))
 
-        matrix1 = Matrix([[1, 2], [3, 4]])
-        matrix2 = Matrix([[5, 6], [7, 8]])
-        scalar1 = 2
 
-        # Test matrix * matrix multiplication
-        result = matrix1 * matrix2
-        expected = Matrix([[19, 22], [43, 50]])
-        self.assertEqual(result, expected)
-
-        # Test matrix * scalar multiplication
-        result = matrix1 * scalar1
-        expected = Matrix([[2, 4], [6, 8]])
-        self.assertEqual(result, expected)
-
-        # Test invalid input type
-        with self.assertRaises(TypeError):
-            matrix1 * "string"
-
-        # Test invalid matrix dimensions
-        print(matrix1 * matrix1.T())
-
-    def test_rmul(self):
-
-        matrix1 = Matrix([[1, 2], [3, 4]])
-        scalar1 = 2
-
-        # Test scalar * matrix multiplication
-        result = scalar1 * matrix1
-        expected = Matrix([[2, 4], [6, 8]])
-        self.assertEqual(result, expected)
-
-        # Test invalid input type
-        with self.assertRaises(TypeError):
-            "string" * matrix1
-
-    def test_div(self):
-        matrix1 = Matrix(data=[[1, 2], [3, 4]])
-        result = matrix1 / 2
-        expected = Matrix([[0.5, 1.0], [1.5, 2.0]])
-        self.assertEqual(result.shape, expected.shape)
-        self.assertEqual(result.data, expected.data)
-
-        with self.assertRaises(TypeError):
-            matrix2 = Matrix(data=[[1.0, 2.0], [3, 4]])
-            matrix1 / matrix2
-
-        with self.assertRaises(TypeError):
-            matrix1 / "invalid"
-
-        with self.assertRaises(ZeroDivisionError):
-            matrix1 / 0
-
-    def test_rdiv(self):
-        matrix1 = Matrix(data=[[1, 2], [3, 4]])
-        result = 2 / matrix1
-        expected = Matrix([[2.0, 1.0], [2.0 / 3, 0.5]])
-        self.assertEqual(result.shape, expected.shape)
-        self.assertEqual(result.data, expected.data)
-
-        with self.assertRaises(TypeError):
-            "invalid" / matrix1
-
-        with self.assertRaises(ZeroDivisionError):
-            matrix2 = Matrix([[0, 1.0], [2.0 / 3, 0.5]])
-            2 / matrix2
-
-    def test_T(self):
-
-        matrix1 = Matrix([[1, 2], [3, 4]])
-        matrix1.T()
-        expected = Matrix([[1.0, 3.0], [2.0, 4.0]])
-        self.assertEqual(matrix1, expected)
-
-        matrix2 = Matrix([[5, 6, 7], [8, 9, 10]])
-        matrix2.T()
-        expected = Matrix([[5, 8], [6, 9], [7, 10]])
-        self.assertEqual(matrix2, expected)
-
-        matrix3 = Matrix([[1, 2], [3, 4], [5, 6]])
-        matrix3.T()
-        expected = Matrix([[1, 3, 5], [2, 4, 6]])
-        self.assertEqual(matrix3, expected)
-
-        matrix4 = Matrix([[1]])
-        matrix4.T()
-        expected = Matrix([[1]])
-        self.assertEqual(matrix4, expected)
 
 
 if __name__ == '__main__':

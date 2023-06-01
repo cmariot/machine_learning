@@ -14,7 +14,7 @@ class Matrix:
         elif data is not None and shape is not None:
             raise TypeError(
                 "Matrix() takes 1 positional argument but 2 were given")
-        elif data is not None:
+        if data is not None:
             self.__init_by_data(data)
         elif shape is not None:
             self.__init_by_shape(shape)
@@ -23,14 +23,20 @@ class Matrix:
         if (not isinstance(data, list)
                 or not all(isinstance(x, list) for x in data)):
             raise TypeError("Data must be a list of lists")
+        elif len(data) == 0:
+            raise ValueError("Data must not be empty")
         elif not all(len(x) == len(data[0]) for x in data):
             raise ValueError(
                 "Data must be a matrix, all rows must have the same length")
+        elif len(data[0]) == 0:
+            raise ValueError("Data must not be empty")
         elif not all(
                 isinstance(x, (int, float)) for row in data for x in row):
             raise TypeError("Data must contain only integers or floats")
         self.data = [[float(x) for x in row] for row in data]
         self.shape = (len(data), len(data[0]))
+        if self.shape[0] == 1 or self.shape[1] == 1:
+            self.__class__ = Vector
 
     def __init_by_shape(self, shape):
         if not isinstance(shape, tuple):
@@ -44,8 +50,10 @@ class Matrix:
         self.data = [[0.0 for _ in range(shape[1])]
                      for _ in range(shape[0])]
         self.shape = shape
+        if self.shape[0] == 1 or self.shape[1] == 1:
+            self.__class__ = Vector
 
-    # add : only matrices of same dimensions.
+    # add : only matrices/vectors of same dimensions.
     # __add__
     def __add__(self, other):
         if not isinstance(other, Matrix):
@@ -60,7 +68,7 @@ class Matrix:
     def __radd__(self, other):
         return self + other
 
-    # sub : only matrices of same dimensions.
+    # sub : only matrices/vectors of same dimensions.
     # __sub__
     def __sub__(self, other):
         if not isinstance(other, Matrix):
@@ -75,6 +83,60 @@ class Matrix:
     def __rsub__(self, other):
         return self - other
 
+    def scale(self, factor):
+        if not isinstance(factor, (int, float)):
+            raise TypeError("Can only scale a Matrix by a scalar")
+        return Matrix([[factor * x for x in row] for row in self.data])
+
+    def mul_by_vector(self, vector):
+        if not isinstance(vector, Vector):
+            raise TypeError("Can only multiply a Matrix by a Vector")
+        elif self.shape[1] != vector.shape[0]:
+            raise ValueError("Matrix and vector shapes do not match")
+        result = []
+        for i in range(self.shape[0]):
+            dot_product = sum([self.data[i][k] * vector.data[k][0]
+                               for k in range(self.shape[1])])
+            result.append([dot_product])
+        return Vector(result)
+
+    def mul_by_matrix(self, matrix):
+        if not isinstance(matrix, Matrix):
+            raise TypeError("Can only multiply a Matrix by a Matrix")
+        elif self.shape[1] != matrix.shape[0]:
+            raise ValueError("Matrix shapes do not match")
+
+        result = []
+        for i in range(self.shape[0]):
+            row = self.data[i]
+            new_row = []
+            for j in range(matrix.shape[1]):
+                col = [matrix.data[k][j] for k in range(matrix.shape[0])]
+                dot_product = sum([row[k] * col[k]
+                                   for k in range(self.shape[1])])
+                new_row.append(dot_product)
+            result.append(new_row)
+        return Matrix(result)
+
+    # mul : scalars, vectors and matrices,
+    # can have errors with vectors and matrices,
+    # returns a Vector if we perform Matrix * Vector mutliplication.
+    # __mul__
+    def __mul__(self, other):
+        if isinstance(other, Vector):
+            return self.mul_by_vector(other)
+        elif isinstance(other, Matrix):
+            return self.mul_by_matrix(other)
+        elif isinstance(other, (int, float)):
+            return self.scale(other)
+        else:
+            raise TypeError("Can only multiply a Matrix by a scalar, "
+                            "a Vector or a Matrix")
+
+    # __rmul__
+    def __rmul__(self, other):
+        return self * other
+
     # div : only scalars.
     # __truediv__
     def __truediv__(self, other):
@@ -86,62 +148,34 @@ class Matrix:
 
     # __rtruediv__
     def __rtruediv__(self, other):
-        if not isinstance(other, (int, float)):
-            raise TypeError("Can only divide a scalar by a Matrix")
-        elif any(0 in row for row in self.data):
-            raise ZeroDivisionError(
-                "Cannot divide by a Matrix with a 0 element")
-        
-        # Check the return value, not sure if it's correct.
-
-        return Matrix([[other / a for a in row] for row in self.data])
-
-    # mul : scalars, vectors and matrices,
-    # can have errors with vectors and matrices,
-    # returns a Vector if we perform Matrix * Vector mutliplication.
-    # __mul__
-    def __mul__(self, other):
-        if isinstance(other, Matrix):
-            if self.shape[1] != other.shape[0]:
-                raise ValueError("Can only multiply matrices" +
-                                 " if the number of columns of the first" +
-                                 " matrix is equal to the number of rows" +
-                                 " of the second matrix")
-            return Matrix([[sum(a * b for a, b in zip(x, y))
-                            for y in zip(*other.data)]
-                           for x in self.data])
-        elif isinstance(other, Vector):
-            if self.shape[1] != other.shape[0]:
-                raise ValueError("Can only multiply a matrix by a vector" +
-                                 " if the number of columns of the matrix" +
-                                 " is equal to the number of rows of" +
-                                 " the vector")
-            return Vector([sum(a * b for a, b in zip(x, other.data))
-                           for x in self.data])
-        elif isinstance(other, (int, float)):
-            return Matrix([[other * a for a in row] for row in self.data])
-        else:
-            raise TypeError("Can only multiply a Matrix by a scalar," +
-                            " a Vector or a Matrix")
-
-    # __rmul__
-    def __rmul__(self, other):
-        return self * other
+        raise TypeError("Cannot divide a scalar by a Matrix")
 
     # __str__ : print the matrix in a nice way.
     def __str__(self):
-        max_len = max(len(str(x)) for row in self.data for x in row) + 2
-        string = ""
-        for row in self.data:
-            string += "[ "
-            for x in row:
-                string += str(x).rjust(max_len)
-            string += "]\n"
-        return string[:-1]
+        ret: str = "[ "
+        for x in range(self.shape[1]):
+            if x != 0:
+                ret += "  [ "
+            else:
+                ret += "[ "
+            for y in range(self.shape[0]):
+                if y == self.shape[0] - 1:
+                    if x == self.shape[1] - 1:
+                        ret += f"{self.data[y][x]:.2f} ]"
+                    else:
+                        ret += f"{self.data[y][x]:.2f} ]\n"
+                else:
+                    ret += f"{self.data[y][x]:.2f}, "
+        ret += " ]"
+        return ret
 
     # __repr__
+    # (More precise than __str__)
     def __repr__(self):
-        return "Matrix(" + str(self.data) + ")"
+        if self.shape[0] == 1 or self.shape[1] == 1:
+            return "Vector(" + str(self.data) + ")"
+        else:
+            return "Matrix(" + str(self.data) + ")"
 
     # Transpose the matrix
     def T(self):
@@ -164,110 +198,25 @@ class Matrix:
 
 class Vector(Matrix):
 
-    def __init__(self, data):
-        if not isinstance(data, list):
-            raise TypeError("Data must be a list")
-        elif not all(isinstance(x, list) for x in data):
-            raise TypeError("Data must be a list of lists")
-        elif not all(isinstance(x, (int, float)) for row in data for x in row):
-            raise TypeError("Data must be a list of lists of numbers")
+    """
+    A vector is a matrix with only one column.
 
-        if len(data) == 1:
-            super().__init__(data, (1, len(data[0])))
-        else:
-            if not all(len(row) == 1 for row in data):
-                raise ValueError("Data must be a list of lists of size (n, 1)")
-            super().__init__(data, (len(data), 1))
+    """
 
-    # add : only vectors of same dimensions.
-    # __add__
-    def __add__(self, other):
-        if not isinstance(other, Vector):
-            raise TypeError("Can only add a Vector to a Vector")
-        elif self.shape != other.shape:
-            raise ValueError("Can only add vectors of same shape")
+    def __init__(self,
+                 data: 'list[list[float]]' = None,
+                 shape: 'tuple[int, int]' = None):
+        super().__init__(data=data, shape=shape)
+        if self.shape[0] != 1 and self.shape[1] != 1:
+            raise ValueError("A vector must have only one column")
 
-        return Vector([[a + b] for a, b in zip(self.data, other.data)])
-
-    # __radd__
-    def __radd__(self, other):
-        return self + other
-
-    # sub : only vectors of same dimensions.
-    # __sub__
-    def __sub__(self, other):
-        if not isinstance(other, Vector):
-            raise TypeError("Can only subtract a Vector from a Vector")
-        elif self.shape != other.shape:
-            raise ValueError("Can only subtract vectors of same shape")
-
-        return Vector([[a - b] for a, b in zip(self.data, other.data)])
-
-    # __rsub__
-    def __rsub__(self, other):
-        return self - other
-
-    # div : only scalars.
-    # __truediv__
-    def __truediv__(self, other):
-        if not isinstance(other, (int, float)):
-            raise TypeError("Can only divide a Vector by a scalar")
-        elif other == 0:
-            raise ZeroDivisionError("Cannot divide a Vector by 0")
-        return self * (1 / other)
-
-    # __rtruediv__
-    def __rtruediv__(self, other):
-        if not isinstance(other, (int, float)):
-            raise TypeError("Can only divide a scalar by a Vector")
-        elif any(0 in row for row in self.data):
-            raise ZeroDivisionError(
-                "Cannot divide by a Vector with a 0 element")
-        return Vector([[other / a] for a in self.data])
-
-    # mul : scalars, vectors and matrices,
-    # can have errors with vectors and matrices,
-    # returns a Vector if we perform Matrix * Vector mutliplication.
-    # __mul__
-    def __mul__(self, other):
-        if isinstance(other, Matrix):
-            if self.shape[0] != other.shape[1]:
-                raise ValueError("Can only multiply a vector by a matrix" +
-                                 " if the number of rows of the vector" +
-                                 " is equal to the number of columns of" +
-                                 " the matrix")
-            return Vector([[sum(a * b for a, b in zip(x, other.data))]
-                           for x in self.data])
-        elif isinstance(other, Vector):
-            if self.shape != other.shape:
-                raise ValueError("Can only multiply vectors of same shape")
-            return sum(a * b for a, b in zip(self.data, other.data))
-        elif isinstance(other, (int, float)):
-            return Vector([[other * a] for a in self.data])
-        else:
-            raise TypeError("Can only multiply a Vector by a scalar," +
-                            " a Vector or a Matrix")
-
-    # __rmul__
-    def __rmul__(self, other):
-        return self * other
-
-    # __str__
-    def __str__(self):
-        max_len = max(len(str(x)) for x in self.data) + 2
-        string = "[ "
-        for x in self.data:
-            string += str(x).rjust(max_len)
-        string += "]"
-        return string
-
-    # __repr__
-    def __repr__(self):
-        return "Vector(" + str(self.data) + ")"
-
-    # Dot product
     def dot(self, other):
-        return self * other
+        if not isinstance(other, Vector):
+            raise TypeError("Can only dot a Vector with a Vector")
+        elif self.shape != other.shape:
+            raise ValueError("Can only dot vectors of same shape")
+        return sum([self.data[i][0] * other.data[i][0]
+                    for i in range(self.shape[0])])
 
     # Cross product
     def cross(self, other):
@@ -275,11 +224,83 @@ class Vector(Matrix):
             raise TypeError("Can only cross a Vector with a Vector")
         elif self.shape != other.shape:
             raise ValueError("Can only cross vectors of same shape")
-        elif self.shape != (3, 1):
-            raise ValueError("Can only cross vectors of shape (3, 1)")
-        return Vector([[self.data[1][0] * other.data[2][0] -
-                        self.data[2][0] * other.data[1][0]],
-                       [self.data[2][0] * other.data[0][0] -
-                        self.data[0][0] * other.data[2][0]],
-                       [self.data[0][0] * other.data[1][0] -
-                        self.data[1][0] * other.data[0][0]]])
+        elif self.shape != (3, 1) and self.shape != (1, 3):
+            raise ValueError(
+                "Can only cross vectors of shape (3, 1) or (1, 3)")
+        if self.shape == (1, 3):
+            return Vector([
+                self.data[0] * other.data[1] - self.data[1] * other.data[0],
+                self.data[1] * other.data[2] - self.data[2] * other.data[1],
+                self.data[2] * other.data[0] - self.data[0] * other.data[2]
+            ])
+        else:
+            return Vector([
+                [self.data[1][0] * other.data[2][0]
+                 - self.data[2][0] * other.data[1][0]],
+                [self.data[2][0] * other.data[0][0]
+                 - self.data[0][0] * other.data[2][0]],
+                [self.data[0][0] * other.data[1][0]
+                 - self.data[1][0] * other.data[0][0]]
+            ])
+
+
+if __name__ == "__main__":
+
+    # Subject tests part 1
+    print("Subjet tests part 2")
+    print("Matrix M1 :")
+    m1 = Matrix([[0.0, 1.0], [2.0, 3.0], [4.0, 5.0]])
+    print(str(m1))
+    print("M1 shape =", m1.shape)
+    print("Transposition of M1 :")
+    print(str(m1.T()))
+    print("M1 shape =", m1.shape)
+
+    # Subject tests part 2
+    print("\nSubjet tests part 2")
+    print("Matrix M2 :")
+    m2 = Matrix([[0., 2., 4.], [1., 3., 5.]])
+    print(str(m2))
+    print("M2 shape =", m2.shape)
+    print("Transposition of M2 :")
+    print(str(m2.T()))
+    print("M2 shape =", m2.shape)
+
+    # Subject tests part 3
+    print("\nSubjet tests part 3")
+    m3 = Matrix([[0.0, 1.0, 2.0, 3.0],
+                [0.0, 2.0, 4.0, 6.0]])
+
+    m4 = Matrix([[0.0, 1.0],
+                [2.0, 3.0],
+                [4.0, 5.0],
+                [6.0, 7.0]])
+    m5 = m3 * m4
+    print(str(m5))
+
+    # Subject tests part 4
+    print("\nSubjet tests part 4")
+    print("Matrix M6 :")
+    m6 = Matrix([[0.0, 1.0, 2.0],
+                [0.0, 2.0, 4.0]])
+    print(str(m6))
+    print("M6 shape =", m6.shape)
+    print("Vector V1 :")
+    v1 = Vector([[1], [2], [3]])
+    print(str(v1))
+    print("V1 shape =", v1.shape)
+    print("Multiplication of M6 and V1 :")
+    print(str(m6 * v1))
+
+    # Subject tests part 5
+    print("\nSubjet tests part 5")
+    print("Vector V2 :")
+    v2 = Vector([[1], [2], [3]])
+    print(str(v2))
+    print("V2 shape =", v2.shape)
+    print("Vector V3 :")
+    v3 = Vector([[2], [4], [8]])
+    print(str(v3))
+    print("V3 shape =", v3.shape)
+    print("Addition of V2 and V3 :")
+    print(str(v2 + v3))
