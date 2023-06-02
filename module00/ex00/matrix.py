@@ -95,28 +95,29 @@ class Matrix:
             raise ValueError("Matrix and vector shapes do not match")
         result = []
         for i in range(self.shape[0]):
-            dot_product = sum([self.data[i][k] * vector.data[k][0]
-                               for k in range(self.shape[1])])
-            result.append([dot_product])
-        return Vector(result)
+            val = 0
+            for j in range(self.shape[1]):
+                val += self.data[i][j] * vector.data[i][0]
+            result.append([val])
+        return Matrix(result)
 
     def mul_by_matrix(self, matrix):
         if not isinstance(matrix, Matrix):
             raise TypeError("Can only multiply a Matrix by a Matrix")
         elif self.shape[1] != matrix.shape[0]:
             raise ValueError("Matrix shapes do not match")
-
-        result = []
-        for i in range(self.shape[0]):
-            row = self.data[i]
-            new_row = []
-            for j in range(matrix.shape[1]):
-                col = [matrix.data[k][j] for k in range(matrix.shape[0])]
-                dot_product = sum([row[k] * col[k]
-                                   for k in range(self.shape[1])])
-                new_row.append(dot_product)
-            result.append(new_row)
-        return Matrix(result)
+        data = []
+        for i in range(self.shape[1]):
+            for j in range(self.shape[0]):
+                line = []
+                val = 0
+                y = matrix.data[j][i]
+                for k in range(self.shape[1]):
+                    x = self.data[j][k]
+                    val += y * x
+                line.append(val)
+            data.append(line)
+        return Matrix(data)
 
     # mul : scalars, vectors and matrices,
     # can have errors with vectors and matrices,

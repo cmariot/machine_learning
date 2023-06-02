@@ -228,10 +228,15 @@ class TestMatrix(unittest.TestCase):
         self.assertEqual(vec4.shape, (1, 2))
 
     def test_matrix_matrix_multiplication(self):
-        mat1 = Matrix([[1, 2], [3, 4]])
-        mat2 = Matrix([[5, 6], [7, 8]])
-        mat3 = mat1 * mat2
-        self.assertEqual(mat3.data, [[19.0, 22.0], [43.0, 50.0]])
+        m1 = Matrix([[0.0, 1.0, 2.0, 3.0],
+                     [0.0, 2.0, 4.0, 6.0]])
+        m2 = Matrix([[0.0, 1.0],
+                     [2.0, 3.0],
+                     [4.0, 5.0],
+                     [6.0, 7.0]])
+        mat3 = m1 * m2
+        expected = Matrix([[28., 34.], [56., 68.]])
+        self.assertEqual(mat3.data, expected.data)
         self.assertEqual(mat3.shape, (2, 2))
 
         mat4 = Matrix([[1, 2, 3], [4, 5, 6]])
@@ -239,8 +244,6 @@ class TestMatrix(unittest.TestCase):
         mat6 = mat4 * mat5
         self.assertEqual(mat6.data, [[22.0, 28.0], [49.0, 64.0]])
         self.assertEqual(mat6.shape, (2, 2))
-
-
 
 
 if __name__ == '__main__':
