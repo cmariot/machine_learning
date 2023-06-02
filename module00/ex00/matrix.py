@@ -83,40 +83,41 @@ class Matrix:
     def __rsub__(self, other):
         return self - other
 
-    def scale(self, factor):
-        if not isinstance(factor, (int, float)):
-            raise TypeError("Can only scale a Matrix by a scalar")
-        return Matrix([[factor * x for x in row] for row in self.data])
-
+    # Multplies a matrix by a vector.
     def mul_by_vector(self, vector):
         if not isinstance(vector, Vector):
             raise TypeError("Can only multiply a Matrix by a Vector")
         elif self.shape[1] != vector.shape[0]:
             raise ValueError("Matrix and vector shapes do not match")
-        result = []
+        data = []
         for i in range(self.shape[0]):
             val = 0
             for j in range(self.shape[1]):
-                val += self.data[i][j] * vector.data[i][0]
-            result.append([val])
-        return Matrix(result)
+                val += self.data[i][j] * vector.data[j][0]
+            data.append([val])
+        return Vector(data)
 
+    # Multiplies a matrix by a scalar.
+    def scale(self, factor):
+        if not isinstance(factor, (int, float)):
+            raise TypeError("Can only scale a Matrix by a scalar")
+        return Matrix([[factor * x for x in row] for row in self.data])
+
+    # Multiplies a matrix by a matrix.
     def mul_by_matrix(self, matrix):
         if not isinstance(matrix, Matrix):
             raise TypeError("Can only multiply a Matrix by a Matrix")
         elif self.shape[1] != matrix.shape[0]:
             raise ValueError("Matrix shapes do not match")
         data = []
-        for i in range(self.shape[1]):
-            for j in range(self.shape[0]):
-                line = []
+        for i in range(self.shape[0]):
+            row = []
+            for j in range(matrix.shape[1]):
                 val = 0
-                y = matrix.data[j][i]
                 for k in range(self.shape[1]):
-                    x = self.data[j][k]
-                    val += y * x
-                line.append(val)
-            data.append(line)
+                    val += self.data[i][k] * matrix.data[k][j]
+                row.append(val)
+            data.append(row)
         return Matrix(data)
 
     # mul : scalars, vectors and matrices,
@@ -153,21 +154,11 @@ class Matrix:
 
     # __str__ : print the matrix in a nice way.
     def __str__(self):
-        ret: str = "[ "
-        for x in range(self.shape[1]):
-            if x != 0:
-                ret += "  [ "
-            else:
-                ret += "[ "
-            for y in range(self.shape[0]):
-                if y == self.shape[0] - 1:
-                    if x == self.shape[1] - 1:
-                        ret += f"{self.data[y][x]:.2f} ]"
-                    else:
-                        ret += f"{self.data[y][x]:.2f} ]\n"
-                else:
-                    ret += f"{self.data[y][x]:.2f}, "
-        ret += " ]"
+        ret = type(self).__name__ + "(\n"
+        for row in self.data:
+            ret += " " + str(row) + "\n"
+        ret += ")"
+
         return ret
 
     # __repr__
@@ -248,7 +239,7 @@ class Vector(Matrix):
 if __name__ == "__main__":
 
     # Subject tests part 1
-    print("Subjet tests part 2")
+    print("Subjet tests part 1")
     print("Matrix M1 :")
     m1 = Matrix([[0.0, 1.0], [2.0, 3.0], [4.0, 5.0]])
     print(str(m1))

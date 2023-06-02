@@ -215,17 +215,13 @@ class TestMatrix(unittest.TestCase):
             vec1.scale('2')
 
     def test_matrix_vector_multiplication(self):
-        mat1 = Matrix([[1, 2], [3, 4]])
-        vec1 = Vector([[1], [2]])
-        vec2 = mat1 * vec1
-        self.assertEqual(vec2.data, [[5.0], [11.0]])
-        self.assertEqual(vec2.shape, (2, 1))
-
-        mat2 = Matrix([[1]])
-        vec3 = Vector([[1, 2, 3]])
-        vec4 = mat2 * vec3
-        self.assertEqual(vec4.data, [[14.0, 32.0]])
-        self.assertEqual(vec4.shape, (1, 2))
+        m1 = Matrix([[0.0, 1.0, 2.0],
+                     [0.0, 2.0, 4.0]])
+        v1 = Vector([[1], [2], [3]])
+        expected = [[8.0], [16.0]]
+        actual = m1 * v1
+        self.assertEqual(actual.data, expected)
+        self.assertEqual(actual.shape, (2, 1))
 
     def test_matrix_matrix_multiplication(self):
         m1 = Matrix([[0.0, 1.0, 2.0, 3.0],
