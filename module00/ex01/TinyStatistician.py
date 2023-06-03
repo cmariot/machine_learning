@@ -1,3 +1,6 @@
+import unittest
+
+
 class TinyStatistician:
 
     @staticmethod
@@ -16,11 +19,10 @@ class TinyStatistician:
         """
         if TinyStatistician.__invalid_input(x):
             return None
-        list_len: int = len(x)
-        sum: float = 0.0
+        total = 0
         for i in x:
-            sum += i
-        return float(sum / list_len)
+            total += i
+        return float(total / len(x))
 
     def median(self, x) -> float:
         """
@@ -28,11 +30,10 @@ class TinyStatistician:
         """
         if TinyStatistician.__invalid_input(x):
             return None
-        list_len = len(x)
         x.sort()
-        middle = list_len // 2
-        if list_len % 2 == 0:
-            return float(x[middle - 1] + x[middle]) / 2
+        middle = len(x) // 2
+        if len(x) % 2 == 0:
+            return (x[middle - 1] + x[middle]) / 2
         else:
             return float(x[middle])
 
@@ -43,11 +44,15 @@ class TinyStatistician:
         """
         if TinyStatistician.__invalid_input(x):
             return None
-        list_len = len(x)
         x.sort()
-        first_quartile_index = list_len // 4
+        first_quartile_index, rem = divmod(len(x), 4)
+        if rem == 0:
+            third_quartile_index = first_quartile_index * 3 - 1
+            first_quartile_index -= 1
+        else:
+            third_quartile_index = first_quartile_index * 3
         return [float(x[first_quartile_index]),
-                float(x[first_quartile_index * 3])]
+                float(x[third_quartile_index])]
 
     def percentile(self, x, percentile) -> float:
         """
@@ -94,6 +99,146 @@ class TinyStatistician:
         return var ** 0.5
 
 
+class TestTinyStatistician(unittest.TestCase):
+    def setUp(self):
+        self.ts = TinyStatistician()
+
+    def test_mean(self):
+        self.assertAlmostEqual(
+            self.ts.mean([1, 2, 3, 4, 5]), 3.0)
+        self.assertAlmostEqual(
+            self.ts.mean([1.5, 2.5, 3.5, 4.5, 5.5]), 3.5)
+        self.assertAlmostEqual(
+            self.ts.mean([1, 2, 3, 4, 5, 6]), 3.5)
+        self.assertAlmostEqual(
+            self.ts.mean([1.5, 2.5, 3.5, 4.5, 5.5, 6.5]), 4.0)
+        self.assertAlmostEqual(
+            self.ts.mean([1, 2, 3, 4, 5, 6, 7]), 4.0)
+        self.assertAlmostEqual(
+            self.ts.mean([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5]), 4.5)
+        self.assertAlmostEqual(
+            self.ts.mean([1, 2, 3, 4, 5, 6, 7, 8]), 4.5)
+        self.assertAlmostEqual(
+            self.ts.mean([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5]), 5.0)
+        self.assertAlmostEqual(
+            self.ts.mean([1, 2, 3, 4, 5, 6, 7, 8, 9]), 5.0)
+        self.assertAlmostEqual(
+            self.ts.mean([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]), 5.5)
+
+    def test_mean_with_invalid_input(self):
+        self.assertIsNone(self.ts.mean([]))
+        self.assertIsNone(self.ts.mean([1, 2, 'a', 4, 5]))
+        self.assertIsNone(self.ts.mean('1, 2, 3, 4, 5'))
+
+    def test_median(self):
+        self.assertAlmostEqual(
+            self.ts.median([1, 2, 3, 4, 5]), 3.0)
+        self.assertAlmostEqual(
+            self.ts.median([1.5, 2.5, 3.5, 4.5, 5.5]), 3.5)
+        self.assertAlmostEqual(
+            self.ts.median([1, 2, 3, 4, 5, 6]), 3.5)
+        self.assertAlmostEqual(
+            self.ts.median([1.5, 2.5, 3.5, 4.5, 5.5, 6.5]), 4.0)
+        self.assertAlmostEqual(
+            self.ts.median([1, 2, 3, 4, 5, 6, 7]), 4.0)
+        self.assertAlmostEqual(
+            self.ts.median([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5]), 4.5)
+        self.assertAlmostEqual(
+            self.ts.median([1, 2, 3, 4, 5, 6, 7, 8]), 4.5)
+        self.assertAlmostEqual(
+            self.ts.median([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5]), 5.0)
+        self.assertAlmostEqual(
+            self.ts.median([1, 2, 3, 4, 5, 6, 7, 8, 9]), 5.0)
+        self.assertAlmostEqual(
+            self.ts.median([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]), 5.5)
+
+    def test_median_with_invalid_input(self):
+        self.assertIsNone(self.ts.median([]))
+        self.assertIsNone(self.ts.median([1, 2, 'a', 4, 5]))
+        self.assertIsNone(self.ts.median('1, 2, 3, 4, 5'))
+
+    def test_quartile(self):
+        self.assertEqual(
+            self.ts.quartile([1, 42, 300, 10, 59]), [10.0, 59.0])
+        self.assertEqual(
+            self.ts.quartile([1, 2, 3, 4, 5, 6, 7, 8, 9]), [3.0, 7.0])
+
+    def test_quartile_with_invalid_input(self):
+        self.assertIsNone(self.ts.quartile([]))
+        self.assertIsNone(self.ts.quartile([1, 2, 'a', 4, 5]))
+        self.assertIsNone(self.ts.quartile('1, 2, 3, 4, 5'))
+
+    def test_percentile(self):
+        self.assertAlmostEqual(
+            self.ts.percentile([1, 2, 3, 4, 5], 10), 1.4)
+        self.assertAlmostEqual(
+            self.ts.percentile([1, 2, 3, 4, 5, 6], 10), 1.5)
+        self.assertAlmostEqual(
+            self.ts.percentile([1, 2, 3, 4, 5, 6, 7], 10), 1.6)
+        self.assertAlmostEqual(
+            self.ts.percentile([1, 2, 3, 4, 5, 6, 7, 8], 10), 1.7)
+        self.assertAlmostEqual(
+            self.ts.percentile([1, 2, 3, 4, 5, 6, 7, 8, 9], 10), 1.8)
+
+    def test_percentile_with_invalid_input(self):
+        self.assertIsNone(
+            self.ts.percentile([], 10))
+        self.assertIsNone(
+            self.ts.percentile([1, 2, 'a', 4, 5], 10))
+        self.assertIsNone(
+            self.ts.percentile('1, 2, 3, 4, 5', 10))
+        self.assertIsNone(
+            self.ts.percentile([1, 2, 3, 4, 5], 'a'))
+        self.assertIsNone(
+            self.ts.percentile([1, 2, 3, 4, 5], -10))
+        self.assertIsNone(
+            self.ts.percentile([1, 2, 3, 4, 5], 110))
+
+    def test_var(self):
+        self.assertAlmostEqual(
+            self.ts.var([1, 2, 3, 4, 5]), 2.5)
+        self.assertAlmostEqual(
+            self.ts.var([1.5, 2.5, 3.5, 4.5, 5.5]), 2.5)
+        self.assertAlmostEqual(
+            self.ts.var([1, 2, 3, 4, 5, 6]), 3.5)
+        self.assertAlmostEqual(
+            self.ts.var([1.5, 2.5, 3.5, 4.5, 5.5, 6.5]), 3.5)
+
+    def test_var_with_invalid_input(self):
+        self.assertIsNone(self.ts.var([]))
+        self.assertIsNone(self.ts.var([1, 2, 'a', 4, 5]))
+        self.assertIsNone(self.ts.var('1, 2, 3, 4, 5'))
+
+    def test_std(self):
+        self.assertAlmostEqual(
+            self.ts.std([1, 2, 3, 4, 5]), 1.5811, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1.5, 2.5, 3.5, 4.5, 5.5]), 1.5811, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1, 2, 3, 4, 5, 6]), 1.8708, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1.5, 2.5, 3.5, 4.5, 5.5, 6.5]), 1.8708, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1, 2, 3, 4, 5, 6, 7]), 2.1602, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5]), 2.1602, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1, 2, 3, 4, 5, 6, 7, 8]), 2.4495, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5]),
+            2.4495, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1, 2, 3, 4, 5, 6, 7, 8, 9]), 2.7386, places=4)
+        self.assertAlmostEqual(
+            self.ts.std([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]),
+            2.7386, places=4)
+
+    def test_std_with_invalid_input(self):
+        self.assertIsNone(self.ts.std([]))
+        self.assertIsNone(self.ts.std([1, 2, 'a', 4, 5]))
+        self.assertIsNone(self.ts.std('1, 2, 3, 4, 5'))
+
+
 if __name__ == "__main__":
     a = [1, 42, 300, 10, 59]
     print(TinyStatistician().mean(a))
@@ -120,3 +265,5 @@ if __name__ == "__main__":
     print(TinyStatistician().std(a))
     # Output:
     # 123.89229193133849
+
+    unittest.main()
