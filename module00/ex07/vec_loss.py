@@ -17,14 +17,13 @@ def loss_elem_(y, y_hat):
         Raises:
             This function should not raise any Exception.
     """
-    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
-        return None
+    for arr in [y, y_hat]:
+        if not isinstance(arr, np.ndarray):
+            return None
     m = y.shape[0]
     if m == 0:
         return None
     if y.shape != (m, 1) or y_hat.shape != (m, 1):
-        return None
-    if np.isreal(y).all() is False or np.isreal(y_hat).all() is False:
         return None
     return (y_hat - y) ** 2
 

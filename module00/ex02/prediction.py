@@ -16,27 +16,21 @@ def simple_predict(x: np.ndarray, theta: np.ndarray) -> np.ndarray:
       This function should not raise any Exception
     """
 
-    # Check if x and theta are numpy.ndarray
-    if not isinstance(x, np.ndarray) or not isinstance(theta, np.ndarray):
-        return None
+    # Check if x and theta are numpy.ndarray, if they are not empty and
+    # if they are array of numbers
+    for arr in [x, theta]:
+        if not isinstance(arr, np.ndarray):
+            return None
+        if arr.size == 0:
+            return None
 
     # Check the dimension of x and theta
-    m = x.shape[0]
-    if m == 0:
-        return None
-    elif x.shape != (m, ) or theta.shape != (2, ):
+    if x.ndim != 1 or theta.size != 2 or theta.ndim != 1:
         return None
 
-    # Check if x and theta are float or int array
-    if np.isreal(x).all() is False or np.isreal(theta).all() is False:
-        return None
-
-    # Create a numpy.ndarray of prediction
-    y_hat = np.ndarray(m)
-
-    # Compute y_hat, the vector of prediction
-    # y_hat = theta[0] + theta[1] * x
-    for i in range(m):
+    # Compute y_hat, the vector of prediction as ndarray of float
+    y_hat = np.zeros(x.shape[0], dtype=float)
+    for i in range(x.shape[0]):
         y_hat[i] = theta[0] + theta[1] * x[i]
 
     return y_hat

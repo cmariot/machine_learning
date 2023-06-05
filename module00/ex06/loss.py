@@ -13,10 +13,8 @@ def add_intercept(x) -> Union[np.ndarray, None]:
           This function should not raise any Exception.
     """
     if not isinstance(x, np.ndarray):
-        print("Not ndarray")
         return None
     if x.size == 0:
-        print("Empty array")
         return None
     return np.c_[np.ones(x.shape[0]), x]
 
@@ -40,7 +38,6 @@ def predict_(
 
     # Check if theta is a numpy.ndarray
     if not isinstance(theta, np.ndarray):
-        print("Not ndarray")
         return None
 
     # Add a column of ones to the vector x
@@ -53,12 +50,6 @@ def predict_(
     # Check the dimension of x and theta
     m = x.shape[0]
     if x.shape != (m, 1) or theta.shape != (2, 1):
-        print("Not same shape in predict_")
-        return None
-
-    # Check if x and theta are numpy.ndarray of float or int
-    if np.isreal(x).all() is False or np.isreal(theta).all() is False:
-        print("Not real")
         return None
 
     # Compute y_hat, the vector of prediction with a matrix multiplication
@@ -67,7 +58,7 @@ def predict_(
     return y_hat
 
 
-def loss_elem_(y, y_hat):
+def loss_elem_(y: np.ndarray, y_hat: np.ndarray) -> Union[np.ndarray, None]:
     """
         Description:
             Calculates all the elements (y_pred - y)^2 of the
@@ -83,15 +74,15 @@ def loss_elem_(y, y_hat):
         Raises:
             This function should not raise any Exception.
     """
-    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
-        return None
+    for arr in [y, y_hat]:
+        if not isinstance(arr, np.ndarray):
+            return None
     m = y.shape[0]
     if m == 0:
         return None
     if y.shape != (m, 1) or y_hat.shape != (m, 1):
         return None
-    if np.isreal(y).all() is False or np.isreal(y_hat).all() is False:
-        return None
+
     return (y_hat - y) ** 2
 
 
@@ -112,8 +103,7 @@ def loss_(y, y_hat):
     loss_elem = loss_elem_(y, y_hat)
     if loss_elem is None:
         return None
-    m = y.shape[0]
-    J_value = np.sum(loss_elem) / (2 * m)
+    J_value = np.mean(loss_elem) / 2
     return J_value
 
 

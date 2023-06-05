@@ -45,14 +45,16 @@ class TinyStatistician:
         if TinyStatistician.__invalid_input(x):
             return None
         x.sort()
-        first_quartile_index, rem = divmod(len(x), 4)
-        if rem == 0:
-            third_quartile_index = first_quartile_index * 3 - 1
-            first_quartile_index -= 1
+        middle = len(x) // 2
+        Q1_index = middle // 2
+        Q3_index = middle + Q1_index
+        if len(x) % 2 == 0:
+            Q1 = (x[Q1_index - 1] + x[Q1_index]) / 2
+            Q3 = (x[Q3_index - 1] + x[Q3_index]) / 2
         else:
-            third_quartile_index = first_quartile_index * 3
-        return [float(x[first_quartile_index]),
-                float(x[third_quartile_index])]
+            Q1 = x[Q1_index]
+            Q3 = x[Q3_index]
+        return [float(Q1), float(Q3)]
 
     def percentile(self, x, percentile) -> float:
         """
@@ -162,6 +164,10 @@ class TestTinyStatistician(unittest.TestCase):
             self.ts.quartile([1, 42, 300, 10, 59]), [10.0, 59.0])
         self.assertEqual(
             self.ts.quartile([1, 2, 3, 4, 5, 6, 7, 8, 9]), [3.0, 7.0])
+        self.assertEqual(
+            self.ts.quartile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), [2.5, 7.5])
+        self.assertEqual(
+            self.ts.quartile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]), [3.0, 8.0])
 
     def test_quartile_with_invalid_input(self):
         self.assertIsNone(self.ts.quartile([]))

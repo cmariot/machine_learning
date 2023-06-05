@@ -53,10 +53,6 @@ def predict_(
     if x.shape != (m, ) or theta.shape != (2, ):
         return None
 
-    # Check if x and theta are numpy.ndarray of float or int
-    if np.isreal(x).all() is False or np.isreal(theta).all() is False:
-        return None
-
     # Compute y_hat, the vector of prediction with a matrix multiplication
     y_hat = np.matmul(X, theta)
 
@@ -85,8 +81,6 @@ def loss_elem_(y, y_hat):
     if m == 0:
         return None
     if y.shape != (m, ) or y_hat.shape != (m, ):
-        return None
-    if np.isreal(y).all() is False or np.isreal(y_hat).all() is False:
         return None
     return (y_hat - y) ** 2
 
@@ -130,26 +124,14 @@ def plot_with_loss(x, y, theta):
         This function should not raise any Exception.
     """
 
-    if not isinstance(x, np.ndarray):
-        return None
-    elif not isinstance(y, np.ndarray):
-        return None
-    elif not isinstance(theta, np.ndarray):
+    # Check the input arguments
+    if not all(isinstance(arr, np.ndarray) for arr in [x, y, theta]):
         return None
 
-    if x.size == 0 or y.size == 0:
-        return None
-    elif x.shape != y.shape:
+    if any(arr.size == 0 for arr in [x, y]):
         return None
 
-    if (x.shape != (x.size, )
-        or y.shape != (y.size, )
-            or theta.shape != (2, )):
-        return None
-
-    if (np.isreal(x).all() is False
-        or np.isreal(y).all() is False
-            or np.isreal(theta).all() is False):
+    if any(arr.shape != (arr.size,) for arr in [x, y]) or theta.shape != (2,):
         return None
 
     # Predict y_hat
@@ -168,14 +150,11 @@ def plot_with_loss(x, y, theta):
     for i in range(x.shape[0]):
         plt.plot([x[i], x[i]], [y[i], y_hat[i]], 'r--')
 
-    # Compute the value of J_theta
-    cost = loss_(y, y_hat) * 2
-
-    if cost is None:
-        return None
+    # Compute the value of the loss
+    loss = loss_(y, y_hat) * 2
 
     # Add a title
-    plt.title("Cost : {}".format(cost))
+    plt.title("Cost : {}".format(loss))
 
     plt.show()
 

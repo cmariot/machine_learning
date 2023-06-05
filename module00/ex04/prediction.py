@@ -52,12 +52,8 @@ def predict_(
     if x.shape != (m, ) or theta.shape != (2, ):
         return None
 
-    # Check if x and theta are numpy.ndarray of float or int
-    if np.isreal(x).all() is False or np.isreal(theta).all() is False:
-        return None
-
     # Compute y_hat, the vector of prediction with a matrix multiplication
-    y_hat = np.matmul(X, theta)
+    y_hat = X.dot(theta)
 
     return y_hat
 

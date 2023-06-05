@@ -16,20 +16,14 @@ def plot(x, y, theta):
         This function should not raise any Exceptions.
     """
 
-    if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray) \
-            or not isinstance(theta, np.ndarray):
-        print("x, y and theta must be numpy.ndarray")
-        return None
-    elif x.size == 0 or y.size == 0 or theta.size == 0:
-        print("x, y and theta must be non-empty numpy.ndarray")
-        return None
-    elif x.shape != (x.size, ) or y.shape != (y.size, ) \
+    for arr in [x, y, theta]:
+        if not isinstance(arr, np.ndarray):
+            return None
+        if arr.size == 0:
+            return None
+
+    if not np.all([arr.shape == (arr.size,) for arr in [x, y]]) \
             or theta.shape != (2, 1):
-        print("x, y and theta must be numpy.ndarray of dimension 1")
-        return None
-    elif np.isreal(x).all() is False or np.isreal(y).all() is False \
-            or np.isreal(theta).all() is False:
-        print("x, y and theta must be numpy.ndarray of float or int")
         return None
 
     # Plot the data and prediction line
