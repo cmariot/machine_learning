@@ -17,7 +17,7 @@ class TinyStatistician:
         """
         Computes the mean of a given non-empty list of int or float.
         """
-        if TinyStatistician.__invalid_input(x):
+        if self.__invalid_input(x):
             return None
         total = 0
         for i in x:
@@ -28,7 +28,7 @@ class TinyStatistician:
         """
         Computes the median of a given non-empty list of int or float.
         """
-        if TinyStatistician.__invalid_input(x):
+        if self.__invalid_input(x):
             return None
         x.sort()
         middle = len(x) // 2
@@ -42,7 +42,7 @@ class TinyStatistician:
         Computes the quartiles Q1 and Q3 of a given non-empty list of
         int or float.
         """
-        if TinyStatistician.__invalid_input(x):
+        if self.__invalid_input(x):
             return None
         x.sort()
         middle = len(x) // 2
@@ -63,7 +63,7 @@ class TinyStatistician:
         uses a different definition of percentile, it does linear
         interpolation between the two closest list element to the percentile.
         """
-        if TinyStatistician.__invalid_input(x):
+        if self.__invalid_input(x):
             return None
         elif not isinstance(percentile, int):
             return None
@@ -84,7 +84,7 @@ class TinyStatistician:
         Note:
         uses the unbiased estimator (divides by n - 1).
         """
-        if TinyStatistician.__invalid_input(x):
+        if self.__invalid_input(x):
             return None
         mean = TinyStatistician.mean(self, x)
         diff = sum((i - mean) ** 2 for i in x)
