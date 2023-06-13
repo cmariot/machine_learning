@@ -35,8 +35,9 @@ def simple_gradient(x, y, theta):
     gradient = np.zeros((2, 1))
     J0 = J1 = 0
     for i in range(m):
-        J0 += (theta[0] + theta[1] * x[i] - y[i])
-        J1 += (theta[0] + theta[1] * x[i] - y[i]) * x[i]
+        h0 = theta[0] + theta[1] * x[i]
+        J0 += (h0 - y[i])
+        J1 += (h0 - y[i]) * x[i]
     gradient[0] = J0 / m
     gradient[1] = J1 / m
     return gradient

@@ -109,6 +109,9 @@ if __name__ == "__main__":
     y_hat = linear_model.predict_(Xpill)
     loss = linear_model.loss_(Yscore, y_hat)
 
+    print("theta0 = {:f}, theta1 = {:f}, loss = {:f}".format(
+        linear_model.thetas[0][0], linear_model.thetas[1][0], loss))
+
     # Plot the result
     plt.plot(Xpill, Yscore, 'bo')
     plt.plot(Xpill, y_hat, 'xg--')
@@ -118,4 +121,26 @@ if __name__ == "__main__":
     plt.title("Linear regression of space driving score\n"
               + "depending on quantity of blue pill")
 
+    plt.show()
+
+    # Plot evolution of the loss function J as a function of θ1
+    # for different values of θ0
+    some_thetas_zero = [85, 87.5, 90, 92.5, 95]
+    for theta_zero in some_thetas_zero:
+        loss_values = []
+        theta_one_values = np.arange(-14, -4, 0.01)
+        for theta_one in theta_one_values:
+            linear_model = MyLinearRegression(
+                np.array([[theta_zero], [theta_one]]))
+            y_hat = linear_model.predict_(Xpill)
+            loss_values.append(linear_model.loss_(Yscore, y_hat))
+
+        plt.plot(theta_one_values, loss_values)
+    plt.xlabel("θ1 values")
+    plt.ylabel("Loss function J")
+    plt.legend(some_thetas_zero)
+    plt.title("Evolution of the loss function J as a function of θ1\n"
+              + "for different values of θ0")
+    plt.ylim(10, 150)
+    plt.grid()
     plt.show()

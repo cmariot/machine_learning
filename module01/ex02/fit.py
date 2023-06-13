@@ -102,8 +102,8 @@ def fit_(x, y, theta, alpha, max_iter):
 
     # Gradient descent
     theta = theta.reshape((2, 1))
+    gradient = np.zeros((2, 1))
     for _ in range(max_iter):
-        gradient = np.zeros((2, 1))
         gradient[0] = np.sum((X.dot(theta) - y)) / m
         gradient[1] = np.sum((X.dot(theta) - y) * x) / m
         theta = theta - alpha * gradient

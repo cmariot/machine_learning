@@ -11,7 +11,7 @@ def minmax(x):
 
     Returns:
         x' as a numpy.ndarray.
-        None if x is a non-empty numpy.ndarray or not a numpy.ndarray.
+        None if x is an empty numpy.ndarray or not a numpy.ndarray.
 
     Raises:
         This function shouldn't raise any Exception.
