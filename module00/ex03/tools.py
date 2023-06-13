@@ -17,9 +17,14 @@ def add_intercept(x) -> Union[np.ndarray, None]:
     """
     if not isinstance(x, np.ndarray):
         return None
-    if x.size == 0:
+
+    m = x.shape[0]
+    n = x.shape[1] if x.ndim > 1 else 1
+
+    if m == 0 or n == 0:
         return None
-    return np.c_[np.ones(x.shape[0]), x]
+
+    return np.c_[np.ones(m), x]
 
 
 if __name__ == "__main__":

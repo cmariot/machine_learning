@@ -19,34 +19,32 @@ def predict_(
             This function should not raise any Exceptions.
     """
 
-    # Check if theta and theta are non empty numpy.ndarray
+    # Check if x and theta are non empty numpy.ndarray
     for arr in [x, theta]:
         if not isinstance(arr, np.ndarray):
             return None
-        elif arr.size == 0 or arr.ndim == 0:
+        if arr.size == 0:
             return None
 
-    # Check the dimension of theta and x
+    # Check the dimension of theta
     if theta.size != 2 or theta.ndim != 1:
         return None
-    elif x.ndim != 1 and x.size != 1:
+
+    # Check the dimension of x
+    m = x.size
+    if x.ndim != 1:
         return None
 
-    # Compute y_hat, the vector of prediction with a matrix multiplication
-    # For a row vector
-    if x.size == 1:
-        X = np.c_[np.ones(x.shape[0]), x.reshape(-1, 1)]
-        return (np.matmul(X, theta)).reshape(-1, 1)
-    # For a column vector
-    else:
-        X = np.c_[np.ones(x.shape[0]), x]
-        return np.matmul(X, theta)
+    # Add a column of 1's to x
+    x_prime = np.c_[np.ones(m), x]
+
+    # Compute y_hat, the vector of prediction as ndarray of float
+    return np.matmul(x_prime, theta)
 
 
 if __name__ == "__main__":
 
     x = np.arange(1, 6)
-    print(x)
     # x = [1, 2, 3, 4, 5]
 
     theta1 = np.array([5, 0])
