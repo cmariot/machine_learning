@@ -25,7 +25,7 @@ def loss_elem_(y, y_hat):
         return None
     if y.shape != (m, 1) or y_hat.shape != (m, 1):
         return None
-    return (y_hat - y) ** 2
+    return np.square(y_hat - y)
 
 
 def loss_(y, y_hat):
@@ -50,8 +50,8 @@ def loss_(y, y_hat):
         return None
 
     # Compute the mean of J_elem
-    J_value = np.mean(J_elem)
-    return J_value / 2
+    J_value = np.mean(J_elem) / 2
+    return J_value
 
 
 if __name__ == "__main__":

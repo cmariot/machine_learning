@@ -18,27 +18,37 @@ def plot(x, y, theta):
 
     for arr in [x, y, theta]:
         if not isinstance(arr, np.ndarray):
-            return None
+            print(1)
+            return
         if arr.size == 0:
-            return None
+            print(2)
+            return
 
-    if not np.all([arr.shape == (arr.size,) for arr in [x, y]]) \
-            or theta.shape != (2, 1):
-        return None
+    # Check the dimensions of theta
+    if theta.shape != (2, 1):
+        print(3)
+        return
+
+    # Check the dimensions of x and y
+    for arr in [x, y]:
+        if arr.ndim != 1:
+            print(4)
+            return
+    if x.size != y.size:
+        print(5)
+        return
 
     # Plot the data and prediction line
-    try:
-        plt.plot(x, y, 'o')
-        plt.plot(x, theta[0] + theta[1] * x, '-')
-        plt.show()
-    except Exception as e:
-        print(e)
+    plt.plot(x, y, 'o')
+    plt.plot(x, theta[0] + theta[1] * x, '-')
+    plt.show()
 
 
 if __name__ == "__main__":
+
     x = np.arange(1, 6)
     y = np.array([3.74013816, 3.61473236, 4.57655287, 4.66793434, 5.95585554])
-    # Example 1:
+
     theta1 = np.array([[4.5], [-0.2]])
     plot(x, y, theta1)
 

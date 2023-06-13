@@ -2,23 +2,6 @@ import numpy as np
 from typing import Union
 
 
-def add_intercept(x) -> Union[np.ndarray, None]:
-    """Adds a column of 1's to the non-empty numpy.array x. Args:
-          x: has to be a numpy.array of dimension m * n.
-        Returns:
-          X, a numpy.array of dimension m * (n + 1).
-          None if x is not a numpy.array.
-          None if x is an empty numpy.array.
-        Raises:
-          This function should not raise any Exception.
-    """
-    if not isinstance(x, np.ndarray):
-        return None
-    if x.size == 0:
-        return None
-    return np.c_[np.ones(x.shape[0]), x]
-
-
 def predict_(
         x: np.ndarray, theta: np.ndarray) -> Union[np.ndarray, None]:
 
@@ -29,36 +12,50 @@ def predict_(
             theta: has to be an numpy.array, a vector of dimension 2 * 1.
         Returns:
             y_hat as a numpy.array, a vector of dimension m * 1.
-            None if x and/or theta are not numpy.array.
-            None if x or theta are empty numpy.array.
+            None if x and/or theta are not numpy.array. OK
+            None if x or theta are empty numpy.array. OK
             None if x or theta dimensions are not appropriate.
         Raises:
             This function should not raise any Exceptions.
     """
 
-    # Check if theta is a numpy.ndarray
-    if not isinstance(theta, np.ndarray):
+    # Check if x and theta are non empty numpy.ndarray
+    for arr in [x, theta]:
+        if not isinstance(arr, np.ndarray):
+            return None
+        if arr.size == 0:
+            return None
+
+    # Check the dimension of theta
+    if theta.shape != (2, 1) and theta.shape != (1, 2):
         return None
 
-    # Add a column of ones to the vector x
-    X = add_intercept(x)
-
-    # If x is not a numpy.ndarray or x is empty, return None
-    if X is None:
+    # Check the dimension of x
+    if x.shape[0] != 1 and x.shape[1] != 1:
         return None
 
-    # Check the dimension of x and theta
+    # If x and theta are row vectors, reshape them as column vectors
+    if theta.shape[0] == 1:
+        theta = theta.reshape(-1, 1)
+        if x.shape[0] == 1:
+            x = x.reshape(-1, 1)
+        else:
+            return None
+
+    # Size of the training set
     m = x.shape[0]
-    if x.shape != (m, 1) or theta.shape != (2, 1):
-        return None
 
-    # Compute y_hat, the vector of prediction with a matrix multiplication
-    y_hat = np.matmul(X, theta)
+    # Add a column of 1's to x
+    x_prime = np.c_[np.ones(m), x]
+
+    # Compute y_hat, the vector of prediction as ndarray of float
+    y_hat = np.matmul(x_prime, theta)
 
     return y_hat
 
 
 def loss_elem_(y: np.ndarray, y_hat: np.ndarray) -> Union[np.ndarray, None]:
+
     """
         Description:
             Calculates all the elements (y_pred - y)^2 of the
@@ -74,16 +71,22 @@ def loss_elem_(y: np.ndarray, y_hat: np.ndarray) -> Union[np.ndarray, None]:
         Raises:
             This function should not raise any Exception.
     """
+
+    # Check if y and y_hat are non empty ndarray
     for arr in [y, y_hat]:
         if not isinstance(arr, np.ndarray):
             return None
-    m = y.shape[0]
-    if m == 0:
-        return None
-    if y.shape != (m, 1) or y_hat.shape != (m, 1):
+        elif arr.size == 0:
+            return None
+
+    # Check the dimensions of y and y_hat
+    m = y.size
+    if y_hat.shape != (m, 1) or y.shape != (m, 1):
         return None
 
-    return (y_hat - y) ** 2
+    # Compute J_elem, a vector
+    J_elem = np.square(y_hat - y)
+    return J_elem
 
 
 def loss_(y, y_hat):
@@ -100,10 +103,15 @@ def loss_(y, y_hat):
         Raises:
             This function should not raise any Exception.
     """
-    loss_elem = loss_elem_(y, y_hat)
-    if loss_elem is None:
+
+    # Compute J_elem, if None : type or dimmension error
+    J_elem = loss_elem_(y, y_hat)
+    if J_elem is None:
         return None
-    J_value = np.mean(loss_elem) / 2
+
+    # Mean = sum / m
+    J_value = np.mean(J_elem) / 2
+
     return J_value
 
 
