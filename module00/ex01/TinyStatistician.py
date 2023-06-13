@@ -70,13 +70,13 @@ class TinyStatistician:
         elif percentile < 0 or percentile > 100:
             return None
         x.sort()
-        list_len = len(x)
-        index = int(percentile / 100 * (list_len - 1))
-        if index == list_len - 1:
-            return (x[index])
-        else:
-            return (x[index] + (x[index + 1] - x[index]) *
-                    (percentile / 100 * (list_len - 1) - index))
+        length = len(x)
+        percentile_index = (length - 1) * percentile / 100
+        floor_index = int(percentile_index)
+        diff = percentile_index - floor_index
+        return (x[floor_index]
+                + ((x[floor_index + 1] - x[floor_index])
+                   / 100 * diff * 100))
 
     def var(self, x) -> float:
         """

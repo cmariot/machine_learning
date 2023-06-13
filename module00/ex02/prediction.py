@@ -24,15 +24,17 @@ def simple_predict(x: np.ndarray, theta: np.ndarray) -> np.ndarray:
         if arr.size == 0:
             return None
 
-    # Check the dimension of x and theta
-    if x.ndim != 1 or theta.size != 2 or theta.ndim != 1:
+    # Check the dimension of theta
+    if theta.size != 2 or theta.ndim != 1:
         return None
+      
+    # Check the dimension of x
+    
 
     # Compute y_hat, the vector of prediction as ndarray of float
     y_hat = np.zeros(x.shape[0], dtype=float)
     for i in range(x.shape[0]):
         y_hat[i] = theta[0] + theta[1] * x[i]
-
     return y_hat
 
 
