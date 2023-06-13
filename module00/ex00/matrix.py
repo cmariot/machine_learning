@@ -47,7 +47,7 @@ class Matrix:
             raise TypeError("Shape must contain only integers")
         elif not all(x > 0 for x in shape):
             raise ValueError("Shape must contain only positive integers")
-        self.data = [[0.0 for _ in range(shape[1])]
+        self.data = [[0.0 for __ in range(shape[1])]
                      for _ in range(shape[0])]
         self.shape = shape
         if self.shape[0] == 1 or self.shape[1] == 1:
@@ -60,7 +60,6 @@ class Matrix:
             raise TypeError("Can only add a Matrix to a Matrix")
         elif self.shape != other.shape:
             raise ValueError("Can only add matrices of same shape")
-
         return Matrix([[a + b for a, b in zip(x, y)]
                        for x, y in zip(self.data, other.data)])
 
@@ -75,7 +74,6 @@ class Matrix:
             raise TypeError("Can only subtract a Matrix from a Matrix")
         elif self.shape != other.shape:
             raise ValueError("Can only subtract matrices of same shape")
-
         return Matrix([[a - b for a, b in zip(x, y)]
                        for x, y in zip(self.data, other.data)])
 
@@ -101,7 +99,7 @@ class Matrix:
     def scale(self, factor):
         if not isinstance(factor, (int, float)):
             raise TypeError("Can only scale a Matrix by a scalar")
-        return Matrix([[factor * x for x in row] for row in self.data])
+        return Matrix([[x * factor for x in row] for row in self.data])
 
     # Multiplies a matrix by a matrix.
     def mul_by_matrix(self, matrix):
@@ -158,7 +156,6 @@ class Matrix:
         for row in self.data:
             ret += " " + str(row) + "\n"
         ret += ")"
-
         return ret
 
     # __repr__
@@ -192,7 +189,6 @@ class Vector(Matrix):
 
     """
     A vector is a matrix with only one column.
-
     """
 
     def __init__(self,
@@ -207,8 +203,9 @@ class Vector(Matrix):
             raise TypeError("Can only dot a Vector with a Vector")
         elif self.shape != other.shape:
             raise ValueError("Can only dot vectors of same shape")
-        return sum([self.data[i][0] * other.data[i][0]
-                    for i in range(self.shape[0])])
+        return sum(self.data[i][j] * other.data[i][j]
+                   for i in range(self.shape[0])
+                   for j in range(self.shape[1]))
 
     # Cross product
     def cross(self, other):
@@ -216,16 +213,9 @@ class Vector(Matrix):
             raise TypeError("Can only cross a Vector with a Vector")
         elif self.shape != other.shape:
             raise ValueError("Can only cross vectors of same shape")
-        elif self.shape != (3, 1) and self.shape != (1, 3):
-            raise ValueError(
-                "Can only cross vectors of shape (3, 1) or (1, 3)")
         if self.shape == (1, 3):
-            return Vector([
-                self.data[0] * other.data[1] - self.data[1] * other.data[0],
-                self.data[1] * other.data[2] - self.data[2] * other.data[1],
-                self.data[2] * other.data[0] - self.data[0] * other.data[2]
-            ])
-        else:
+            return (self.T().cross(other.T())).T()
+        elif self.shape == (3, 1):
             return Vector([
                 [self.data[1][0] * other.data[2][0]
                  - self.data[2][0] * other.data[1][0]],
@@ -234,6 +224,7 @@ class Vector(Matrix):
                 [self.data[0][0] * other.data[1][0]
                  - self.data[1][0] * other.data[0][0]]
             ])
+        raise ValueError("Can only cross vectors of shape (3, 1) or (1, 3)")
 
 
 if __name__ == "__main__":

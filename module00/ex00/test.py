@@ -108,6 +108,38 @@ class TestVector(unittest.TestCase):
         with self.assertRaises(TypeError):
             mat1.scale('2')
 
+    def test_truediv(self):
+        v1 = Vector([[1, 2, 3]])
+        v2 = v1 / 2
+        self.assertEqual(v2.data, [[0.5, 1, 1.5]])
+        with self.assertRaises(ZeroDivisionError):
+            v1 / 0
+        with self.assertRaises(TypeError):
+            v1 / "not a scalar"
+
+    def test_rtruediv(self):
+        v1 = Vector([[1, 2, 3]])
+        with self.assertRaises(TypeError):
+            2 / v1
+
+    def test_dot(self):
+        v1 = Vector([[1, 2, 3]])
+        v2 = Vector([[4, 5, 6]])
+        self.assertEqual(v1.dot(v2), 32)
+        v3 = Vector([[1, 2, 3, 4]])
+        with self.assertRaises(ValueError):
+            v1.dot(v3)
+
+    def test_cross(self):
+        v1 = Vector([[1, 2, 3]])
+        v2 = Vector([[4, 5, 6]])
+        v3 = v1.cross(v2)
+        self.assertEqual(v3.data, [[-3, 6, -3]])
+        self.assertEqual(v3.shape, (1, 3))
+        v4 = Vector([[1, 2]])
+        with self.assertRaises(ValueError):
+            v1.cross(v4)
+
 
 class TestMatrix(unittest.TestCase):
 
@@ -240,6 +272,30 @@ class TestMatrix(unittest.TestCase):
         mat6 = mat4 * mat5
         self.assertEqual(mat6.data, [[22.0, 28.0], [49.0, 64.0]])
         self.assertEqual(mat6.shape, (2, 2))
+
+    def test_truediv(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        m2 = m1 / 2
+        self.assertEqual(m2.data, [[0.5, 1], [1.5, 2]])
+        with self.assertRaises(ZeroDivisionError):
+            m1 / 0
+        with self.assertRaises(TypeError):
+            m1 / "not a scalar"
+
+    def test_rtruediv(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        with self.assertRaises(TypeError):
+            2 / m1
+
+    def test_T(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        m2 = m1.T()
+        self.assertEqual(m2.data, [[1, 3], [2, 4]])
+        self.assertEqual(m2.shape, (2, 2))
+        m3 = Matrix([[1, 2, 3], [4, 5, 6]])
+        m4 = m3.T()
+        self.assertEqual(m4.data, [[1, 4], [2, 5], [3, 6]])
+        self.assertEqual(m4.shape, (3, 2))
 
 
 if __name__ == '__main__':

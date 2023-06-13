@@ -5,6 +5,7 @@ from typing import Union
 def add_intercept(x) -> Union[np.ndarray, None]:
     """
         Adds a column of 1's to the non-empty numpy.array x.
+        Used to perform a linear algebra trick for matrix multiplication.
         Args:
           x: has to be a numpy.array of dimension m * n.
         Returns:
