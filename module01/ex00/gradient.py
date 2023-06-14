@@ -27,20 +27,21 @@ def simple_gradient(x, y, theta):
             return None
 
     # Check if x and y have compatible shapes
-    m = x.shape[0]
-    if x.shape != y.shape or x.shape[1] != 1 or theta.shape != (2, 1):
+    m = x.size
+    if x.shape != (m, 1) or y.shape != (m, 1):
+        return None
+
+    # Check the shape of theta
+    if theta.shape != (2, 1):
         return None
 
     # Compute gradient
     gradient = np.zeros((2, 1))
-    J0 = J1 = 0
     for i in range(m):
-        h0 = theta[0] + theta[1] * x[i]
-        J0 += (h0 - y[i])
-        J1 += (h0 - y[i]) * x[i]
-    gradient[0] = J0 / m
-    gradient[1] = J1 / m
-    return gradient
+        y_hat = theta[0] + theta[1] * x[i]
+        gradient[0] += (y_hat - y[i])
+        gradient[1] += (y_hat - y[i]) * x[i]
+    return gradient / m
 
 
 if __name__ == "__main__":
