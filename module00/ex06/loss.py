@@ -85,8 +85,10 @@ def loss_elem_(y: np.ndarray, y_hat: np.ndarray) -> Union[np.ndarray, None]:
         return None
 
     # Compute J_elem, a vector
-    J_elem = np.square(y_hat - y)
-    return J_elem
+    J_elem = np.ndarray(shape=(m, 1), dtype=float)
+    for i in range(m):
+        J_elem[i] = (y_hat[i] - y[i]) ** 2
+    return (J_elem)
 
 
 def loss_(y, y_hat):

@@ -153,8 +153,8 @@ def plot_with_loss(x, y, theta):
     # Compute the value of the loss
     loss = loss_(y, y_hat) * 2
 
-    # Add a title
-    plt.title("Cost : {:4}".format(loss))
+    # Add a title with a field-width of 4
+    plt.title("Cost : {:4f}".format(loss))
 
     plt.show()
 
