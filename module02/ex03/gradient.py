@@ -2,7 +2,8 @@ import numpy as np
 
 
 def gradient(x, y, theta):
-    """Computes a gradient vector from three non-empty numpy.array,
+    """
+    Computes a gradient vector from three non-empty numpy.array,
     without any for-loop.
     The three arrays must have the compatible dimensions.
     Args:
@@ -33,7 +34,11 @@ def gradient(x, y, theta):
     elif y.shape != (m, 1):
         return None
 
-    X = np.c_[np.ones((m, 1)), x]
+    X_prime = np.c_[np.ones((m, 1)), x]
+
+    gradient = (np.matmul(X_prime.T, np.matmul(X_prime, theta) - y)) / m
+    return gradient
+
     y_hat = np.dot(X, theta)
     y_hat_minus_y = y_hat - y
     return np.dot(X.T, y_hat_minus_y) / m

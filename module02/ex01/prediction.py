@@ -16,24 +16,28 @@ def predict_(x, theta):
         This function should not raise any Exception.
     """
 
-    if not isinstance(x, np.ndarray) or not isinstance(theta, np.ndarray):
-        return None
+    for arr in [x, theta]:
+        if not isinstance(arr, np.ndarray):
+            return None
+        elif arr.size == 0:
+            return None
 
     m = x.shape[0]
     n = x.shape[1]
 
-    if m == 0 or n == 0 or theta.shape[0] != n + 1 or theta.shape[1] != 1:
+    if theta.shape != (n + 1, 1):
         return None
 
-    X = np.concatenate((np.ones((m, 1)), x), axis=1)
-    y_hat = np.dot(X, theta)
+    # Add a column of 1 to x -> X_prime
+    X_prime = np.concatenate((np.ones((m, 1)), x), axis=1)
+
+    y_hat = np.dot(X_prime, theta)
     return y_hat
 
 
 if __name__ == "__main__":
 
     x = np.arange(1, 13).reshape((4, -1))
-    print(x)
 
     # Example 1:
     theta1 = np.array([5, 0, 0, 0]).reshape((-1, 1))

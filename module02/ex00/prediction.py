@@ -16,13 +16,16 @@ def simple_predict(x, theta):
       This function should not raise any Exception.
     """
 
-    if not isinstance(x, np.ndarray) or not isinstance(theta, np.ndarray):
-        return None
+    for arr in [x, theta]:
+        if not isinstance(arr, np.ndarray):
+            return None
+        elif arr.size == 0:
+            return None
 
     m = x.shape[0]
     n = x.shape[1]
 
-    if m == 0 or n == 0 or theta.shape[0] != n + 1 or theta.shape[1] != 1:
+    if theta.shape != (n + 1, 1):
         return None
 
     y_hat = np.zeros((m, 1))
