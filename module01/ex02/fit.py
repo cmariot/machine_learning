@@ -54,6 +54,49 @@ def predict_(
     return y_hat
 
 
+def simple_gradient(x, y, theta):
+    """
+    Computes a gradient vector from 3 non-empty numpy.array,
+    without any for loop.
+    The three arrays must have compatible shapes.
+    Args:
+        x: has to be a numpy.array, a matrix of shape m * 1.
+        y: has to be a numpy.array, a vector of shape m * 1.
+        theta: has to be a numpy.array, a 2 * 1 vector.
+    Return:
+        The gradient as a numpy.ndarray, a vector of dimension 2 * 1.
+        None if x, y, or theta is an empty numpy.ndarray.
+        None if x, y and theta do not have compatible dimensions.
+    Raises:
+        This function should not raise any Exception.
+    """
+
+    # Check if x, y, and theta are non empty numpy arrays
+    for arr in [x, y, theta]:
+        if not isinstance(arr, np.ndarray):
+            return None
+        if arr.size == 0:
+            return None
+
+    # Check if x and y have compatible shapes
+    m = x.size
+    if x.shape != (m, 1) or y.shape != (m, 1):
+        return None
+
+    # Check the shape of theta
+    if theta.shape != (2, 1):
+        return None
+
+    # Matrix of shape m * 2
+    Xprime = np.c_[np.ones((m, 1)), x]
+
+    # Matrix of shape 2 * m
+    XprimeT = Xprime.T
+
+    gradient = np.matmul((XprimeT), (Xprime.dot(theta) - y)) / m
+    return gradient
+
+
 def fit_(x, y, theta, alpha, max_iter):
     """
          Description:
@@ -81,9 +124,11 @@ def fit_(x, y, theta, alpha, max_iter):
         if arr.size == 0:
             return None
 
-    # Check if x and y have compatible shapes
+    # Check if x, y and theta have compatible shapes
     m = x.shape[0]
-    if x.shape != y.shape or x.shape[1] != 1 or theta.shape != (2, 1):
+    if x.shape != (m, 1) or y.shape != (m, 1):
+        return None
+    elif theta.shape != (2, 1):
         return None
 
     # Check if alpha and max_iter types and if they are positive
@@ -92,18 +137,15 @@ def fit_(x, y, theta, alpha, max_iter):
     if alpha <= 0 or max_iter <= 0:
         return None
 
-    # Reshape the x array to be a matrix of shape m * 2
-    X = np.c_[np.ones((m, 1)), x]
-    X = X.reshape((m, 2))
-
     # Gradient descent
-    theta = theta.reshape((2, 1))
     gradient = np.zeros((2, 1))
     for _ in range(max_iter):
-        gradient[0] = np.sum((X.dot(theta) - y)) / m
-        gradient[1] = np.sum((X.dot(theta) - y) * x) / m
+        gradient = simple_gradient(x, y, theta)
+        if gradient is None:
+            return None
+        elif gradient[0] == 0. and gradient[1] == 0.:
+            break
         theta = theta - alpha * gradient
-
     return theta
 
 

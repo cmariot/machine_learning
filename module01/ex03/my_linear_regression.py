@@ -1,71 +1,53 @@
 import numpy as np
-from typing import Union
 
 
 class MyLinearRegression():
     """
         Description:
-                My personnal linear regression class to fit like a boss.
+            My personnal linear regression class to fit like a boss.
     """
 
     def __init__(self, thetas, alpha=0.001, max_iter=1000):
-        # Args checking :
-        if not isinstance(thetas, np.ndarray):
+        if (not isinstance(thetas, np.ndarray) or thetas.shape != (2, 1)):
             return None
-        if thetas.shape != (2, 1) and thetas.shape != (2,):
-            return None
-        if not isinstance(alpha, float):
-            return None
-        if not isinstance(max_iter, int):
-            return None
-        if alpha < 0:
-            return None
-        if max_iter < 0:
-            return None
-
         self.thetas = thetas
+        if not isinstance(alpha, float) or alpha < 0.0:
+            return None
         self.alpha = alpha
+        if not isinstance(max_iter, int) or max_iter < 0:
+            return None
         self.max_iter = max_iter
 
     def fit_(self, x, y):
-        for arr in [x, y, self.thetas]:
+        for arr in [x, y]:
             if not isinstance(arr, np.ndarray):
                 return None
             if arr.size == 0:
                 return None
-
-        # Check if x and y have compatible shapes
         m = x.shape[0]
-        if x.shape != y.shape or x.shape[1] != 1 \
-                or self.thetas.shape != (2, 1):
+        if x.shape != (m, 1) or y.shape != (m, 1):
             return None
-
-        # Reshape the x array to be a matrix of shape m * 2
-        X = np.c_[np.ones((m, 1)), x]
-        X = X.reshape((m, 2))
-
-        # Gradient descent
-        self.thetas = self.thetas.reshape((2, 1))
+        Xprime = np.c_[np.ones((m, 1)), x]
+        XprimeT = Xprime.T
+        gradient = np.zeros((2, 1))
         for _ in range(self.max_iter):
-            gradient = np.zeros((2, 1))
-            gradient[0] = np.sum((X.dot(self.thetas) - y)) / m
-            gradient[1] = np.sum((X.dot(self.thetas) - y) * x) / m
+            gradient = np.matmul((XprimeT), (Xprime.dot(self.thetas) - y)) / m
+            if gradient[0] == 0. and gradient[1] == 0.:
+                break
             self.thetas = self.thetas - self.alpha * gradient
-
         return self.thetas
 
-    def predict_(self, x) -> Union[np.ndarray, None]:
+    def predict_(self, x):
         """
         Computes the vector of prediction y_hat from two non-empty numpy.array.
         """
         if not isinstance(x, np.ndarray):
             return None
-        elif x.size == 0 or x.shape[1] != 1:
+        m = x.shape[0]
+        if m == 0 or x.shape != (m, 1):
             return None
-        X = np.c_[np.ones(x.shape[0]), x]
-        y_hat = X.dot(self.thetas)
-
-        return y_hat
+        X = np.c_[np.ones(m), x]
+        return X.dot(self.thetas)
 
     def loss_elem_(self, y, y_hat):
         for arr in [y, y_hat]:
@@ -76,16 +58,14 @@ class MyLinearRegression():
             return None
         if y.shape != (m, 1) or y_hat.shape != (m, 1):
             return None
-        return (y_hat - y) ** 2
+        return np.square(y_hat - y)
 
     def loss_(self, y, y_hat):
-        # Compute the loss by calling loss_elem_
         J_elem = self.loss_elem_(y, y_hat)
         if J_elem is None:
             return None
-        # Compute the mean of J_elem
-        J_value = np.mean(J_elem)
-        return J_value / 2
+        J_value = np.mean(J_elem) / 2
+        return J_value
 
 
 if __name__ == "__main__":
@@ -95,13 +75,16 @@ if __name__ == "__main__":
     y = np.array(
         [[37.4013816], [36.1473236], [45.7655287], [46.6793434], [59.5585554]])
 
-    lr1 = MyLinearRegression(np.array([[2], [0.7]]))
+    print("X :\n", x)
+    print("Y :\n", y)
 
-    print("THETAS :", lr1.thetas)
+    lr1 = MyLinearRegression(np.array([[2], [0.7]]))
+    print("Class Initialization : Thetas = [[2.0], [0.7]]"
+          + " -> y_hat(x) = 2 + 0.7 * x")
 
     # Example 0.0:
     y_hat = lr1.predict_(x)
-    print("Y_HAT :", y_hat)
+    print("y_hat with initial thetas :\n", y_hat)
     # Output:
     # array([[10.74695094],
     #        [17.05055804],
@@ -111,7 +94,6 @@ if __name__ == "__main__":
 
     # Example 0.1:
     loss_elem = lr1.loss_elem_(y, y_hat)
-    print("LOSS_ELEM :", loss_elem)
     # Output:
     # array([[710.45867381],
     #        [364.68645485],
@@ -121,21 +103,28 @@ if __name__ == "__main__":
 
     # Example 0.2:
     loss = lr1.loss_(y, y_hat)
-    print("LOSS :", loss)
+    print("This prediction has a loss of :", loss)
     # Output:
     # 195.34539903032385
 
     # Example 1.0:
     lr2 = MyLinearRegression(np.array([[1], [1]]), 5e-8, 1500000)
+
+    print("\nTraining the model ... Please wait.\n")
+
     lr2.fit_(x, y)
-    print("PREDICTED THETAS :", lr2.thetas)
+
+    print("After Fit : Thetas = [[{}], [{}]]".format(
+        lr2.thetas[0],
+        lr2.thetas[1]
+        ))
     # Output:
     # array([[1.40709365],
     #        [1.1150909 ]])
 
     # Example 1.1:
     y_hat = lr2.predict_(x)
-    print("NEW Y_HAT :", y_hat)
+    print("Updated y_hat nearest to y :\n", y_hat)
     # Output:
     # array([[15.3408728 ],
     #       [25.38243697],
@@ -145,7 +134,6 @@ if __name__ == "__main__":
 
     # Example 1.2:
     loss_elem = lr2.loss_elem_(y, y_hat)
-    print("NEW LOSS_ELEM :", loss_elem)
     # Output:
     # array([[486.66604863],
     #        [115.88278416],
@@ -155,6 +143,6 @@ if __name__ == "__main__":
 
     # Example 1.3:
     loss = lr2.loss_(y, y_hat)
-    print("NEW LOSS :", loss)
+    print("Updated loss, nearest to 0 :", loss)
     # Output:
     # 80.83996294128525
