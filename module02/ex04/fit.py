@@ -57,7 +57,6 @@ def gradient_(x, y, theta):
     for array in [x, y, theta]:
         if not isinstance(array, np.ndarray):
             return None
-
     m, n = x.shape
     if m == 0 or n == 0:
         return None
@@ -65,9 +64,7 @@ def gradient_(x, y, theta):
         return None
     elif theta.shape != (n + 1, 1):
         return None
-
     X_prime = np.c_[np.ones(m), x]
-
     return (1 / m) * (X_prime.T.dot(X_prime.dot(theta) - y))
 
 

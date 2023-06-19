@@ -1,6 +1,6 @@
 import numpy as np
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from math import sqrt
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 
 def mse_elem(y, y_hat) -> np.ndarray:
@@ -22,16 +22,10 @@ def mse_(y, y_hat) -> float:
     """
     if any(not isinstance(_, np.ndarray) for _ in [y, y_hat]):
         return None
-
-    m = y.shape[0]
-    if m == 0 or y.shape != (m, ) or y_hat.shape != (m, ):
+    m = y.size
+    if m == 0 or y_hat.size != m or y.ndim != 1 or y_hat.ndim != 1:
         return None
-
-    if any(not np.all(np.isreal(_)) for _ in [y, y_hat]):
-        return None
-
     J_elem = mse_elem(y, y_hat)
-
     return J_elem.mean()
 
 
@@ -55,16 +49,10 @@ def rmse_(y, y_hat):
     """
     if any(not isinstance(_, np.ndarray) for _ in [y, y_hat]):
         return None
-
-    m = y.shape[0]
-    if m == 0 or y.shape != (m, ) or y_hat.shape != (m, ):
+    m = y.size
+    if m == 0 or y_hat.size != m or y.ndim != 1 or y_hat.ndim != 1:
         return None
-
-    if any(not np.all(np.isreal(_)) for _ in [y, y_hat]):
-        return None
-
     J_elem = rmse_elem(y, y_hat).mean()
-
     return sqrt(J_elem)
 
 
@@ -85,33 +73,24 @@ def mae_(y, y_hat):
         Raises:
             This function should not raise any Exceptions.
     """
-
     if any(not isinstance(_, np.ndarray) for _ in [y, y_hat]):
         return None
-
-    m = y.shape[0]
-    if m == 0 or y.shape != (m, ) or y_hat.shape != (m, ):
+    m = y.size
+    if m == 0 or y_hat.size != m or y.ndim != 1 or y_hat.ndim != 1:
         return None
-
-    if any(not np.all(np.isreal(_)) for _ in [y, y_hat]):
-        return None
-
     J_elem = mae_elem(y, y_hat)
     return J_elem.mean()
 
 
 def r2score_elem(y, y_hat):
-
     m = y.shape[0]
     mean = y.mean()
-
-    numerator = 0
-    denominator = 0
+    numerator = 0.
+    denominator = 0.
     for i in range(m):
         numerator += (y_hat[i] - y[i]) ** 2
         denominator += (y[i] - mean) ** 2
-
-    return 1 - (numerator / denominator)
+    return numerator / denominator
 
 
 def r2score_(y, y_hat):
@@ -127,19 +106,13 @@ def r2score_(y, y_hat):
         Raises:
             This function should not raise any Exceptions.
     """
-
     if any(not isinstance(_, np.ndarray) for _ in [y, y_hat]):
         return None
-
-    m = y.shape[0]
-    if m == 0 or y.shape != (m, ) or y_hat.shape != (m, ):
+    m = y.size
+    if m == 0 or y_hat.size != m or y.ndim != 1 or y_hat.ndim != 1:
         return None
-
-    if any(not np.all(np.isreal(_)) for _ in [y, y_hat]):
-        return None
-
     r2_score_elem = r2score_elem(y, y_hat)
-    return r2_score_elem
+    return 1 - r2_score_elem
 
 
 if __name__ == "__main__":

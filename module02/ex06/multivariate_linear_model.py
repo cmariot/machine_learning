@@ -93,6 +93,15 @@ class MyLR:
         J_elem = self.mse_elem(y, y_hat)
         return J_elem.mean()
 
+    def minmax(x):
+        if not isinstance(x, np.ndarray):
+            return None
+        if x.size == 0:
+            return None
+        if x.ndim != 1:
+            x = x.reshape(-1)
+        return (x - np.min(x)) / (np.max(x) - np.min(x))
+
 
 if __name__ == "__main__":
 
@@ -101,6 +110,8 @@ if __name__ == "__main__":
 
     # Open and read the file spacecraft_data.csv with pandas
     spacecraft_data = pd.read_csv("../ressources/spacecraft_data.csv")
+
+    # Should I normalize the features ?
 
     # PART ONE : Univariate linear regression
     features = ["Age", "Thrust_power", "Terameters"]
@@ -116,7 +127,7 @@ if __name__ == "__main__":
 
         # Plot the data and the prediction
         plt.scatter(x, y)
-        plt.scatter(x, y_hat, color="orange")
+        plt.scatter(x, y_hat, color="orange", marker=".")
         plt.title(
             "Sell price of a spacecraft depending on its {}".format(feature))
         plt.xlabel(feature)

@@ -35,6 +35,7 @@ class MyLinearRegression():
             if gradient[0] == 0. and gradient[1] == 0.:
                 break
             self.thetas = self.thetas - self.alpha * gradient
+            print("{:2.2f} %".format(_ / self.max_iter * 100), end="\r")
         return self.thetas
 
     def predict_(self, x):

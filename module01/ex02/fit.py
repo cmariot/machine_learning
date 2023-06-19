@@ -146,6 +146,7 @@ def fit_(x, y, theta, alpha, max_iter):
         elif gradient[0] == 0. and gradient[1] == 0.:
             break
         theta = theta - alpha * gradient
+        print("{:2.2f} %" .format(_ / max_iter * 100), end="\r")
     return theta
 
 

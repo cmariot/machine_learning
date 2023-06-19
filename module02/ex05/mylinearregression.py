@@ -79,6 +79,8 @@ class MyLR:
             if all(__ == 0. for __ in gradient):
                 break
             self.thetas = self.thetas - self.alpha * gradient
+            print("{:2.2f} %".format(_ / self.max_iter * 100))
+
         return self.thetas
 
 
