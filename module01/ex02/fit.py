@@ -27,34 +27,24 @@ def predict_(
             return None
 
     # Check the dimension of theta
-    if theta.shape != (2, 1) and theta.shape != (1, 2):
+    if theta.shape != (2, 1):
         return None
 
     # Check the dimension of x
-    if x.shape[0] != 1 and x.shape[1] != 1:
+    m = x.size
+    if x.shape != (m, 1):
+        print("Here 4")
         return None
-
-    # If x and theta are row vectors, reshape them as column vectors
-    if theta.shape[0] == 1:
-        theta = theta.reshape(-1, 1)
-        if x.shape[0] == 1:
-            x = x.reshape(-1, 1)
-        else:
-            return None
-
-    # Size of the training set
-    m = x.shape[0]
 
     # Add a column of 1's to x
     x_prime = np.c_[np.ones(m), x]
 
     # Compute y_hat, the vector of prediction as ndarray of float
-    y_hat = np.matmul(x_prime, theta)
-
-    return y_hat
+    return np.matmul(x_prime, theta)
 
 
 def simple_gradient(x, y, theta):
+
     """
     Computes a gradient vector from 3 non-empty numpy.array,
     without any for loop.
@@ -87,14 +77,14 @@ def simple_gradient(x, y, theta):
     if theta.shape != (2, 1):
         return None
 
-    # Matrix of shape m * 2
-    Xprime = np.c_[np.ones((m, 1)), x]
+    # Add a column of 1 -> Matrix of shape m * 2
+    Xprime = np.c_[np.ones(m), x]
 
     # Matrix of shape 2 * m
     XprimeT = Xprime.T
 
-    gradient = np.matmul((XprimeT), (Xprime.dot(theta) - y)) / m
-    return gradient
+    # Compute and return the gradient
+    return np.matmul((XprimeT), (np.matmul(Xprime, theta) - y)) / m
 
 
 def fit_(x, y, theta, alpha, max_iter):
@@ -143,7 +133,7 @@ def fit_(x, y, theta, alpha, max_iter):
         gradient = simple_gradient(x, y, theta)
         if gradient is None:
             return None
-        elif gradient[0] == 0. and gradient[1] == 0.:
+        elif gradient[0] == 0.0 and gradient[1] == 0.0:
             break
         theta = theta - alpha * gradient
         print("{:2.2f} %" .format(_ / max_iter * 100), end="\r")
@@ -158,7 +148,7 @@ if __name__ == "__main__":
     theta = np.array([1, 1]).reshape((-1, 1))
 
     # Example 0:
-    theta1 = fit_(x, y, theta, alpha=5e-8, max_iter=1500000)
+    theta1 = fit_(x, y, theta, alpha=5e-8, max_iter=1_500_000)
     print(theta1)
     # Output:
     # array([[1.40709365],

@@ -2,10 +2,6 @@ import numpy as np
 
 
 class MyLinearRegression():
-    """
-        Description:
-            My personnal linear regression class to fit like a boss.
-    """
 
     def __init__(self, thetas, alpha=0.001, max_iter=1000):
         if (not isinstance(thetas, np.ndarray) or thetas.shape != (2, 1)):
@@ -31,7 +27,8 @@ class MyLinearRegression():
         XprimeT = Xprime.T
         gradient = np.zeros((2, 1))
         for _ in range(self.max_iter):
-            gradient = np.matmul((XprimeT), (Xprime.dot(self.thetas) - y)) / m
+            gradient = np.matmul((XprimeT),
+                                 (np.matmul(Xprime, self.thetas) - y)) / m
             if gradient[0] == 0. and gradient[1] == 0.:
                 break
             self.thetas = self.thetas - self.alpha * gradient
@@ -39,9 +36,6 @@ class MyLinearRegression():
         return self.thetas
 
     def predict_(self, x):
-        """
-        Computes the vector of prediction y_hat from two non-empty numpy.array.
-        """
         if not isinstance(x, np.ndarray):
             return None
         m = x.shape[0]
@@ -95,6 +89,7 @@ if __name__ == "__main__":
 
     # Example 0.1:
     loss_elem = lr1.loss_elem_(y, y_hat)
+    print("LOSS_ELEM =", loss_elem)
     # Output:
     # array([[710.45867381],
     #        [364.68645485],
@@ -135,6 +130,7 @@ if __name__ == "__main__":
 
     # Example 1.2:
     loss_elem = lr2.loss_elem_(y, y_hat)
+    print("LOSS_ELEM =", loss_elem)
     # Output:
     # array([[486.66604863],
     #        [115.88278416],

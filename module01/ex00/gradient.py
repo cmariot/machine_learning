@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def simple_gradient(x, y, theta):
+def simple_gradient(x: np.ndarray,
+                    y: np.ndarray,
+                    theta: np.ndarray) -> np.ndarray:
     """
     Computes a gradient vector from 3 non-empty numpy.array,
     with a for-loop.
@@ -41,6 +43,7 @@ def simple_gradient(x, y, theta):
         y_hat = theta[0] + theta[1] * x[i]
         gradient[0] += (y_hat - y[i])
         gradient[1] += (y_hat - y[i]) * x[i]
+
     return gradient / m
 
 
@@ -48,11 +51,11 @@ if __name__ == "__main__":
 
     x = np.array(
         [12.4956442, 21.5007972, 31.5527382, 48.9145838, 57.5088733]
-        ).reshape((-1, 1))
+    ).reshape((-1, 1))
 
     y = np.array(
         [37.4013816, 36.1473236, 45.7655287, 46.6793434, 59.5585554]
-        ).reshape((-1, 1))
+    ).reshape((-1, 1))
 
     # Example 0:
     theta1 = np.array([2, 0.7]).reshape((-1, 1))
