@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
     # Plot evolution of the loss function J as a function of θ1
     # for different values of θ0
-    some_thetas_zero = [85, 87.5, 89.123874, 92.5, 95]
+    some_thetas_zero = [85, 87.5, 90, 92.5, 95]
     for theta_zero in some_thetas_zero:
         loss_values = []
         theta_one_values = np.arange(-14, -4, 0.01)

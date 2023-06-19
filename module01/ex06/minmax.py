@@ -20,11 +20,14 @@ def minmax(x):
 
     if not isinstance(x, np.ndarray):
         return None
+    print("\n")
+    print(x)
+    print("Shape =", x.shape)
+    print("Size =", x.size)
+    print("Ndim =", x.ndim)
+    print("\n")
     if x.size == 0:
         return None
-    if x.ndim != 1:
-        x = x.reshape(-1)
-
     return (x - np.min(x)) / (np.max(x) - np.min(x))
 
 

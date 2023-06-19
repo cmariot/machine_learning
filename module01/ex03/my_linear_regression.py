@@ -109,7 +109,7 @@ if __name__ == "__main__":
     # 195.34539903032385
 
     # Example 1.0:
-    lr2 = MyLinearRegression(np.array([[1], [1]]), 5e-8, 1500000)
+    lr2 = MyLinearRegression(np.array([[1], [1]]), 5e-8, 1_500_000)
 
     print("\nTraining the model ... Please wait.\n")
 

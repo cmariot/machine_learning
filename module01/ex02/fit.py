@@ -1,9 +1,8 @@
 import numpy as np
-from typing import Union
 
 
 def predict_(
-        x: np.ndarray, theta: np.ndarray) -> Union[np.ndarray, None]:
+        x: np.ndarray, theta: np.ndarray):
 
     """
         Computes the vector of prediction y_hat from two non-empty numpy.array.
@@ -158,15 +157,15 @@ if __name__ == "__main__":
     theta = np.array([1, 1]).reshape((-1, 1))
 
     # Example 0:
-    theta1 = fit_(x, y, theta, alpha=5e-8, max_iter=1500000)
+    theta1 = fit_(x, y, theta, alpha=5e-8, max_iter=1_500_000)
     print(theta1)
     # Output:
     # array([[1.40709365],
     #        [1.1150909 ]])
 
     # Example 1:
-    predict = predict_(x, theta1)
-    print(predict)
+    y_hat = predict_(x, theta1)
+    print(y_hat)
     # Output:
     # array([[15.3408728 ],
     #        [25.38243697],

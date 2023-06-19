@@ -39,8 +39,9 @@ def simple_gradient(x, y, theta):
     gradient = np.zeros((2, 1))
     for i in range(m):
         y_hat = theta[0] + theta[1] * x[i]
-        gradient[0] += (y_hat - y[i])
-        gradient[1] += (y_hat - y[i]) * x[i]
+        diff = y_hat - y[i]
+        gradient[0] += diff
+        gradient[1] += diff * x[i]
     return gradient / m
 
 
