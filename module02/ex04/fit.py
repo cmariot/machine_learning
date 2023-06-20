@@ -1,59 +1,23 @@
 import numpy as np
+import time
+import shutil
 
 
 def predict_(x, theta):
-    """
-    Computes the prediction vector y_hat from two non-empty numpy.array.
-    Args:
-        x: has to be an numpy.array, a vector of dimensions m * n.
-        theta: has to be an numpy.array, a vector of dimensions (n + 1) * 1.
-    Return:
-        y_hat as a numpy.array, a vector of dimensions m * 1.
-        None if x or theta are empty numpy.array.
-        None if x or theta dimensions are not appropriate.
-        None if x or theta is not of expected type.
-    Raises:
-        This function should not raise any Exception.
-    """
-
     for arr in [x, theta]:
         if not isinstance(arr, np.ndarray):
             return None
         elif arr.size == 0:
             return None
-
     m = x.shape[0]
     n = x.shape[1]
-
     if theta.shape != (n + 1, 1):
         return None
-
-    # Add a column of 1 to x -> X_prime
     X_prime = np.concatenate((np.ones((m, 1)), x), axis=1)
-
-    y_hat = np.dot(X_prime, theta)
-    return y_hat
+    return X_prime @ theta
 
 
 def gradient_(x, y, theta):
-    """
-    Computes a gradient vector from three non-empty numpy.array,
-    without any for-loop.
-    The three arrays must have the compatible dimensions.
-    Args:
-        x: has to be an numpy.array, a matrix of dimension m * n.
-        y: has to be an numpy.array, a vector of dimension m * 1.
-        theta: has to be an numpy.array, a vector (n + 1) * 1.
-    Return:
-        The gradient as a numpy.array, a vector of dimensions n * 1,
-            containg the result of the formula for all j.
-        None if x, y, or theta are empty numpy.array.
-        None if x, y and theta do not have compatible dimensions.
-        None if x, y or theta is not of expected type.
-    Raises:
-        This function should not raise any Exception.
-    """
-
     for array in [x, y, theta]:
         if not isinstance(array, np.ndarray):
             return None
@@ -65,7 +29,66 @@ def gradient_(x, y, theta):
     elif theta.shape != (n + 1, 1):
         return None
     X_prime = np.c_[np.ones(m), x]
-    return (1 / m) * (X_prime.T.dot(X_prime.dot(theta) - y))
+    return (X_prime.T @ (X_prime @ theta - y)) / m
+
+
+def ft_progress(iterable,
+                length=shutil.get_terminal_size().columns - 2,
+                fill='█',
+                empty='░',
+                print_end='\r'):
+    """
+    Progress bar generator
+    This function displays a progress bar for an iterable object
+    and yields its items.
+
+    Parameters:
+    - iterable (list): An iterable object.
+    - length (int, optional): The length of the progress bar. Default is 50.
+    - fill (str, optional): The character used to fill the progress bar.
+    - print_end (str, optional): The character used to separate printed output.
+
+    Returns:
+    - generator: A generator that yields the items of the iterable object.
+
+    Example usage:
+    ```
+        for i in ft_progress(range(100)):
+            time.sleep(0.1)
+    ```
+    """
+
+    total = len(iterable)
+    start = time.time()
+    for i, item in enumerate(iterable, start=1):
+        elapsed_time = time.time() - start
+        eta = elapsed_time * (total / i - 1)
+        current_percent = (i / total) * 100
+        filled_length = int(length * i / total)
+        if eta == 0.0:
+            eta_str = '[DONE]    '
+        elif eta < 60:
+            eta_str = f'[ETA {eta:.0f} s]'
+        elif eta < 3600:
+            eta_str = f'[ETA {eta / 60:.0f} m]'
+        else:
+            eta_str = f'[ETA {eta / 3600:.0f} h]'
+        percent_str = f'[{current_percent:6.2f} %] '
+        progress_str = fill * filled_length + empty * (length - filled_length)
+        counter_str = f' [{i:>{len(str(total))}}/{total}] '
+        if elapsed_time < 60:
+            elapsed_time_str = f' [Elapsed-time {elapsed_time:.2f} s]'
+        elif elapsed_time < 3600:
+            elapsed_time_str = f' [Elapsed-time {elapsed_time / 60:.2f} m]'
+        else:
+            elapsed_time_str = f' [Elapsed-time {elapsed_time / 3600:.2f} h]'
+        bar = ("\033[F\033[K " + progress_str + "\n"
+               + elapsed_time_str
+               + counter_str
+               + percent_str
+               + eta_str)
+        print(bar, end=print_end)
+        yield item
 
 
 def fit_(x, y, theta, alpha, max_iter):
@@ -109,13 +132,14 @@ def fit_(x, y, theta, alpha, max_iter):
         return None
 
     # Train the model to fit the data
-    for _ in range(max_iter):
+    for _ in ft_progress(range(max_iter)):
         gradient = gradient_(x, y, theta)
         if gradient is None:
             return None
-        if all(__ == 0. for __ in gradient):
+        if all(val == [0.] for val in gradient):
             break
         theta = theta - alpha * gradient
+    print()
     return theta
 
 
@@ -137,7 +161,7 @@ if __name__ == "__main__":
                       [1.]])
 
     # Example 0:
-    theta2 = fit_(x, y, theta, alpha=0.0005, max_iter=42000)
+    theta2 = fit_(x, y, theta, alpha=0.0005, max_iter=42_000)
     print(theta2)
     # Output:
     # array([[41.99..],[0.97..], [0.77..], [-1.20..]])

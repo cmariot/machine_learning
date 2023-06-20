@@ -31,7 +31,7 @@ def predict_(x, theta):
     # Add a column of 1 to x -> X_prime
     X_prime = np.concatenate((np.ones((m, 1)), x), axis=1)
 
-    y_hat = np.dot(X_prime, theta)
+    y_hat = X_prime @ theta
     return y_hat
 
 

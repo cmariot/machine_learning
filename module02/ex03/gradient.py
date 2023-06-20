@@ -34,7 +34,7 @@ def gradient(x, y, theta):
 
     X_prime = np.c_[np.ones(m), x]
 
-    return (1 / m) * (X_prime.T.dot(X_prime.dot(theta) - y))
+    return (X_prime.T @ (X_prime @ theta - y)) / m
 
 
 if __name__ == "__main__":
@@ -50,15 +50,10 @@ if __name__ == "__main__":
                  [-5, -9, 6],
                  [1, -5, 11],
                  [9, -11, 8]])
-    print(x.shape)
-
     y = np.array([2, 14, -13, 5, 12, 4, -19]).reshape((-1, 1))
-    print(y.shape)
-
-    theta1 = np.array([0, 3, 0.5, -6]).reshape((-1, 1))
-    print(theta1.shape)
 
     # Example :
+    theta1 = np.array([0, 3, 0.5, -6]).reshape((-1, 1))
     print(gradient(x, y, theta1))
     # Output:
     # array([[ -33.71428571], [ -37.35714286], [183.14285714], [-393.]])

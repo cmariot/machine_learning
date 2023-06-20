@@ -10,9 +10,7 @@ def loss_(y, y_hat):
         return None
     if y.shape != (m, 1) or y_hat.shape != (m, 1):
         return None
-    J_elem = np.square(y_hat - y)
-    J_value = np.mean(J_elem) / 2
-    return J_value
+    return np.mean((y_hat - y) ** 2) / 2
 
 
 if __name__ == "__main__":
