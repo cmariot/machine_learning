@@ -2,10 +2,6 @@ import numpy as np
 
 
 class MyLinearRegression():
-    """
-        Description:
-            My personnal linear regression class to fit like a boss.
-    """
 
     def __init__(self, thetas, alpha=0.001, max_iter=1000):
         if (not isinstance(thetas, np.ndarray) or thetas.shape != (2, 1)):
@@ -27,28 +23,28 @@ class MyLinearRegression():
         m = x.shape[0]
         if x.shape != (m, 1) or y.shape != (m, 1):
             return None
-        Xprime = np.c_[np.ones((m, 1)), x]
-        XprimeT = Xprime.T
         gradient = np.zeros((2, 1))
+        x_size = x.size
+        Xprime = np.c_[np.ones(x_size), x]
+        XprimeT = Xprime.T
         for _ in range(self.max_iter):
-            gradient = np.matmul((XprimeT), (Xprime.dot(self.thetas) - y)) / m
-            if gradient[0] == 0. and gradient[1] == 0.:
+            gradient = XprimeT @ (Xprime @ self.thetas - y) / x_size
+            if gradient is None:
+                return None
+            elif all(val == [0.0] for val in gradient):
                 break
             self.thetas = self.thetas - self.alpha * gradient
-            print("{:2.2f} %".format(_ / self.max_iter * 100), end="\r")
+            print(" {:2.2f} %" .format(_ / self.max_iter * 100), end="\r")
         return self.thetas
 
     def predict_(self, x):
-        """
-        Computes the vector of prediction y_hat from two non-empty numpy.array.
-        """
         if not isinstance(x, np.ndarray):
             return None
         m = x.shape[0]
         if m == 0 or x.shape != (m, 1):
             return None
         X = np.c_[np.ones(m), x]
-        return X.dot(self.thetas)
+        return X @ self.thetas
 
     def loss_elem_(self, y, y_hat):
         for arr in [y, y_hat]:
@@ -59,14 +55,13 @@ class MyLinearRegression():
             return None
         if y.shape != (m, 1) or y_hat.shape != (m, 1):
             return None
-        return np.square(y_hat - y)
+        return (y_hat - y) ** 2
 
     def loss_(self, y, y_hat):
         J_elem = self.loss_elem_(y, y_hat)
         if J_elem is None:
             return None
-        J_value = np.mean(J_elem) / 2
-        return J_value
+        return np.mean(J_elem) / 2
 
 
 if __name__ == "__main__":
@@ -95,6 +90,7 @@ if __name__ == "__main__":
 
     # Example 0.1:
     loss_elem = lr1.loss_elem_(y, y_hat)
+    print("LOSS_ELEM =", loss_elem)
     # Output:
     # array([[710.45867381],
     #        [364.68645485],
@@ -135,6 +131,7 @@ if __name__ == "__main__":
 
     # Example 1.2:
     loss_elem = lr2.loss_elem_(y, y_hat)
+    print("LOSS_ELEM =", loss_elem)
     # Output:
     # array([[486.66604863],
     #        [115.88278416],

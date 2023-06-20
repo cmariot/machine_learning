@@ -26,34 +26,23 @@ def predict_(
             return None
 
     # Check the dimension of theta
-    if theta.shape != (2, 1) and theta.shape != (1, 2):
+    if theta.shape != (2, 1):
         return None
 
     # Check the dimension of x
-    if x.shape[0] != 1 and x.shape[1] != 1:
+    m = x.size
+    if x.shape != (m, 1):
         return None
-
-    # If x and theta are row vectors, reshape them as column vectors
-    if theta.shape[0] == 1:
-        theta = theta.reshape(-1, 1)
-        if x.shape[0] == 1:
-            x = x.reshape(-1, 1)
-        else:
-            return None
-
-    # Size of the training set
-    m = x.shape[0]
 
     # Add a column of 1's to x
     x_prime = np.c_[np.ones(m), x]
 
     # Compute y_hat, the vector of prediction as ndarray of float
-    y_hat = np.matmul(x_prime, theta)
-
-    return y_hat
+    return x_prime @ theta
 
 
 def simple_gradient(x, y, theta):
+
     """
     Computes a gradient vector from 3 non-empty numpy.array,
     without any for loop.
@@ -78,21 +67,19 @@ def simple_gradient(x, y, theta):
             return None
 
     # Check if x and y have compatible shapes
-    m = x.size
-    if x.shape != (m, 1) or y.shape != (m, 1):
+    x_size = x.size
+    if x.shape != (x_size, 1) or y.shape != (x_size, 1):
         return None
 
     # Check the shape of theta
     if theta.shape != (2, 1):
         return None
 
-    # Matrix of shape m * 2
-    Xprime = np.c_[np.ones((m, 1)), x]
+    # Add a column of 1 -> Matrix of shape m * 2
+    Xprime = np.c_[np.ones(x_size), x]
 
-    # Matrix of shape 2 * m
-    XprimeT = Xprime.T
-
-    gradient = np.matmul((XprimeT), (Xprime.dot(theta) - y)) / m
+    # Compute and return the gradient
+    gradient = Xprime.T @ (Xprime @ theta - y) / x_size
     return gradient
 
 
@@ -131,9 +118,9 @@ def fit_(x, y, theta, alpha, max_iter):
         return None
 
     # Check if alpha and max_iter types and if they are positive
-    if not isinstance(alpha, float) or not isinstance(max_iter, int):
+    if not isinstance(alpha, float) or alpha <= 0.0:
         return None
-    if alpha <= 0 or max_iter <= 0:
+    elif not isinstance(max_iter, int) or max_iter <= 0:
         return None
 
     # Gradient descent
@@ -142,10 +129,10 @@ def fit_(x, y, theta, alpha, max_iter):
         gradient = simple_gradient(x, y, theta)
         if gradient is None:
             return None
-        elif gradient[0] == 0. and gradient[1] == 0.:
+        elif all(val == [0.0] for val in gradient):
             break
         theta = theta - alpha * gradient
-        print("{:2.2f} %" .format(_ / max_iter * 100), end="\r")
+        print(" {:2.2f} %" .format(_ / max_iter * 100), end="\r")
     return theta
 
 

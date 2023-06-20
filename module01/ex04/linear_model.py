@@ -1,13 +1,11 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sys import exit
+from sklearn.metrics import mean_squared_error
 
 
 class MyLinearRegression():
-    """
-        Description:
-            My personnal linear regression class to fit like a boss.
-    """
 
     def __init__(self, thetas, alpha=0.001, max_iter=1000):
         if (not isinstance(thetas, np.ndarray) or thetas.shape != (2, 1)):
@@ -29,28 +27,28 @@ class MyLinearRegression():
         m = x.shape[0]
         if x.shape != (m, 1) or y.shape != (m, 1):
             return None
-        Xprime = np.c_[np.ones((m, 1)), x]
-        XprimeT = Xprime.T
         gradient = np.zeros((2, 1))
+        x_size = x.size
+        Xprime = np.c_[np.ones(x_size), x]
+        XprimeT = Xprime.T
         for _ in range(self.max_iter):
-            gradient = np.matmul((XprimeT), (Xprime.dot(self.thetas) - y)) / m
-            if gradient[0] == 0. and gradient[1] == 0.:
+            gradient = XprimeT @ (Xprime @ self.thetas - y) / x_size
+            if gradient is None:
+                return None
+            elif all(val == [0.0] for val in gradient):
                 break
             self.thetas = self.thetas - self.alpha * gradient
-            print("{:2.2f} %".format(_ / self.max_iter * 100), end="\r")
+            print(" {:2.2f} %" .format(_ / self.max_iter * 100), end="\r")
         return self.thetas
 
     def predict_(self, x):
-        """
-        Computes the vector of prediction y_hat from two non-empty numpy.array.
-        """
         if not isinstance(x, np.ndarray):
             return None
         m = x.shape[0]
         if m == 0 or x.shape != (m, 1):
             return None
         X = np.c_[np.ones(m), x]
-        return X.dot(self.thetas)
+        return X @ self.thetas
 
     def loss_elem_(self, y, y_hat):
         for arr in [y, y_hat]:
@@ -61,39 +59,37 @@ class MyLinearRegression():
             return None
         if y.shape != (m, 1) or y_hat.shape != (m, 1):
             return None
-        return np.square(y_hat - y)
+        return (y_hat - y) ** 2
 
     def loss_(self, y, y_hat):
         J_elem = self.loss_elem_(y, y_hat)
         if J_elem is None:
             return None
-        J_value = np.mean(J_elem) / 2
-        return J_value
+        return np.mean(J_elem) / 2
+
+    def mse_elem(self, y, y_hat) -> np.ndarray:
+        return (y_hat - y) ** 2
+
+    def mse_(self, y, y_hat) -> float:
+        if any(not isinstance(_, np.ndarray) for _ in [y, y_hat]):
+            return None
+        m = y.size
+        if m == 0 or y.shape != (m, 1) or y_hat.shape != (m, 1):
+            return None
+        J_elem = self.mse_elem(y, y_hat)
+        return J_elem.mean()
 
 
-if __name__ == "__main__":
-
+def get_dataset():
     # Read the dataset
-    data = pd.read_csv("are_blue_pills_magics.csv")
-    Xpill = np.array(data["Micrograms"]).reshape(-1, 1)
-    Yscore = np.array(data["Score"]).reshape(-1, 1)
+    try:
+        return pd.read_csv("are_blue_pills_magics.csv")
+    except Exception:
+        print("Error : Cannot read the dataset")
+        exit(1)
 
-    thetas = [np.array([[1.], [1.]])]
 
-    # Perform a linear regression
-    linear_model = MyLinearRegression(thetas[0], 0.001, 150)
-
-    for _ in range(1000):
-        linear_model.fit_(Xpill, Yscore)
-        thetas.append(linear_model.thetas)
-
-    y_hat = linear_model.predict_(Xpill)
-    loss = linear_model.loss_(Yscore, y_hat)
-
-    print("theta0 = {:f}, theta1 = {:f}, loss = {:f}".format(
-        linear_model.thetas[0][0], linear_model.thetas[1][0], loss))
-
-    # Plot the result
+def plot_linear_regression(Xpill, Yscore, y_hat):
     plt.title("Linear regression of space driving score\n"
               + "depending on quantity of blue pill")
     plt.plot(Xpill, Yscore, 'bo')
@@ -105,8 +101,8 @@ if __name__ == "__main__":
     plt.legend(["Real values", "Predicted values"])
     plt.show()
 
-    # Plot evolution of the loss function J as a function of θ1
-    # for different values of θ0
+
+def plot_loss_evolution(Xpill, Yscore):
     some_thetas_zero = [85, 87.5, 90, 92.5, 95]
     for theta_zero in some_thetas_zero:
         loss_values = []
@@ -115,9 +111,10 @@ if __name__ == "__main__":
             linear_model = MyLinearRegression(
                 np.array([[theta_zero], [theta_one]]))
             y_hat = linear_model.predict_(Xpill)
-            loss_values.append(linear_model.loss_(Yscore, y_hat))
-
+            loss = linear_model.loss_(Yscore, y_hat)
+            loss_values.append(loss)
         plt.plot(theta_one_values, loss_values)
+
     plt.xlabel("θ1 values")
     plt.ylabel("Loss function J")
     plt.legend(some_thetas_zero)
@@ -126,3 +123,46 @@ if __name__ == "__main__":
     plt.ylim(10, 150)
     plt.grid()
     plt.show()
+
+
+def compute_mse(Xpill, Yscore):
+    linear_model1 = MyLinearRegression(np.array([[89.0], [-8]]))
+    Y_model1 = linear_model1.predict_(x=Xpill)
+    print(linear_model1.mse_(Yscore, Y_model1))
+    # 57.60304285714282
+    print(mean_squared_error(Yscore, Y_model1))
+    # 57.603042857142825
+
+    linear_model2 = MyLinearRegression(np.array([[89.0], [-6]]))
+    Y_model2 = linear_model2.predict_(Xpill)
+    print(linear_model2.mse_(Yscore, Y_model2))
+    # 232.16344285714285
+    print(mean_squared_error(Yscore, Y_model2))
+    # 232.16344285714285
+
+
+if __name__ == "__main__":
+
+    data = get_dataset()
+
+    # Variables init
+    Xpill = np.array(data["Micrograms"]).reshape(-1, 1)
+    Yscore = np.array(data["Score"]).reshape(-1, 1)
+    linear_model = MyLinearRegression(np.array([[1.], [1.]]), 0.001, 1_500_000)
+
+    # Train the model and evaluate the predicted values
+    linear_model.fit_(Xpill, Yscore)
+    y_hat = linear_model.predict_(Xpill)
+    loss = linear_model.loss_(Yscore, y_hat)
+
+    print("theta0 = {:f}, theta1 = {:f}, loss = {:f}".format(
+        linear_model.thetas[0][0], linear_model.thetas[1][0], loss))
+
+    # Plot the real values, the predicted values and the linear regression
+    plot_linear_regression(Xpill, Yscore, y_hat)
+
+    # Compute and plot evolution of the loss function J as a function of θ1
+    # for different values of θ0
+    plot_loss_evolution(Xpill, Yscore)
+
+    compute_mse(Xpill, Yscore)

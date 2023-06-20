@@ -19,10 +19,13 @@ def zscore(x):
 
     if not isinstance(x, np.ndarray):
         return None
-    if x.size == 0:
+    x_size = x.size
+    if x_size == 0:
         return None
-    if x.ndim != 1:
-        x = x.reshape(-1)
+    if x.shape != (x_size, ):
+        x = x.reshape((-1, ))
+    if x.shape != (x_size, ):
+        return None
     return (x - np.mean(x)) / np.std(x)
 
 

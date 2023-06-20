@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def minmax(x):
+def minmax(x: np.ndarray):
     """
     Computes the normalized version of a non-empty numpy.ndarray
     using the min-max standardization.
@@ -20,13 +20,12 @@ def minmax(x):
 
     if not isinstance(x, np.ndarray):
         return None
-    print("\n")
-    print(x)
-    print("Shape =", x.shape)
-    print("Size =", x.size)
-    print("Ndim =", x.ndim)
-    print("\n")
-    if x.size == 0:
+    x_size = x.size
+    if x_size == 0:
+        return None
+    if x.shape != (x_size, ):
+        x = x.reshape((-1, ))
+    if x.shape != (x_size, ):
         return None
     return (x - np.min(x)) / (np.max(x) - np.min(x))
 

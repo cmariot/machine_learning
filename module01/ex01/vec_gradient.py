@@ -2,6 +2,7 @@ import numpy as np
 
 
 def simple_gradient(x, y, theta):
+
     """
     Computes a gradient vector from 3 non-empty numpy.array,
     without any for loop.
@@ -26,21 +27,19 @@ def simple_gradient(x, y, theta):
             return None
 
     # Check if x and y have compatible shapes
-    m = x.size
-    if x.shape != (m, 1) or y.shape != (m, 1):
+    x_size = x.size
+    if x.shape != (x_size, 1) or y.shape != (x_size, 1):
         return None
 
     # Check the shape of theta
     if theta.shape != (2, 1):
         return None
 
-    # Matrix of shape m * 2
-    Xprime = np.c_[np.ones((m, 1)), x]
+    # Add a column of 1 -> Matrix of shape m * 2
+    Xprime = np.c_[np.ones(x_size), x]
 
-    # Matrix of shape 2 * m
-    XprimeT = Xprime.T
-
-    gradient = np.matmul((XprimeT), (Xprime.dot(theta) - y)) / m
+    # Compute and return the gradient
+    gradient = Xprime.T @ (Xprime @ theta - y) / x_size
     return gradient
 
 

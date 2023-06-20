@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def simple_gradient(x, y, theta):
+def simple_gradient(x: np.ndarray,
+                    y: np.ndarray,
+                    theta: np.ndarray) -> np.ndarray:
     """
     Computes a gradient vector from 3 non-empty numpy.array,
     with a for-loop.
@@ -27,8 +29,8 @@ def simple_gradient(x, y, theta):
             return None
 
     # Check if x and y have compatible shapes
-    m = x.size
-    if x.shape != (m, 1) or y.shape != (m, 1):
+    x_size = x.size
+    if x.shape != (x_size, 1) or y.shape != (x_size, 1):
         return None
 
     # Check the shape of theta
@@ -37,23 +39,30 @@ def simple_gradient(x, y, theta):
 
     # Compute gradient
     gradient = np.zeros((2, 1))
-    for i in range(m):
+    for i in range(x_size):
+
+        # Compute predicted value
         y_hat = theta[0] + theta[1] * x[i]
+
+        # Compute difference between predicted and real value
         diff = y_hat - y[i]
+
+        # Update gradient
         gradient[0] += diff
         gradient[1] += diff * x[i]
-    return gradient / m
+
+    return gradient / x_size
 
 
 if __name__ == "__main__":
 
     x = np.array(
         [12.4956442, 21.5007972, 31.5527382, 48.9145838, 57.5088733]
-        ).reshape((-1, 1))
+    ).reshape((-1, 1))
 
     y = np.array(
         [37.4013816, 36.1473236, 45.7655287, 46.6793434, 59.5585554]
-        ).reshape((-1, 1))
+    ).reshape((-1, 1))
 
     # Example 0:
     theta1 = np.array([2, 0.7]).reshape((-1, 1))
