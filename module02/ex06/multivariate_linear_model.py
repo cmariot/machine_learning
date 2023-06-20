@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
+import shutil
 
 
 class MyLR:
@@ -60,6 +62,44 @@ class MyLR:
         X_prime = np.c_[np.ones(m), x]
         return (1 / m) * (X_prime.T.dot(X_prime.dot(self.thetas) - y))
 
+    def ft_progress(self, iterable,
+                    length=shutil.get_terminal_size().columns - 2,
+                    fill='█',
+                    empty='░',
+                    print_end='\r'):
+        total = len(iterable)
+        start = time.time()
+        for i, item in enumerate(iterable, start=1):
+            elapsed_time = time.time() - start
+            eta = elapsed_time * (total / i - 1)
+            current_percent = (i / total) * 100
+            filled_length = int(length * i / total)
+            if eta == 0.0:
+                eta_str = '[DONE]    '
+            elif eta < 60:
+                eta_str = f'[ETA {eta:.0f} s]'
+            elif eta < 3600:
+                eta_str = f'[ETA {eta / 60:.0f} m]'
+            else:
+                eta_str = f'[ETA {eta / 3600:.0f} h]'
+            percent_str = f'[{current_percent:6.2f} %] '
+            progress_str = str(fill * filled_length
+                               + empty * (length - filled_length))
+            counter_str = f' [{i:>{len(str(total))}}/{total}] '
+            if elapsed_time < 60:
+                et_str = f' [Elapsed-time {elapsed_time:.2f} s]'
+            elif elapsed_time < 3600:
+                et_str = f' [Elapsed-time {elapsed_time / 60:.2f} m]'
+            else:
+                et_str = f' [Elapsed-time {elapsed_time / 3600:.2f} h]'
+            bar = ("\033[F\033[K " + progress_str + "\n"
+                   + et_str
+                   + counter_str
+                   + percent_str
+                   + eta_str)
+            print(bar, end=print_end)
+            yield item
+
     def fit_(self, x, y):
         for arr in [x, y]:
             if not isinstance(arr, np.ndarray):
@@ -71,14 +111,14 @@ class MyLR:
             return None
         elif self.thetas.shape != ((n + 1), 1):
             return None
-        for _ in range(self.max_iter):
+        for _ in self.ft_progress(range(self.max_iter)):
             gradient = self.gradient_(x, y)
             if gradient is None:
                 return None
-            elif all(__ == 0. for __ in gradient):
+            if all(__ == 0. for __ in gradient):
                 break
             self.thetas = self.thetas - self.alpha * gradient
-            print("{:2.2f} %".format(_ / self.max_iter * 100), end="\r")
+        print()
         return self.thetas
 
     def mse_elem(self, y, y_hat) -> np.ndarray:
