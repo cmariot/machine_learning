@@ -33,14 +33,13 @@ def predict_(
     # Check the dimension of x
     m = x.size
     if x.shape != (m, 1):
-        print("Here 4")
         return None
 
     # Add a column of 1's to x
     x_prime = np.c_[np.ones(m), x]
 
     # Compute y_hat, the vector of prediction as ndarray of float
-    return np.matmul(x_prime, theta)
+    return x_prime @ theta
 
 
 def simple_gradient(x, y, theta):
@@ -69,8 +68,8 @@ def simple_gradient(x, y, theta):
             return None
 
     # Check if x and y have compatible shapes
-    m = x.size
-    if x.shape != (m, 1) or y.shape != (m, 1):
+    x_size = x.size
+    if x.shape != (x_size, 1) or y.shape != (x_size, 1):
         return None
 
     # Check the shape of theta
@@ -78,13 +77,11 @@ def simple_gradient(x, y, theta):
         return None
 
     # Add a column of 1 -> Matrix of shape m * 2
-    Xprime = np.c_[np.ones(m), x]
-
-    # Matrix of shape 2 * m
-    XprimeT = Xprime.T
+    Xprime = np.c_[np.ones(x_size), x]
 
     # Compute and return the gradient
-    return np.matmul((XprimeT), (np.matmul(Xprime, theta) - y)) / m
+    gradient = Xprime.T @ (Xprime @ theta - y) / x_size
+    return gradient
 
 
 def fit_(x, y, theta, alpha, max_iter):
@@ -122,9 +119,9 @@ def fit_(x, y, theta, alpha, max_iter):
         return None
 
     # Check if alpha and max_iter types and if they are positive
-    if not isinstance(alpha, float) or not isinstance(max_iter, int):
+    if not isinstance(alpha, float) or alpha <= 0.0:
         return None
-    if alpha <= 0 or max_iter <= 0:
+    elif not isinstance(max_iter, int) or max_iter <= 0:
         return None
 
     # Gradient descent
@@ -133,10 +130,10 @@ def fit_(x, y, theta, alpha, max_iter):
         gradient = simple_gradient(x, y, theta)
         if gradient is None:
             return None
-        elif gradient[0] == 0.0 and gradient[1] == 0.0:
+        elif all(val == [0.0] for val in gradient):
             break
         theta = theta - alpha * gradient
-        print("{:2.2f} %" .format(_ / max_iter * 100), end="\r")
+        print(" {:2.2f} %" .format(_ / max_iter * 100), end="\r")
     return theta
 
 

@@ -23,16 +23,18 @@ class MyLinearRegression():
         m = x.shape[0]
         if x.shape != (m, 1) or y.shape != (m, 1):
             return None
-        Xprime = np.c_[np.ones((m, 1)), x]
-        XprimeT = Xprime.T
         gradient = np.zeros((2, 1))
+        x_size = x.size
+        Xprime = np.c_[np.ones(x_size), x]
+        XprimeT = Xprime.T
         for _ in range(self.max_iter):
-            gradient = np.matmul((XprimeT),
-                                 (np.matmul(Xprime, self.thetas) - y)) / m
-            if gradient[0] == 0. and gradient[1] == 0.:
+            gradient = XprimeT @ (Xprime @ self.thetas - y) / x_size
+            if gradient is None:
+                return None
+            elif all(val == [0.0] for val in gradient):
                 break
             self.thetas = self.thetas - self.alpha * gradient
-            print("{:2.2f} %".format(_ / self.max_iter * 100), end="\r")
+            print(" {:2.2f} %" .format(_ / self.max_iter * 100), end="\r")
         return self.thetas
 
     def predict_(self, x):
@@ -42,7 +44,7 @@ class MyLinearRegression():
         if m == 0 or x.shape != (m, 1):
             return None
         X = np.c_[np.ones(m), x]
-        return X.dot(self.thetas)
+        return X @ self.thetas
 
     def loss_elem_(self, y, y_hat):
         for arr in [y, y_hat]:
@@ -53,14 +55,13 @@ class MyLinearRegression():
             return None
         if y.shape != (m, 1) or y_hat.shape != (m, 1):
             return None
-        return np.square(y_hat - y)
+        return (y_hat - y) ** 2
 
     def loss_(self, y, y_hat):
         J_elem = self.loss_elem_(y, y_hat)
         if J_elem is None:
             return None
-        J_value = np.mean(J_elem) / 2
-        return J_value
+        return np.mean(J_elem) / 2
 
 
 if __name__ == "__main__":

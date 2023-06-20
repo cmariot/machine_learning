@@ -29,8 +29,8 @@ def simple_gradient(x: np.ndarray,
             return None
 
     # Check if x and y have compatible shapes
-    m = x.size
-    if x.shape != (m, 1) or y.shape != (m, 1):
+    x_size = x.size
+    if x.shape != (x_size, 1) or y.shape != (x_size, 1):
         return None
 
     # Check the shape of theta
@@ -39,12 +39,19 @@ def simple_gradient(x: np.ndarray,
 
     # Compute gradient
     gradient = np.zeros((2, 1))
-    for i in range(m):
-        y_hat = theta[0] + theta[1] * x[i]
-        gradient[0] += (y_hat - y[i])
-        gradient[1] += (y_hat - y[i]) * x[i]
+    for i in range(x_size):
 
-    return gradient / m
+        # Compute predicted value
+        y_hat = theta[0] + theta[1] * x[i]
+
+        # Compute difference between predicted and real value
+        diff = y_hat - y[i]
+
+        # Update gradient
+        gradient[0] += diff
+        gradient[1] += diff * x[i]
+
+    return gradient / x_size
 
 
 if __name__ == "__main__":

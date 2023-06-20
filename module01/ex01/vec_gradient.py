@@ -27,8 +27,8 @@ def simple_gradient(x, y, theta):
             return None
 
     # Check if x and y have compatible shapes
-    m = x.size
-    if x.shape != (m, 1) or y.shape != (m, 1):
+    x_size = x.size
+    if x.shape != (x_size, 1) or y.shape != (x_size, 1):
         return None
 
     # Check the shape of theta
@@ -36,13 +36,11 @@ def simple_gradient(x, y, theta):
         return None
 
     # Add a column of 1 -> Matrix of shape m * 2
-    Xprime = np.c_[np.ones(m), x]
-
-    # Matrix of shape 2 * m
-    XprimeT = Xprime.T
+    Xprime = np.c_[np.ones(x_size), x]
 
     # Compute and return the gradient
-    return np.matmul((XprimeT), (np.matmul(Xprime, theta) - y)) / m
+    gradient = Xprime.T @ (Xprime @ theta - y) / x_size
+    return gradient
 
 
 if __name__ == "__main__":
