@@ -46,7 +46,7 @@ if __name__ == "__main__":
     #        [  4.,  16.,  64., 256.],
     #        [  5.,  25., 125., 625.]])
 
-    Vandermonde_matrix = add_polynomial_features(x, -6)
+    Vandermonde_matrix = add_polynomial_features(x, 6)
 
     print(Vandermonde_matrix)
 

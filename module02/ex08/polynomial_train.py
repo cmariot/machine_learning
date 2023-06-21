@@ -2,6 +2,7 @@ import shutil
 import time
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class MyLR:
@@ -157,7 +158,7 @@ class MyLR:
 
 if __name__ == "__main__":
 
-    linear_regression = MyLR([1, 1], 10e-10, 600_000)
+    linear_regression = MyLR([80, -10], 10e-10, 10_000)
 
     # Get the dataset in the file are_blue_pills_magics.csv
     try:
@@ -177,6 +178,18 @@ if __name__ == "__main__":
     mse_scores = []
     thetas = []
 
+
+    hypothesis_theta1 = np.array([[89.0], [-8.3]]).reshape(-1, 1)
+    hypothesis_theta2 = np.array([[89.0], [-8.3], [3.2]]).reshape(-1, 1)
+    hypothesis_theta3 = np.array([[89.0], [-8.3], [3.2], [-0.5]]).reshape(-1, 1)
+    hypothesis_theta4 = np.array([[-20], [160], [-80], [10], [-1]]).reshape(-1, 1)
+    hypothesis_theta5 = np.array([[1140], [-1850], [1110], [-305],
+                                 [40], [-2]]).reshape(-1, 1)
+    hypothesis_theta6 = np.array([[9110], [-18015], [13400], [-4935],
+                                 [966], [-96.4], [3.86]]).reshape(-1, 1)
+
+    hypothesis_thetas = [theta1, theta2, theta3, theta4, theta5, theta6]
+
     # Trains six separate Linear Regression models with polynomial
     # hypothesis with degrees ranging from 1 to 6
 
@@ -187,17 +200,43 @@ if __name__ == "__main__":
 
         linear_regression.thetas = np.ones((i + 1, 1))
         current_x = polynomial_x[:, :i]
-
-        print(current_x)
-
         linear_regression.fit_(current_x, y)
         y_hat = linear_regression.predict_(current_x)
 
         thetas.append(linear_regression.thetas)
         mse_scores.append(linear_regression.mse_(y, y_hat))
 
-
     for i in range(6):
         print("Model {} :".format(i + 1))
         print("Thetas : {}".format(thetas[i]))
         print("MSE : {}\n".format(mse_scores[i]))
+
+    # Plots a bar plot showing the MSE score of the models in function of
+    # the polynomial degree of the hypothesis,
+    plt.bar([1, 2, 3, 4, 5, 6], mse_scores)
+    plt.xlabel("Polynomial degree")
+    plt.ylabel("MSE")
+    plt.show()
+
+    # Plots the 6 models and the data points on the same figure.
+    # Use lineplot style for the models and scaterplot for the data points.
+    # Add more prediction points to have smooth curves for the models.
+
+    fig, ax = plt.subplots(2, 3)
+    for i in range(6):
+
+        # Plot the data points
+        ax[i // 3, i % 3].scatter(x, y, color='blue')
+
+        # Plot the model
+        x_values = np.linspace(0, 6, 100)
+        linear_regression.thetas = thetas[i]
+        y_values = linear_regression.predict_(
+            linear_regression.add_polynomial_features(x_values, i))
+        if y_values is not None:
+            ax[i // 3, i % 3].plot(x_values, y_values, color='red')
+
+
+
+
+    plt.show()
