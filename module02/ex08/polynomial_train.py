@@ -158,7 +158,7 @@ class MyLR:
 
 if __name__ == "__main__":
 
-    linear_regression = MyLR([80, -10], 10e-10, 1_000_000)
+    linear_regression = MyLR([80, -10], 10e-10, 100_000)
 
     # Get the dataset in the file are_blue_pills_magics.csv
     try:
@@ -175,36 +175,37 @@ if __name__ == "__main__":
 
     polynomial_x = linear_regression.add_polynomial_features(x, 6)
 
-    # Loss = 18.134809974968505
+    # Loss = 18.13
     hypothesis_theta1 = np.array([[89.04720427],
                                   [-8.99425854]]
                                  ).reshape(-1, 1)
 
-    # Loss = 26.988042374726316 
+    # Loss = 26.988042374726316
     hypothesis_theta2 = np.array([[69.77316037],
                                   [1.49660362],
                                   [-1.21861482]]).reshape(-1, 1)
 
-    # Loss = 25.80
+    # Loss = 27.87
     hypothesis_theta3 = np.array([[89.0],
-                                  [-8.3],
-                                  [0.9],
-                                  [-0.2]]).reshape(-1, 1)
+                                  [-8.4],
+                                  [0.8],
+                                  [-0.1]]).reshape(-1, 1)
 
-    # Loss = 45.15
-    hypothesis_theta4 = np.array([[-20],
-                                  [160],
-                                  [-80],
-                                  [10],
-                                  [-1]]
+    # Loss = 45
+    hypothesis_theta4 = np.array([[-19.9],
+                                  [160.4],
+                                  [-78.6],
+                                  [13.6],
+                                  [-0.8]]
                                  ).reshape(-1, 1)
 
+    # Loss = 12.83
     hypothesis_theta5 = np.array([[1140],
                                   [-1850],
                                   [1110],
-                                  [-305],
-                                  [40],
-                                  [-2]]
+                                  [-305.2],
+                                  [39.3],
+                                  [-1.9]]
                                  ).reshape(-1, 1)
 
     hypothesis_theta6 = np.array([[9110],
@@ -245,14 +246,18 @@ if __name__ == "__main__":
         ax[(i - 1) // 3][(i - 1) % 3].scatter(x, y, color='blue')
 
         # Plots the model curve
-        continuous_x = np.linspace(0, 6, 100)
-        predicted_x = linear_regression.add_polynomial_features(continuous_x, i)
+        min_x = np.min(x)
+        max_x = np.max(x)
+        continuous_x = np.linspace(min_x, max_x, 100)
+        predicted_x = linear_regression.add_polynomial_features(continuous_x,
+                                                                i)
         predicted_y = linear_regression.predict_(predicted_x)
         ax[(i - 1) // 3][(i - 1) % 3].plot(continuous_x, predicted_y,
                                            color='orange')
 
         # Compute Loss
         loss = linear_regression.loss_(y, y_hat)
+        print()
         print("Loss {} : {}".format(i, loss))
         print("Thetas : {}".format(linear_regression.thetas))
         print()
