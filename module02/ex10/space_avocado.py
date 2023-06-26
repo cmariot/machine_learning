@@ -284,11 +284,34 @@ if __name__ == "__main__":
     dataset = get_dataset()
 
     # Split the dataset into a training and a test set
-    (x_train, x_test, y_train, y_test) = data_spliter(dataset, 0.01)
+    splitted = data_spliter(dataset, 0.01)
+    if splitted is None:
+        exit(1)
+    else:
+        (x_train, x_test, y_train, y_test) = splitted
 
-    nb_features = x_train.shape[1]
-    features = ["weight", "prod_distance", "time_delivery"]
+    features = dataset.columns.values[:-1]
+    nb_features = len(features)
     max_degree = 4
+
+    # Use your polynomial_features method on your training set.
+    # For each feature and for each polynomial degree, compute the
+    # polynomial expansion of the feature up to the given degree.
+
+    for feature in range(nb_features):
+        print("Feature : {}".format(features[feature]))
+        for degree in range(1, max_degree + 1):
+            print("Degree : {}".format(degree))
+            x_train_poly = add_polynomial_features(
+                x_train[:, feature], degree)
+            x_test_poly = add_polynomial_features(
+                x_test[:, feature], degree)
+
+            print("x_train_poly shape : {}".format(x_train_poly.shape))
+            print("x_test_poly shape : {}".format(x_test_poly.shape))
+
+    # Consider several Linear Regression models with polynomial hypothesis
+    # with a maximum degree of 4.
 
     linear_regression = MyLR(numpy.array([
         [0.2],
@@ -296,64 +319,68 @@ if __name__ == "__main__":
         [0],
         [0]]),
         5e-8,
-        100_000)
+        1_000_000)
 
-    # Normalize the train features to have the same scale
-    for feature in range(nb_features):
-        x_train[feature] = linear_regression.minmax(x_train[feature])
-        x_test[feature] = linear_regression.minmax(x_test[feature])
-    y_train = linear_regression.minmax(y_train)
-    y_test = linear_regression.minmax(y_test)
+    # Evaluate your models on the test set.
 
-    print("x_train shape : {}".format(x_train.shape))
-    print("y_train shape : {}".format(y_train.shape))
-    print("x_test shape : {}".format(x_test.shape))
-    print("y_test shape : {}".format(y_test.shape))
 
-    # Create a matrix, called polynomial_train_x to store the x training set,
-    # each index coreespond to a polynomial degree
-    polynomial_train_x = []
-    for feature in range(nb_features):
-        polynomial_x = add_polynomial_features(x_train[feature], 4)
-        if polynomial_x is None:
-            print("Error: can't add polynomial feature.")
-            exit(1)
-        polynomial_train_x.append(polynomial_x)
-
-    print(len(polynomial_train_x))
-    print(polynomial_train_x[:])
-
-    for power in range(max_degree):
-
-        training_x = []
-
-        for feature in range(nb_features):
-            polynomial_x = polynomial_train_x[feature]
-            current_degree = polynomial_x[:, power]
-            training_x.append(current_degree)
-
-        new_array = numpy.array(training_x)
-        print("Shape =", new_array.shape)
-
-        y_hat_train = linear_regression.predict_(new_array)
-        print("MSE : {}\n".format(
-            linear_regression.mse_(y_train, y_hat_train)))
-
-        linear_regression.fit_(new_array, y_train)
-
-        print("theta : {}".format(linear_regression.thetas))
-
-        y_hat_train = linear_regression.predict_(new_array)
-        print("MSE : {}\n".format(
-            linear_regression.mse_(y_train, y_hat_train)))
-
-    fig, axs = plt.subplots(1, 3)
-
-    for feature in range(nb_features):
-        x = x_test[:, feature]
-        y_hat_test = linear_regression.thetas[0] + \
-            linear_regression.thetas[feature + 1] * x
-        axs[feature].scatter(x, y_test)
-        axs[feature].plot(x, y_hat_test, color='red')
-        axs[feature].set_title(features[feature])
-    plt.show()
+#
+#    # Normalize the train features to have the same scale
+#    for feature in range(nb_features):
+#        x_train[feature] = linear_regression.minmax(x_train[feature])
+#        x_test[feature] = linear_regression.minmax(x_test[feature])
+#    y_train = linear_regression.minmax(y_train)
+#    y_test = linear_regression.minmax(y_test)
+#
+#    print("x_train shape : {}".format(x_train.shape))
+#    print("y_train shape : {}".format(y_train.shape))
+#    print("x_test shape : {}".format(x_test.shape))
+#    print("y_test shape : {}".format(y_test.shape))
+#
+#    # Create a matrix, called polynomial_train_x to store the x training set,
+#    # each index coreespond to a polynomial degree
+#    # polynomial_train_x = []
+#    # for feature in range(nb_features):
+#    #     polynomial_x = add_polynomial_features(x_train[feature], 4)
+#    #     if polynomial_x is None:
+#    #         print("Error: can't add polynomial feature.")
+#    #         exit(1)
+#    #     polynomial_train_x.append(polynomial_x)
+#
+#    # print(len(polynomial_train_x))
+#    # print(polynomial_train_x[:])
+#
+#    #for power in range(max_degree):
+#
+#    #    training_x = []
+#
+#    #    for feature in range(nb_features):
+#    #        polynomial_x = polynomial_train_x[feature]
+#    #        current_degree = polynomial_x[:, power]
+#    #        training_x.append(current_degree)
+#
+#    #    new_array = numpy.array(training_x)
+#    #    print("Shape =", new_array.shape)
+#
+#    y_hat_train = linear_regression.predict_(x_train)
+#    print("MSE : {}\n".format(
+#        linear_regression.mse_(y_train, y_hat_train)))
+#
+#    linear_regression.fit_(x_train, y_train)
+#
+#    print("theta : {}".format(linear_regression.thetas))
+#
+#    y_hat_train = linear_regression.predict_(x_train)
+#    print("MSE : {}\n".format(
+#        linear_regression.mse_(y_train, y_hat_train)))
+#
+#    fig, axs = plt.subplots(1, 3)
+#
+#    for feature in range(nb_features):
+#        x = x_test[:, feature]
+#        y_hat_test = linear_regression.thetas[0] + \
+#            linear_regression.thetas[feature + 1] * x
+#        axs[feature].scatter(x, y_test)
+#        axs[feature].plot(x, y_hat_test, color='red')
+#        axs[feature].set_title(features[feature])
+#    plt.show()
