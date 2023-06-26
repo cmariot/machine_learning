@@ -118,7 +118,6 @@ class MyLR:
             if all(abs(__) <= convergence for __ in gradient):
                 break
             self.thetas = self.thetas - self.alpha * gradient
-            print("gradient: ", gradient)
         print()
         print("AT THE END OF FIT : thetas: ", self.thetas)
         return self.thetas
@@ -319,24 +318,25 @@ if __name__ == "__main__":
                                   [280804.06613411],
                                   [-26029.32304272],
                                   [3264.76650934]])
-#         elif degree == 1:
-#            [[ 5.54616088e+05]
-#  [ 2.64783155e+05]
-#  [-6.45475077e+01]
-#  [-1.12745948e+04]]
-
+        elif degree == 1:
+            thetas = numpy.array([[5.54616088e+05],
+                                  [2.64783155e+05],
+                                  [-6.45475077e+01],
+                                  [-1.12745948e+04]])
         else:
             thetas = numpy.zeros((x.shape[1] + 1, 1))
         linear_regression.thetas = thetas
         y_hat = linear_regression.predict_(x)
         mse = linear_regression.mse_(y, y_hat)
         print("MSE : {}".format(mse))
+        print("Loss : {}".format(linear_regression.loss_(y, y_hat)))
         linear_regression.fit_(x, y)
 
         x_test = numpy.array([x_test[:, 0], x_test[:, 1], x_test[:, 2]]).T
         y_hat = linear_regression.predict_(x_test)
         mse = linear_regression.mse_(y_test, y_hat)
         print("MSE : {}".format(mse))
+        print("Loss : {}".format(linear_regression.loss_(y_test, y_hat)))
 
         fig, axs = plt.subplots(1, 3)
         y_hat_test = linear_regression.predict_(x_test)
