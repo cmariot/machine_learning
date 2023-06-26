@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def loss_(y, y_hat):
+def loss_(y: np.ndarray, y_hat: np.ndarray):
     for arr in [y, y_hat]:
         if not isinstance(arr, np.ndarray):
             return None
@@ -10,7 +10,8 @@ def loss_(y, y_hat):
         return None
     if y.shape != (m, 1) or y_hat.shape != (m, 1):
         return None
-    return np.mean((y_hat - y) ** 2) / 2
+    pred_sub_y = y_hat - y
+    return (np.dot(pred_sub_y.T, pred_sub_y) / (2 * m))[0, 0]
 
 
 if __name__ == "__main__":

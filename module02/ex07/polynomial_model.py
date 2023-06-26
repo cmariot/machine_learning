@@ -25,9 +25,8 @@ def add_polynomial_features(x, power):
     if power == 0:
         return np.ones((x.size, 1))
     res = np.ones((x.size, power))
-    for i in range(1, power + 1):
-        for j in range(x.size):
-            res[j][i - 1] = x[j] ** i
+    for i in range(power):
+        res[:, i] = x.ravel() ** (i + 1)
     return res
 
 
@@ -40,11 +39,11 @@ if __name__ == "__main__":
     print(Vandermonde_matrix)
 
     # Output:
-    # array([[  1.,   1.,   1.,   1.],
-    #        [  2.,   4.,   8.,  16.],
-    #        [  3.,   9.,  27.,  81.],
-    #        [  4.,  16.,  64., 256.],
-    #        [  5.,  25., 125., 625.]])
+    # array([[  1.,   1.,   1.],
+    #        [  2.,   4.,   8.],
+    #        [  3.,   9.,  27.],
+    #        [  4.,  16.,  64.],
+    #        [  5.,  25., 125.]])
 
     Vandermonde_matrix = add_polynomial_features(x, 6)
 

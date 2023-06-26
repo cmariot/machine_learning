@@ -136,7 +136,7 @@ def fit_(x, y, theta, alpha, max_iter):
         gradient = gradient_(x, y, theta)
         if gradient is None:
             return None
-        if all(val == [0.] for val in gradient):
+        elif all(val == [0.] for val in gradient):
             break
         theta = theta - alpha * gradient
     print()

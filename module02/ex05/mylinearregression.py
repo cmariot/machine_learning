@@ -5,7 +5,7 @@ import shutil
 
 class MyLR:
 
-    def __init__(self, thetas, alpha=0.001, max_iter=1000):
+    def __init__(self, thetas, alpha=0.001, max_iter=10_000):
         if not isinstance(alpha, float) or alpha < 0.0:
             return None
         elif not isinstance(max_iter, int) or max_iter < 0:
@@ -113,7 +113,7 @@ class MyLR:
             gradient = self.gradient_(x, y)
             if gradient is None:
                 return None
-            if all(__ == 0. for __ in gradient):
+            elif all(__ == 0. for __ in gradient):
                 break
             self.thetas = self.thetas - self.alpha * gradient
         print()
@@ -136,9 +136,13 @@ if __name__ == "__main__":
                  [1.],
                  [1]])
 
+    print("X: \n", X)
+    print("Y: \n", Y)
+    print("Default thetas: \n", mylr.thetas)
+
     # Example 0:
     y_hat = mylr.predict_(X)
-    print(y_hat)
+    print("y_hat: \n", y_hat)
     # Output:
     # array([[8.], [48.], [323.]])
 
@@ -149,21 +153,23 @@ if __name__ == "__main__":
 
     # Example 2:
     loss = mylr.loss_(Y, y_hat)
-    print(loss)
+    print("Loss :\n", loss)
     # Output:
     # 1875.0
 
     # Example 3:
     mylr.alpha = 1.6e-4
-    mylr.max_iter = 200000
+    mylr.max_iter = 200_000
+
+    print("\nTraining the model ... Please wait.\n\n")
     mylr.fit_(X, Y)
-    print(mylr.thetas)
+    print("\nTrained thetas :\n", mylr.thetas)
     # Output:
     # array([[18.188..], [2.767..], [-0.374..], [1.392..], [0.017..]])
 
     # Example 4:
     y_hat = mylr.predict_(X)
-    print(y_hat)
+    print("Updated y prediction\n", y_hat)
     # Output:
     # array([[23.417..], [47.489..], [218.065...]])
 
@@ -174,6 +180,6 @@ if __name__ == "__main__":
 
     # Example 6:
     loss = mylr.loss_(Y, y_hat)
-    print(loss)
+    print("New loss :\n", loss)
     # Output:
     # 0.0732..

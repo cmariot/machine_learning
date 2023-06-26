@@ -22,17 +22,13 @@ def predict_(x, theta):
         elif arr.size == 0:
             return None
 
-    m = x.shape[0]
-    n = x.shape[1]
-
-    if theta.shape != (n + 1, 1):
+    if theta.shape != (x.shape[1] + 1, 1):
         return None
 
     # Add a column of 1 to x -> X_prime
-    X_prime = np.concatenate((np.ones((m, 1)), x), axis=1)
+    X_prime = np.c_[np.ones(x.shape[0]), x]
 
-    y_hat = X_prime @ theta
-    return y_hat
+    return X_prime @ theta
 
 
 if __name__ == "__main__":

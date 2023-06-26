@@ -41,6 +41,7 @@ if __name__ == "__main__":
 
     # /!\ Modif des thetas : Ajout d'un 0 a l'index 0,
     # la fonction prend en parametre un vecteur de taille n + 1
+    # prediction = theta0 + theta1 * x1 + theta2 * x2 + ... + thetan * xn
 
     x = np.array([
                  [-6, -7, -9],

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 class MyLR:
 
-    def __init__(self, thetas, alpha=0.0001, max_iter=500000):
+    def __init__(self, thetas, alpha=0.0001, max_iter=500_000):
         if not isinstance(alpha, float) or alpha < 0.0:
             return None
         elif not isinstance(max_iter, int) or max_iter < 0:
@@ -25,9 +25,8 @@ class MyLR:
         n = x.shape[1]
         if self.thetas.shape != (n + 1, 1):
             return None
-        X_prime = np.concatenate((np.ones((m, 1)), x), axis=1)
-        y_hat = np.dot(X_prime, self.thetas)
-        return y_hat
+        X_prime = np.c_[np.ones(m), x]
+        return X_prime @ self.thetas
 
     def loss_elem_(self, y, y_hat):
         for arr in [y, y_hat]:
@@ -38,15 +37,15 @@ class MyLR:
             return None
         if y.shape != (m, 1) or y_hat.shape != (m, 1):
             return None
-        J_elem = np.square(y_hat - y)
+        pred_sub_y = y_hat - y
+        J_elem = np.dot(pred_sub_y.T, pred_sub_y)
         return J_elem
 
     def loss_(self, y, y_hat):
         J_elem = self.loss_elem_(y, y_hat)
         if J_elem is None:
             return None
-        J_value = np.mean(J_elem) / 2
-        return J_value
+        return (J_elem / (2 * y.shape[0]))[0, 0]
 
     def gradient_(self, x, y):
         for array in [x, y]:
@@ -60,7 +59,7 @@ class MyLR:
         elif self.thetas.shape != (n + 1, 1):
             return None
         X_prime = np.c_[np.ones(m), x]
-        return X_prime.T @ (X_prime @ self.thetas - y) / m
+        return (X_prime.T @ (X_prime @ self.thetas - y)) / m
 
     def ft_progress(self, iterable,
                     length=shutil.get_terminal_size().columns - 2,
@@ -115,9 +114,9 @@ class MyLR:
             gradient = self.gradient_(x, y)
             if gradient is None:
                 return None
-            if all(__ == [0.] for __ in gradient):
+            if all(__ == 0. for __ in gradient):
                 break
-            self.thetas = self.thetas - self.alpha * gradient
+            self.thetas -= self.alpha * gradient
         print()
         return self.thetas
 
@@ -150,9 +149,8 @@ class MyLR:
         if power == 0:
             return np.ones((x.size, 1))
         res = np.ones((x.size, power))
-        for i in range(1, power + 1):
-            for j in range(x.size):
-                res[j][i - 1] = x[j] ** i
+        for i in range(power):
+            res[:, i] = x.ravel() ** (i + 1)
         return res
 
 

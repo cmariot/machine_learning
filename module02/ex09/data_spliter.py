@@ -44,7 +44,6 @@ def print_data(data, name):
             print(val)
         else:
             print(val, end=", ")
-    print("")
 
 
 def data_spliter(x, y, proportion):
@@ -89,20 +88,22 @@ if __name__ == "__main__":
     # Create a vector of dimension (10, 1)
     y = np.random.randint(0, 100, (100, 1))
 
-    (x_train, x_test, y_train, y_test) = data_spliter(x, y, 0.5)
+    print("x.shape : ", x.shape)
+    print("y.shape : ", y.shape)
+
+    print("Splitting the dataset into a training set and a test set ...")
+    (x_train, x_test, y_train, y_test) = data_spliter(x, y, 0.2)
 
     # Print the training set
-    print("Training set :")
-    print_data(x_train, "X")
-    print_data(y_train, "Y")
+    print_data(x_train, "taining_x")
+    print_data(y_train, "training_y")
 
-    print("X.shape : ", x_train.shape)
-    print("Y.shape : ", y_train.shape)
-    
+    print("taining_x.shape : ", x_train.shape)
+    print("taining_y.shape : ", y_train.shape)
+
     # Print the test set
-    print("Test set :")
-    print_data(x_test, "X")
-    print_data(y_test, "Y")
+    print_data(x_test, "test_x")
+    print_data(y_test, "test_y")
 
-    print("X.shape : ", x_test.shape)
-    print("Y.shape : ", y_test.shape)
+    print("test_x.shape : ", x_test.shape)
+    print("test_y.shape : ", y_test.shape)
