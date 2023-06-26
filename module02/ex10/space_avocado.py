@@ -100,31 +100,27 @@ class MyLR:
             print(bar, end=print_end)
             yield item
 
-    def fit_(self, x, y):
+    def fit_(self, x, y, convergence=10e-5):
         for arr in [x, y]:
             if not isinstance(arr, numpy.ndarray):
-                print("Error: 1")
                 return None
         m, n = x.shape
         if m == 0 or n == 0:
-            print("Error: 2")
             return None
         if y.shape != (m, 1):
-            print("Error: 3")
-            print(y.shape, "vs", (m, 1))
             return None
         elif self.thetas.shape != ((n + 1), 1):
-            print("Error: 4")
             return None
         for _ in self.ft_progress(range(self.max_iter)):
             gradient = self.gradient_(x, y)
             if gradient is None:
-                print("Error: 5")
                 return None
-            if all(__ == 0. for __ in gradient):
+            if all(abs(__) <= convergence for __ in gradient):
                 break
             self.thetas = self.thetas - self.alpha * gradient
+            print("gradient: ", gradient)
         print()
+        print("AT THE END OF FIT : thetas: ", self.thetas)
         return self.thetas
 
     def mse_elem(self, y, y_hat) -> numpy.ndarray:
@@ -284,7 +280,7 @@ if __name__ == "__main__":
     dataset = get_dataset()
 
     # Split the dataset into a training and a test set
-    splitted = data_spliter(dataset, 0.01)
+    splitted = data_spliter(dataset, 0.1)
     if splitted is None:
         exit(1)
     else:
@@ -295,43 +291,63 @@ if __name__ == "__main__":
     max_degree = 4
 
     # Use your polynomial_features method on your training set.
-    # For each feature and for each polynomial degree, compute the
-    # polynomial expansion of the feature up to the given degree.
+    # For each feature, create a polynomial of 4 degrees.
 
+    linear_regression = MyLR(numpy.array((2, 1)), 5e-4, 1_000_000)
+    x_train_poly = []
     for feature in range(nb_features):
-        print("Feature : {}".format(features[feature]))
-        for degree in range(1, max_degree + 1):
-            print("Degree : {}".format(degree))
-            x_train_poly = add_polynomial_features(
-                x_train[:, feature], degree)
-            x_test_poly = add_polynomial_features(
-                x_test[:, feature], degree)
-
-            print("x_train_poly shape : {}".format(x_train_poly.shape))
-            print("x_test_poly shape : {}".format(x_test_poly.shape))
+        polynomial_feature = add_polynomial_features(
+            x_train[:, feature], max_degree)
+        # Normalize the training data
+        for degree in range(max_degree):
+            polynomial_feature[:, degree] = \
+                linear_regression.minmax(polynomial_feature[:, degree])
+        x_test[:, feature] = linear_regression.minmax(x_test[:, feature])
+        x_train_poly.append(polynomial_feature)
 
     # Consider several Linear Regression models with polynomial hypothesis
     # with a maximum degree of 4.
+    for degree in range(max_degree):
+        print("Degree : {}".format(degree + 1))
+        # Train your models on the training set.
+        x = numpy.array([x_train_poly[0][:, degree],
+                         x_train_poly[1][:, degree],
+                         x_train_poly[2][:, degree]]).T
+        y = y_train
+        if degree == 0:
+            thetas = numpy.array([[516625.14931463],
+                                  [280804.06613411],
+                                  [-26029.32304272],
+                                  [3264.76650934]])
+#         elif degree == 1:
+#            [[ 5.54616088e+05]
+#  [ 2.64783155e+05]
+#  [-6.45475077e+01]
+#  [-1.12745948e+04]]
 
-    linear_regression = MyLR(numpy.array([
-        [0.2],
-        [0],
-        [0],
-        [0]]),
-        5e-8,
-        1_000_000)
+        else:
+            thetas = numpy.zeros((x.shape[1] + 1, 1))
+        linear_regression.thetas = thetas
+        y_hat = linear_regression.predict_(x)
+        mse = linear_regression.mse_(y, y_hat)
+        print("MSE : {}".format(mse))
+        linear_regression.fit_(x, y)
 
-    # Evaluate your models on the test set.
+        x_test = numpy.array([x_test[:, 0], x_test[:, 1], x_test[:, 2]]).T
+        y_hat = linear_regression.predict_(x_test)
+        mse = linear_regression.mse_(y_test, y_hat)
+        print("MSE : {}".format(mse))
+
+        fig, axs = plt.subplots(1, 3)
+        y_hat_test = linear_regression.predict_(x_test)
+        for feature in range(nb_features):
+            axs[feature].scatter(x_test[:, feature], y_test)
+            axs[feature].scatter(x_test[:, feature], y_hat_test,
+                                 color='red', marker='.')
+            axs[feature].set_title(features[feature])
+        plt.show()
 
 
-#
-#    # Normalize the train features to have the same scale
-#    for feature in range(nb_features):
-#        x_train[feature] = linear_regression.minmax(x_train[feature])
-#        x_test[feature] = linear_regression.minmax(x_test[feature])
-#    y_train = linear_regression.minmax(y_train)
-#    y_test = linear_regression.minmax(y_test)
-#
 #    print("x_train shape : {}".format(x_train.shape))
 #    print("y_train shape : {}".format(y_train.shape))
 #    print("x_test shape : {}".format(x_test.shape))
@@ -374,13 +390,4 @@ if __name__ == "__main__":
 #    print("MSE : {}\n".format(
 #        linear_regression.mse_(y_train, y_hat_train)))
 #
-#    fig, axs = plt.subplots(1, 3)
-#
-#    for feature in range(nb_features):
-#        x = x_test[:, feature]
-#        y_hat_test = linear_regression.thetas[0] + \
-#            linear_regression.thetas[feature + 1] * x
-#        axs[feature].scatter(x, y_test)
-#        axs[feature].plot(x, y_hat_test, color='red')
-#        axs[feature].set_title(features[feature])
-#    plt.show()
+
