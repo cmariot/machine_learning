@@ -1,161 +1,8 @@
-import shutil
-import time
+from matplotlib import pyplot as plt
 import pandas
 import numpy
-import matplotlib.pyplot as plt
-
-
-class MyLR:
-
-    def __init__(self, thetas, alpha=0.0001, max_iter=500000):
-        if not isinstance(alpha, float) or alpha < 0.0:
-            return None
-        elif not isinstance(max_iter, int) or max_iter < 0:
-            return None
-        self.thetas = numpy.array(thetas)
-        self.alpha = alpha
-        self.max_iter = max_iter
-
-    def predict_(self, x):
-        if not isinstance(x, numpy.ndarray):
-            return None
-        elif x.size == 0:
-            return None
-        m = x.shape[0]
-        n = x.shape[1]
-        if self.thetas.shape != (n + 1, 1):
-            return None
-        X_prime = numpy.concatenate((numpy.ones((m, 1)), x), axis=1)
-        y_hat = numpy.dot(X_prime, self.thetas)
-        return y_hat
-
-    def loss_elem_(self, y, y_hat):
-        for arr in [y, y_hat]:
-            if not isinstance(arr, numpy.ndarray):
-                return None
-        m = y.shape[0]
-        if m == 0:
-            return None
-        if y.shape != (m, 1) or y_hat.shape != (m, 1):
-            return None
-        J_elem = numpy.square(y_hat - y)
-        return J_elem
-
-    def loss_(self, y, y_hat):
-        J_elem = self.loss_elem_(y, y_hat)
-        if J_elem is None:
-            return None
-        J_value = numpy.mean(J_elem) / 2
-        return J_value
-
-    def gradient_(self, x, y):
-        for array in [x, y]:
-            if not isinstance(array, numpy.ndarray):
-                return None
-        m, n = x.shape
-        if m == 0 or n == 0:
-            return None
-        elif y.shape != (m, 1):
-            return None
-        elif self.thetas.shape != (n + 1, 1):
-            return None
-        X_prime = numpy.c_[numpy.ones(m), x]
-        return (1 / m) * (X_prime.T.dot(X_prime.dot(self.thetas) - y))
-
-    def ft_progress(self, iterable,
-                    length=shutil.get_terminal_size().columns - 2,
-                    fill='█',
-                    empty='░',
-                    print_end='\r'):
-        total = len(iterable)
-        start = time.time()
-        for i, item in enumerate(iterable, start=1):
-            elapsed_time = time.time() - start
-            eta = elapsed_time * (total / i - 1)
-            current_percent = (i / total) * 100
-            filled_length = int(length * i / total)
-            if eta == 0.0:
-                eta_str = '[DONE]    '
-            elif eta < 60:
-                eta_str = f'[ETA {eta:.0f} s]'
-            elif eta < 3600:
-                eta_str = f'[ETA {eta / 60:.0f} m]'
-            else:
-                eta_str = f'[ETA {eta / 3600:.0f} h]'
-            percent_str = f'[{current_percent:6.2f} %] '
-            progress_str = str(fill * filled_length
-                               + empty * (length - filled_length))
-            counter_str = f' [{i:>{len(str(total))}}/{total}] '
-            if elapsed_time < 60:
-                et_str = f' [Elapsed-time {elapsed_time:.2f} s]'
-            elif elapsed_time < 3600:
-                et_str = f' [Elapsed-time {elapsed_time / 60:.2f} m]'
-            else:
-                et_str = f' [Elapsed-time {elapsed_time / 3600:.2f} h]'
-            bar = ("\033[F\033[K " + progress_str + "\n"
-                   + et_str
-                   + counter_str
-                   + percent_str
-                   + eta_str)
-            print(bar, end=print_end)
-            yield item
-
-    def fit_(self, x, y, convergence=10e-10):
-        for arr in [x, y]:
-            if not isinstance(arr, numpy.ndarray):
-                return None
-        m, n = x.shape
-        if m == 0 or n == 0:
-            return None
-        if y.shape != (m, 1):
-            return None
-        elif self.thetas.shape != ((n + 1), 1):
-            return None
-        for _ in self.ft_progress(range(self.max_iter)):
-            gradient = self.gradient_(x, y)
-            if gradient is None:
-                return None
-            if all(abs(__) <= convergence for __ in gradient):
-                break
-            self.thetas = self.thetas - self.alpha * gradient
-        print()
-        print("AT THE END OF FIT : thetas: ", self.thetas)
-        return self.thetas
-
-    def mse_elem(self, y, y_hat) -> numpy.ndarray:
-        return (y_hat - y) ** 2
-
-    def mse_(self, y, y_hat) -> float:
-        if any(not isinstance(_, numpy.ndarray) for _ in [y, y_hat]):
-            return None
-        m = y.shape[0]
-        if m == 0 or y.shape != (m, 1) or y_hat.shape != (m, 1):
-            return None
-        J_elem = self.mse_elem(y, y_hat)
-        return J_elem.mean()
-
-    def minmax(self, x):
-        if not isinstance(x, numpy.ndarray):
-            return None
-        if x.size == 0:
-            return None
-        return (x - numpy.min(x)) / (numpy.max(x) - numpy.min(x))
-
-    def normalize(self, x):
-        if not isinstance(x, numpy.ndarray):
-            return None
-        if x.size == 0:
-            return None
-        self.mean = numpy.mean(x)
-        self.std = numpy.std(x)
-        return (x - self.mean) / self.std
-
-    def denormalize(self, x):
-        if not isinstance(x, numpy.ndarray):
-            return None
-        if x.size == 0:
-            return None
-        return (x + self.mean) * self.std
+from my_linear_regression import MyLR as MyLR
+import json
 
 
 def get_dataset():
@@ -305,7 +152,7 @@ if __name__ == "__main__":
     features = dataset.columns.values[:-1]
     nb_features = len(features)
 
-    linear_regression = MyLR(numpy.array((2, 1)), 0.001, 1_000_000)
+    linear_regression = MyLR(numpy.array((2, 1)), 0.05, 10_000)
 
     # Normalize the features
     for feature_index in range(nb_features):
@@ -313,49 +160,171 @@ if __name__ == "__main__":
             linear_regression.normalize(x_train[:, feature_index])
         x_test[:, feature_index] = \
             linear_regression.normalize(x_test[:, feature_index])
+    y_train = linear_regression.normalize(y_train)
+    y_test = linear_regression.normalize(y_test)
 
-    for feature_index in range(nb_features):
+    polynomial_weight = add_polynomial_features(x_train[:, 0], 4)
+    polynomial_prod_distance = add_polynomial_features(x_train[:, 1], 4)
+    polynomial_time_delivery = add_polynomial_features(x_train[:, 2], 4)
 
-        fix, ax = plt.subplots(1, 4)
-        costs = []
+    test_polynolial_weight = add_polynomial_features(x_test[:, 0], 4)
+    test_polynomial_prod_distance = add_polynomial_features(x_test[:, 1], 4)
+    test_polynomial_time_delivery = add_polynomial_features(x_test[:, 2], 4)
 
-        for degree in range(max_degree):
+    models = []
 
-            # Use your polynomial_features method on your training set
-            x_train_poly = add_polynomial_features(x_train[:, feature_index],
-                                                   degree + 1)
+    for degree in range(1, 5):
+        for degree2 in range(1, 5):
+            for degree3 in range(1, 5):
 
-            # Fit the model
-            linear_regression.thetas = numpy.ones((degree + 2, 1))
-            linear_regression.fit_(x_train_poly, y_train)
+                model = {}
+                model["name"] = "w" + str(degree) + \
+                                "d" + str(degree2) + \
+                                "t" + str(degree3)
+                model["degres"] = (degree, degree2, degree3)
 
-            # Use the cost function to evaluate the model on the test set
-            x_test_poly = add_polynomial_features(x_test[:, feature_index],
-                                                  degree + 1)
-            y_hat = linear_regression.predict_(x_test_poly)
-            cost = linear_regression.loss_(y_hat, y_test)
-            costs.append(cost)
-            print("Cost for degree " + str(degree) + " : " + str(cost))
+                model_weight = polynomial_weight[:, :degree]
+                model_prod_distance = polynomial_prod_distance[:, :degree2]
+                model_time_delivery = polynomial_time_delivery[:, :degree3]
 
-            x_denormalized = linear_regression.denormalize(
-                x_test[:, feature_index])
+                x_train = numpy.concatenate(
+                    (model_weight,
+                     model_prod_distance,
+                     model_time_delivery),
+                    axis=1)
 
-            ax[degree].scatter(x_denormalized, y_test, color="blue")
-            ax[degree].scatter(x_denormalized, y_hat, color="red")
-            ax[degree].set_title(
-                "Degree " + str(degree + 1) + "\n Cost : " + str(cost))
+                theta_shape = (degree + degree2 + degree3 + 1, 1)
+                linear_regression.thetas = numpy.ones(theta_shape)
+                model["theta_shape"] = theta_shape
 
-        plt.suptitle(features[feature_index])
-        plt.show()
+                linear_regression.fit_(x_train, y_train)
+                predicted_theta = linear_regression.thetas
+                model["theta"] = predicted_theta.tolist()
 
-        # Plot the cost depending on the degree
-        plt.figure()
-        plt.bar(range(1, max_degree + 1), costs)
-        plt.xlabel("Degree")
-        plt.ylabel("Cost")
-        plt.show()
+                # Create an array with the polynomial features from 0 to degree
+                # for each feature for the test set
+                test_weight = test_polynolial_weight[:, :degree]
+                test_prod_distance = test_polynomial_prod_distance[:, :degree2]
+                test_time_delivery = test_polynomial_time_delivery[:, :degree3]
 
-        print("\n\nBest degree for feature {}: ".format(
-            features[feature_index])
-              + str(costs.index(min(costs)) + 1))
-        print()
+                x_test = numpy.concatenate(
+                    (test_weight,
+                        test_prod_distance,
+                        test_time_delivery),
+                    axis=1)
+
+                y_hat = linear_regression.predict_(x_test)
+                cost = linear_regression.loss_(y_test, y_hat)
+                model["train_cost"] = cost
+                y_hat = linear_regression.predict_(x_test)
+                cost = linear_regression.loss_(y_test, y_hat)
+                model["test_cost"] = cost
+
+                print(model)
+                print()
+                models.append(model)
+
+                # Plot the results on 3 graphs (one for each feature)
+                fig, ax = plt.subplots(1, 3)
+                real_weight = x_test[:, 0]
+                real_prod_distance = x_test[:, 1]
+                real_time_delivery = x_test[:, 2]
+                ax[0].scatter(real_weight, y_test, color="green")
+                ax[0].scatter(x_test[:, 0], y_test, color="blue")
+                ax[0].scatter(x_test[:, 0], y_hat, color="red")
+                ax[0].set_title("Weight")
+                ax[1].scatter(x_test[:, 1], y_test, color="blue")
+                ax[1].scatter(x_test[:, 1], y_hat, color="red")
+                ax[1].set_title("Product distance")
+                ax[2].scatter(x_test[:, 2], y_test, color="blue")
+                ax[2].scatter(x_test[:, 2], y_hat, color="red")
+                ax[2].set_title("Time delivery")
+                plt.show()
+
+    best_model = min(models, key=lambda x: x["test_cost"])
+
+    # Save the models in the file models.json
+    with open("models.json", "w") as file:
+        for model in models:
+            file.write(json.dumps(model))
+            if model != models[-1]:
+                file.write(",\n")
+
+    print("Best model is:")
+    print(best_model)
+
+    # plot the results on 3 graphs (one for each feature) for the best model
+    degree = best_model["degres"][0]
+    degree2 = best_model["degres"][1]
+    degree3 = best_model["degres"][2]
+
+    model_weight = polynomial_weight[:, :degree]
+    model_prod_distance = polynomial_prod_distance[:, :degree2]
+    model_time_delivery = polynomial_time_delivery[:, :degree3]
+
+    x_train = numpy.concatenate(
+        (model_weight[:, :best_model["degres"][0]],
+            model_prod_distance[:, :best_model["degres"][1]],
+            model_time_delivery[:, :best_model["degres"][2]]),
+        axis=1)
+    
+    fig, ax = plt.subplots(3, 1)
+    ax[0].scatter(x_test[:, 0], y_test, color="blue")
+    ax[0].scatter(x_test[:, 0], y_hat, color="red")
+    ax[0].set_title("Weight")
+    ax[1].scatter(x_test[:, 1], y_test, color="blue")
+    ax[1].scatter(x_test[:, 1], y_hat, color="red")
+    ax[1].set_title("Product distance")
+    ax[2].scatter(x_test[:, 2], y_test, color="blue")
+    ax[2].scatter(x_test[:, 2], y_hat, color="red")
+    ax[2].set_title("Time delivery")
+    plt.show()
+
+
+    # Test end
+    
+#    for feature_index in range(nb_features):
+#
+#        fix, ax = plt.subplots(1, 4)
+#        costs = []
+#
+#        for degree in range(max_degree):
+#
+#            # Use your polynomial_features method on your training set
+#            x_train_poly = add_polynomial_features(x_train[:, feature_index],
+#                                                   degree + 1)
+#
+#            # Fit the model
+#            linear_regression.thetas = numpy.ones((degree + 2, 1))
+#            linear_regression.fit_(x_train_poly, y_train)
+#
+#            # Use the cost function to evaluate the model on the test set
+#            x_test_poly = add_polynomial_features(x_test[:, feature_index],
+#                                                  degree + 1)
+#            y_hat = linear_regression.predict_(x_test_poly)
+#            cost = linear_regression.loss_(y_hat, y_test)
+#            costs.append(cost)
+#            print("Cost for degree " + str(degree) + " : " + str(cost))
+#
+#            x_denormalized = linear_regression.denormalize(
+#                x_test[:, feature_index])
+#
+#            ax[degree].scatter(x_denormalized, y_test, color="blue")
+#            ax[degree].scatter(x_denormalized, y_hat, color="red")
+#            ax[degree].set_title(
+#                "Degree " + str(degree + 1) + "\n Cost : " + str(cost))
+#
+#        plt.suptitle(features[feature_index])
+#        plt.show()
+#
+#        # Plot the cost depending on the degree
+#        plt.figure()
+#        plt.bar(range(1, max_degree + 1), costs)
+#        plt.xlabel("Degree")
+#        plt.ylabel("Cost")
+#        plt.show()
+#
+#        print("\n\nBest degree for feature {}: ".format(
+#            features[feature_index])
+#              + str(costs.index(min(costs)) + 1))
+#        print()
