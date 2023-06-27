@@ -96,12 +96,12 @@ def data_spliter(dataset, proportion):
 
     shuffled_x, shuffled_y = shuffle_data(x, y)
 
-    proportin_index = int(x.shape[0] * proportion)
+    proportion_index = int(x.shape[0] * proportion)
 
-    x_train = shuffled_x[:proportin_index]
-    x_test = shuffled_x[proportin_index:]
-    y_train = shuffled_y[:proportin_index]
-    y_test = shuffled_y[proportin_index:]
+    x_train = shuffled_x[:proportion_index]
+    x_test = shuffled_x[proportion_index:]
+    y_train = shuffled_y[:proportion_index]
+    y_test = shuffled_y[proportion_index:]
 
     return (x_train, x_test, y_train, y_test)
 
@@ -136,6 +136,29 @@ def add_polynomial_features(x, power):
     return res
 
 
+def print_model_info(model):
+    print(model["name"].upper())
+    print("price = θ0 + ", end="")
+    (degree, degree2, degree3) = model["degres"]
+    for i in range(1, degree + 1):
+        print("θ" + str(i) + " * weight^" + str(i), end="")
+        if i < degree:
+            print(" + ", end="")
+    print(" + ", end="")
+    for i in range(1, degree2 + 1):
+        print("θ" + str(i + degree) + " * prod_distance^" + str(i),
+              end="")
+        if i < degree2:
+            print(" + ", end="")
+    print(" + ", end="")
+    for i in range(1, degree3 + 1):
+        print("θ" + str(i + degree + degree2) +
+              " * time_delivery^" + str(i), end="")
+        if i < degree3:
+            print(" + ", end="")
+    print()
+
+
 if __name__ == "__main__":
 
     # Get the dataset in the file space_avocado.csv
@@ -148,100 +171,106 @@ if __name__ == "__main__":
     else:
         (x_train, x_test, y_train, y_test) = splitted
 
-    max_degree = 4
     features = dataset.columns.values[:-1]
     nb_features = len(features)
 
-    linear_regression = MyLR(numpy.array((2, 1)), 0.05, 10_000)
+    linear_regression = MyLR(alpha=0.075, max_iter=10_000)
 
     # Normalize the features
+    x_train_normalized = numpy.empty(x_train.shape)
+    x_test_normalized = numpy.empty(x_test.shape)
     for feature_index in range(nb_features):
-        x_train[:, feature_index] = \
+        x_train_normalized[:, feature_index] = \
             linear_regression.normalize(x_train[:, feature_index])
-        x_test[:, feature_index] = \
+        x_test_normalized[:, feature_index] = \
             linear_regression.normalize(x_test[:, feature_index])
-    y_train = linear_regression.normalize(y_train)
-    y_test = linear_regression.normalize(y_test)
 
-    polynomial_weight = add_polynomial_features(x_train[:, 0], 4)
-    polynomial_prod_distance = add_polynomial_features(x_train[:, 1], 4)
-    polynomial_time_delivery = add_polynomial_features(x_train[:, 2], 4)
+    train_polynomial_weight = add_polynomial_features(
+        x_train_normalized[:, 0], 4)
+    train_polynomial_prod_distance = add_polynomial_features(
+        x_train_normalized[:, 1], 4)
+    train_polynomial_time_delivery = add_polynomial_features(
+        x_train_normalized[:, 2], 4)
 
-    test_polynolial_weight = add_polynomial_features(x_test[:, 0], 4)
-    test_polynomial_prod_distance = add_polynomial_features(x_test[:, 1], 4)
-    test_polynomial_time_delivery = add_polynomial_features(x_test[:, 2], 4)
+    test_polynomial_weight = add_polynomial_features(
+        x_test_normalized[:, 0], 4)
+    test_polynomial_prod_distance = add_polynomial_features(
+        x_test_normalized[:, 1], 4)
+    test_polynomial_time_delivery = add_polynomial_features(
+        x_test_normalized[:, 2], 4)
 
     models = []
-
-    for degree in range(1, 5):
-        for degree2 in range(1, 5):
-            for degree3 in range(1, 5):
+    max_degree = range(1, 5)
+    for degree in max_degree:
+        for degree2 in max_degree:
+            for degree3 in max_degree:
 
                 model = {}
                 model["name"] = "w" + str(degree) + \
                                 "d" + str(degree2) + \
                                 "t" + str(degree3)
                 model["degres"] = (degree, degree2, degree3)
+                model["theta_shape"] = (degree + degree2 + degree3 + 1, 1)
 
-                model_weight = polynomial_weight[:, :degree]
-                model_prod_distance = polynomial_prod_distance[:, :degree2]
-                model_time_delivery = polynomial_time_delivery[:, :degree3]
+                print_model_info(model)
 
-                x_train = numpy.concatenate(
-                    (model_weight,
-                     model_prod_distance,
-                     model_time_delivery),
+                # ##################################### #
+                # Train the model with the training set #
+                # ##################################### #
+
+                model_training_x = numpy.concatenate(
+                    (train_polynomial_weight[:, :degree],
+                        train_polynomial_prod_distance[:, :degree2],
+                        train_polynomial_time_delivery[:, :degree3]),
                     axis=1)
 
-                theta_shape = (degree + degree2 + degree3 + 1, 1)
-                linear_regression.thetas = numpy.ones(theta_shape)
-                model["theta_shape"] = theta_shape
+                linear_regression.thetas = numpy.ones(model["theta_shape"])
+                linear_regression.fit_(model_training_x, y_train)
+                model["theta"] = linear_regression.thetas.tolist()
 
-                linear_regression.fit_(x_train, y_train)
-                predicted_theta = linear_regression.thetas
-                model["theta"] = predicted_theta.tolist()
+                # ############################# #
+                # Evaluate the model prediction #
+                # ############################# #
 
-                # Create an array with the polynomial features from 0 to degree
-                # for each feature for the test set
-                test_weight = test_polynolial_weight[:, :degree]
-                test_prod_distance = test_polynomial_prod_distance[:, :degree2]
-                test_time_delivery = test_polynomial_time_delivery[:, :degree3]
-
-                x_test = numpy.concatenate(
-                    (test_weight,
-                        test_prod_distance,
-                        test_time_delivery),
+                model_test_x = numpy.concatenate(
+                    (test_polynomial_weight[:, :degree],
+                        test_polynomial_prod_distance[:, :degree2],
+                        test_polynomial_time_delivery[:, :degree3]),
                     axis=1)
 
-                y_hat = linear_regression.predict_(x_test)
-                cost = linear_regression.loss_(y_test, y_hat)
-                model["train_cost"] = cost
-                y_hat = linear_regression.predict_(x_test)
-                cost = linear_regression.loss_(y_test, y_hat)
-                model["test_cost"] = cost
+                model_y_hat = linear_regression.predict_(model_test_x)
+                model_cost = linear_regression.mse_(y_test,
+                                                    model_y_hat)
+
+                model["cost"] = model_cost
 
                 print(model)
                 print()
                 models.append(model)
 
-                # Plot the results on 3 graphs (one for each feature)
-                fig, ax = plt.subplots(1, 3)
-                real_weight = x_test[:, 0]
-                real_prod_distance = x_test[:, 1]
-                real_time_delivery = x_test[:, 2]
-                ax[0].scatter(real_weight, y_test, color="green")
-                ax[0].scatter(x_test[:, 0], y_test, color="blue")
-                ax[0].scatter(x_test[:, 0], y_hat, color="red")
-                ax[0].set_title("Weight")
-                ax[1].scatter(x_test[:, 1], y_test, color="blue")
-                ax[1].scatter(x_test[:, 1], y_hat, color="red")
-                ax[1].set_title("Product distance")
-                ax[2].scatter(x_test[:, 2], y_test, color="blue")
-                ax[2].scatter(x_test[:, 2], y_hat, color="red")
-                ax[2].set_title("Time delivery")
-                plt.show()
+                # ############################# #
+                # Plot the results on 3 graphs  #
+                # ############################# #
 
-    best_model = min(models, key=lambda x: x["test_cost"])
+                # fig, ax = plt.subplots(1, 3)
+
+                # ax[0].scatter(x_test[:, 0], y_test, color="blue")
+                # ax[0].scatter(x_test[:, 0], model_y_hat, color="red")
+                # ax[0].set_title("Weight")
+
+                # ax[1].scatter(x_test[:, 1], y_test, color="blue")
+                # ax[1].scatter(x_test[:, 1], model_y_hat, color="red")
+                # ax[1].set_title("Product distance")
+
+                # ax[2].scatter(x_test[:, 2], y_test, color="blue")
+                # ax[2].scatter(x_test[:, 2], model_y_hat, color="red")
+                # ax[2].set_title("Time delivery")
+
+                # plt.suptitle(model["name"] +
+                #              " MSE : " + str(model_cost))
+                # plt.show()
+
+    best_model = min(models, key=lambda x: x["cost"])
 
     # Save the models in the file models.json
     with open("models.json", "w") as file:
@@ -253,36 +282,43 @@ if __name__ == "__main__":
     print("Best model is:")
     print(best_model)
 
-    # plot the results on 3 graphs (one for each feature) for the best model
-    degree = best_model["degres"][0]
-    degree2 = best_model["degres"][1]
-    degree3 = best_model["degres"][2]
+    # ########################### #
+    # Plot the cost of each model #
+    # ########################### #
 
-    model_weight = polynomial_weight[:, :degree]
-    model_prod_distance = polynomial_prod_distance[:, :degree2]
-    model_time_delivery = polynomial_time_delivery[:, :degree3]
-
-    x_train = numpy.concatenate(
-        (model_weight[:, :best_model["degres"][0]],
-            model_prod_distance[:, :best_model["degres"][1]],
-            model_time_delivery[:, :best_model["degres"][2]]),
-        axis=1)
-    
-    fig, ax = plt.subplots(3, 1)
-    ax[0].scatter(x_test[:, 0], y_test, color="blue")
-    ax[0].scatter(x_test[:, 0], y_hat, color="red")
-    ax[0].set_title("Weight")
-    ax[1].scatter(x_test[:, 1], y_test, color="blue")
-    ax[1].scatter(x_test[:, 1], y_hat, color="red")
-    ax[1].set_title("Product distance")
-    ax[2].scatter(x_test[:, 2], y_test, color="blue")
-    ax[2].scatter(x_test[:, 2], y_hat, color="red")
-    ax[2].set_title("Time delivery")
+    plt.scatter(range(len(models)), [model["cost"] for model in models])
+    plt.title("Cost of each model")
     plt.show()
 
+    # # plot the results on 3 graphs (one for each feature) for the best model
+    # degree = best_model["degres"][0]
+    # degree2 = best_model["degres"][1]
+    # degree3 = best_model["degres"][2]
+
+    # model_weight = polynomial_weight[:, :degree]
+    # model_prod_distance = polynomial_prod_distance[:, :degree2]
+    # model_time_delivery = polynomial_time_delivery[:, :degree3]
+
+    # x_train = numpy.concatenate(
+    #     (model_weight[:, :best_model["degres"][0]],
+    #         model_prod_distance[:, :best_model["degres"][1]],
+    #         model_time_delivery[:, :best_model["degres"][2]]),
+    #     axis=1)
+
+    # fig, ax = plt.subplots(1, 3)
+    # ax[0].scatter(x_test[:, 0], y_test, color="blue")
+    # ax[0].scatter(x_test[:, 0], y_hat, color="red")
+    # ax[0].set_title("Weight")
+    # ax[1].scatter(x_test[:, 1], y_test, color="blue")
+    # ax[1].scatter(x_test[:, 1], y_hat, color="red")
+    # ax[1].set_title("Product distance")
+    # ax[2].scatter(x_test[:, 2], y_test, color="blue")
+    # ax[2].scatter(x_test[:, 2], y_hat, color="red")
+    # ax[2].set_title("Time delivery")
+    # plt.show()
 
     # Test end
-    
+
 #    for feature_index in range(nb_features):
 #
 #        fix, ax = plt.subplots(1, 4)

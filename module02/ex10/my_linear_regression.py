@@ -5,7 +5,7 @@ import time
 
 class MyLR:
 
-    def __init__(self, thetas, alpha=0.0001, max_iter=500000):
+    def __init__(self, thetas=numpy.ones((2, 1)), alpha=0.1, max_iter=500000):
         if not isinstance(alpha, float) or alpha < 0.0:
             return None
         elif not isinstance(max_iter, int) or max_iter < 0:
@@ -98,7 +98,7 @@ class MyLR:
             print(bar, end=print_end)
             yield item
 
-    def fit_(self, x, y, convergence=10e-10):
+    def fit_(self, x, y):
         for arr in [x, y]:
             if not isinstance(arr, numpy.ndarray):
                 return None
@@ -114,8 +114,6 @@ class MyLR:
             gradient = self.gradient_(x, y)
             if gradient is None:
                 return None
-            if all(abs(__) <= convergence for __ in gradient):
-                break
             self.thetas = self.thetas - self.alpha * gradient
         print()
         return self.thetas
