@@ -174,7 +174,7 @@ if __name__ == "__main__":
     features = dataset.columns.values[:-1]
     nb_features = len(features)
 
-    linear_regression = MyLR(alpha=0.075, max_iter=10_000)
+    linear_regression = MyLR(alpha=0.075, max_iter=15_000)
 
     # Normalize the features
     x_train_normalized = numpy.empty(x_train.shape)
@@ -200,6 +200,7 @@ if __name__ == "__main__":
         x_test_normalized[:, 2], 4)
 
     models = []
+
     max_degree = range(1, 5)
     for degree in max_degree:
         for degree2 in max_degree:
