@@ -14,7 +14,7 @@
     - -1
     - 0
   - !!binary |
-    pp255MMczkE=
+    Ey4Mz3n+aT8=
   degres: !!python/tuple
   - 1
   - 1
@@ -35,14 +35,70 @@
     - *id001
     - false
     - !!binary |
-      nbkqq2+5I0EX+njEMUX2QCFJYAW2P7PAlVAogj0Kg8A=
+      SsqUsjIyxD+Vla9U7RXnP2X4PRZ9GaW/OOzTDsSTar8=
   theta_shape: !!python/tuple
   - 4
   - 1
 - cost: !!python/object/apply:numpy.core.multiarray.scalar
   - *id001
   - !!binary |
-    mMOlFRsSskE=
+    cnd1j3kYaj8=
+  degres: !!python/tuple
+  - 1
+  - 1
+  - 2
+  name: w1d1t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 5
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      /y3EgMF/wz+EjnRwMRbnPy/Ow6BjEKW/odVz4CjBoD+5Xj3bnJiivw==
+  theta_shape: !!python/tuple
+  - 5
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    y/98fG8Vaj8=
+  degres: !!python/tuple
+  - 1
+  - 1
+  - 3
+  name: w1d1t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 6
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      ZBXrR6WNwz/bkWP8MhbnPxauurePEqW/UuYb/mMPoD8JSKf9Y7qjv1noBhQvS28/
+  theta_shape: !!python/tuple
+  - 6
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    VYpQORNZTT8=
   degres: !!python/tuple
   - 1
   - 2
@@ -63,7 +119,661 @@
     - *id001
     - false
     - !!binary |
-      QkRVBXLrIkFYqhbuNxz2QJ8pP9bIdbTAV6uuurS/2UBaNxobIbiFwA==
+      exg0Vfgl0z9S9v6+BgvnP6CxnNzUv+u/5tsrPrmM6j/BpPBleyFuvw==
   theta_shape: !!python/tuple
   - 5
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    yqMuOTReTT8=
+  degres: !!python/tuple
+  - 1
+  - 2
+  - 2
+  name: w1d2t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 6
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      MFWVPNsJ0z+ngmVBIwvnPyLhL91Ru+u/quneV3GI6j8GeAj1g098P1iBby+QzYW/
+  theta_shape: !!python/tuple
+  - 6
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    toMZ/eJdTT8=
+  degres: !!python/tuple
+  - 1
+  - 2
+  - 3
+  name: w1d2t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      TutHAqsK0z/v3NcIMQvnP5MHkrYwvOu/e2nY9yOJ6j8ACHQKNSeDP8Aa7rm/tpS/zY2zZOqLfz8=
+  theta_shape: !!python/tuple
+  - 7
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    IudMTMfxQT8=
+  degres: !!python/tuple
+  - 1
+  - 3
+  - 1
+  name: w1d3t1
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 6
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      p8P8zImg0T8wc1uzEQznP0gaGu40CeC/CafM5Digxb/4EnzWljnmP+b3XtEJIG+/
+  theta_shape: !!python/tuple
+  - 6
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    xrn2VKbyQT8=
+  degres: !!python/tuple
+  - 1
+  - 3
+  - 2
+  name: w1d3t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      +y/U8imQ0T/1JqBjIAznP322BVT4B+C/Zc+Tv3Gexb9zyoxT3TfmPwTRZJyUsmQ/KYP5h+Aber8=
+  theta_shape: !!python/tuple
+  - 7
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    9Tpbv/HyQT8=
+  degres: !!python/tuple
+  - 1
+  - 3
+  - 3
+  name: w1d3t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 8
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      z/UD7jmP0T+7GcHdLAznPwltRyYnCOC/ZsrnOJKexb9PW/kX/DfmPysUbEKVxXM/l8Rf1SxrjL+J
+      s9FoAAV3Pw==
+  theta_shape: !!python/tuple
+  - 8
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    h9D7HgX1Zj8=
+  degres: !!python/tuple
+  - 2
+  - 1
+  - 1
+  name: w2d1t1
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 5
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      XbliHTVWvT9LvzqzKDPwP7M8bFy1l9K/NKnK60cppb/xp8sw8WZuvw==
+  theta_shape: !!python/tuple
+  - 5
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    Bg5IP+ULZz8=
+  degres: !!python/tuple
+  - 2
+  - 1
+  - 2
+  name: w2d1t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 6
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      8OWirgYJvD+E9lerVjLwP3o0XArwk9K/2Z4nFr8gpb8i3niPrdKeP50FhUNue6G/
+  theta_shape: !!python/tuple
+  - 6
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    zECE11YJZz8=
+  degres: !!python/tuple
+  - 2
+  - 1
+  - 3
+  name: w2d1t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      aLL/NFgivD9zhiBJZTLwP+iy2WIolNK/fhurrpIipb/oX8eoCl6dP9PtMldsLqK/wgxjssZqaD8=
+  theta_shape: !!python/tuple
+  - 7
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    Uy25yY20QT8=
+  degres: !!python/tuple
+  - 2
+  - 2
+  - 1
+  name: w2d2t1
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 6
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      Eqx5gyZa0D9tsA1bt0rwPxKbmWiHC9O/wuncCwXb67/7EZiI/abqPyxCIJ8HCHG/
+  theta_shape: !!python/tuple
+  - 6
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    sy3c9Lm2QT8=
+  degres: !!python/tuple
+  - 2
+  - 2
+  - 2
+  name: w2d2t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      6nLFqCRE0D9LDwiWj0rwP4IWiyy6CtO/s/xJgjzX678Cpj1TZ6PqPzGnbCNx33A/iPZoTkMGgb8=
+  theta_shape: !!python/tuple
+  - 7
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    RZyifb22QT8=
+  degres: !!python/tuple
+  - 2
+  - 2
+  - 3
+  name: w2d2t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 8
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      HaX201JE0D8KlEppjErwP8TnQ2CTCtO/hKr80/zX67/9RhTdAKTqPxYXbdrEpno/0EvuCZB2kb+P
+      Wp36fRJ8Pw==
+  theta_shape: !!python/tuple
+  - 8
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    5l2nitgtKT8=
+  degres: !!python/tuple
+  - 2
+  - 3
+  - 1
+  name: w2d3t1
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      +20nO3uqzT9qbM1UZ0jwPxrrbhQyANO/0fCuHpsg4L9/hzSRPUzFv401rOJIO+Y/gqp/wn6Fcb8=
+  theta_shape: !!python/tuple
+  - 7
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    Toyqa6osKT8=
+  degres: !!python/tuple
+  - 2
+  - 3
+  - 2
+  name: w2d3t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 8
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      uwte07KVzT8LlWRGVEjwP7JdHSvS/9K/DpK0wtQf4L+R0xjUtErFv9YsUmUYOuY/HjGFQtiNML8J
+      3/kZv5lwvw==
+  theta_shape: !!python/tuple
+  - 8
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    JT73VbMtKT8=
+  degres: !!python/tuple
+  - 2
+  - 3
+  - 3
+  name: w2d3t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 9
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      jQHxg5SSzT8UyHVaTkjwP/q7veWj/9K/hYUslOwf4L/KGbqyz0rFv7qoZ6ciOuY/jSZla15LYD9f
+      Ol4/Z+eFv9qujs18fXM/
+  theta_shape: !!python/tuple
+  - 9
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    kavWWlUaZz8=
+  degres: !!python/tuple
+  - 3
+  - 1
+  - 1
+  name: w3d1t1
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 6
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      6P6wHqeivz/4PktLPAjsP93mjnMRjK0/sdbOog8nzb/y0OTdgBqlv8ADyEGeAW+/
+  theta_shape: !!python/tuple
+  - 6
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    SaVDstwzZz8=
+  degres: !!python/tuple
+  - 3
+  - 1
+  - 2
+  name: w3d1t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      FUqauxRFvj+jqXHwrgTsP28Re+WAEa4/4xNkm3A6zb9F4w2hchGlv+t2iLS+OqA/xkqU0UBYor8=
+  theta_shape: !!python/tuple
+  - 7
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    vufHiQIxZz8=
+  degres: !!python/tuple
+  - 3
+  - 1
+  - 3
+  name: w3d1t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 8
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      Q4YPmcVhvj/vX/X0rgTsP+bE2BhiEa4/teh0nnU6zb+nVym6ExOlvwpBrVcPS54/91a4aNQnor8l
+      GSi/clRePw==
+  theta_shape: !!python/tuple
+  - 8
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    g7xhJYInQj8=
+  degres: !!python/tuple
+  - 3
+  - 2
+  - 1
+  name: w3d2t1
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      vyY5XEzs0D9VoL69UDvsP2yfmoc+aKg/SKbSSFrQzL8/IJypCtTrvy2hbUDqoOo/0rrJpo5Scb8=
+  theta_shape: !!python/tuple
+  - 7
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    H5uq9wQsQj8=
+  degres: !!python/tuple
+  - 3
+  - 2
+  - 2
+  name: w3d2t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 8
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      zJfKMgvS0D81cXw6qjnsP06zR2Jwq6g/6JYf1NXazL9BAi2uuc/rv/8mZrTSnOo/ClKzmux+dz/H
+      zr6OHIKEvw==
+  theta_shape: !!python/tuple
+  - 8
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    W5M9kYErQj8=
+  degres: !!python/tuple
+  - 3
+  - 2
+  - 3
+  name: w3d2t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 9
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      fB1ksA/T0D88ehmXsjnsP7e2QFRFqKg/oWaQCPnZzL9Z+ZSFfdDrvwHytV5zneo/fHlBU3Jofj+b
+      GNnI7GuRv7eHIMDmcXc/
+  theta_shape: !!python/tuple
+  - 9
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    amNR/WH1Kj8=
+  degres: !!python/tuple
+  - 3
+  - 3
+  - 1
+  name: w3d3t1
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 8
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      ONIHcn3Ozj8oFUgFxzrsP4+nTHQbJag/BpBeunq3zL+UpgsorhvgvwaNBVoVVMW/gYIKEAA55j9e
+      MzAE8s9xvw==
+  theta_shape: !!python/tuple
+  - 8
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    T4QdHQ34Kj8=
+  degres: !!python/tuple
+  - 3
+  - 3
+  - 2
+  name: w3d3t2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 9
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      yjrt7zixzj9vvjMFrznsPxH4UmfGUKg/f7/R0EW+zL/9hKKFjRrgvwMTW3JpUsW/9FHJ42o35j9C
+      I/BkykZWP5qsG4kujHe/
+  theta_shape: !!python/tuple
+  - 9
+  - 1
+- cost: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    fmyxWTn4Kj8=
+  degres: !!python/tuple
+  - 3
+  - 3
+  - 3
+  name: w3d3t3
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id002
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 10
+      - 1
+    - *id001
+    - false
+    - !!binary |
+      F7z7E8evzj/TzSKetjnsP/RlYsybTqg/WeYzT7C9zL82WhvPqxrgv4ewbUyNUsW/b8IaUYI35j9C
+      AGSQRchnP/k645gM1IW/7U/IMafJbT8=
+  theta_shape: !!python/tuple
+  - 10
   - 1

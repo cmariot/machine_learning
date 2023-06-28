@@ -142,13 +142,11 @@ class MyLR:
             return None
         if x.size == 0:
             return None
-        self.mean = numpy.mean(x)
-        self.std = numpy.std(x)
-        return (x - self.mean) / self.std
+        min = numpy.min(x, axis=0)
+        max = numpy.max(x, axis=0)
+        return (x - min) / (max - min)
 
-    def denormalize(self, x):
-        if not isinstance(x, numpy.ndarray):
-            return None
-        if x.size == 0:
-            return None
-        return (x + self.mean) * self.std
+    def denormalize(self, y_train, model_y_hat):
+        min = numpy.min(y_train, axis=0)
+        max = numpy.max(y_train, axis=0)
+        return (model_y_hat * (max - min)) + min

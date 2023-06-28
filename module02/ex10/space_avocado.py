@@ -129,10 +129,10 @@ def add_polynomial_features(x, power):
         return None
     if power == 0:
         return numpy.ones((x.size, 1))
-    res = numpy.ones((x.size, power))
-    for i in range(1, power + 1):
-        for j in range(x.size):
-            res[j][i - 1] = x[j] ** i
+    res = numpy.empty((x.shape[0], x.shape[1] * power))
+    for i in range(x.shape[1]):
+        for j in range(power):
+            res[:, i * power + j] = x[:, i] ** (j + 1)
     return res
 
 
@@ -180,12 +180,9 @@ class Normalizer:
             return None
         if x.size == 0:
             return None
-        self.mean = numpy.mean(x)
-        self.std = numpy.std(x)
-        return (x - self.mean) / self.std
-
-    def denormalize(self):
-        return self.denormalized_features
+        min = numpy.min(x)
+        max = numpy.max(x)
+        return (x - min) / (max - min)
 
 
 if __name__ == "__main__":
@@ -200,42 +197,29 @@ if __name__ == "__main__":
     else:
         (x_train, x_test, y_train, y_test) = splitted
 
-    features = dataset.columns.values[:-1]
-    nb_features = len(features)
+    linear_regression = MyLR(alpha=10e-2, max_iter=15_000)
 
-    linear_regression = MyLR(alpha=0.075, max_iter=15_000)
-
-    # Normalize the features
+    # Normalize the features and the target of the training set
     train_normalizer = Normalizer(x_train)
-    test_normalizer = Normalizer(x_test)
     x_train_normalized = train_normalizer.normalized_features
+    y_train_normalized = linear_regression.normalize(y_train)
+
+    test_normalizer = Normalizer(x_test)
     x_test_normalized = test_normalizer.normalized_features
+    y_test_normalized = linear_regression.normalize(y_test)
 
-    x_train_denormalized = train_normalizer.denormalize()
-    x_test_denormalized = test_normalizer.denormalize()
-
-    train_polynomial_weight = add_polynomial_features(
-        x_train_normalized[:, 0], 4)
-    train_polynomial_prod_distance = add_polynomial_features(
-        x_train_normalized[:, 1], 4)
-    train_polynomial_time_delivery = add_polynomial_features(
-        x_train_normalized[:, 2], 4)
-
-    test_polynomial_weight = add_polynomial_features(
-        x_test_normalized[:, 0], 4)
-    test_polynomial_prod_distance = add_polynomial_features(
-        x_test_normalized[:, 1], 4)
-    test_polynomial_time_delivery = add_polynomial_features(
-        x_test_normalized[:, 2], 4)
+    # Add polynomial features to the training set
+    x_train_polynomial = add_polynomial_features(x_train_normalized, 4)
+    x_test_polynomial = add_polynomial_features(x_test_normalized, 4)
 
     models = []
-
-    max_degree = range(1, 5)
+    max_degree = range(1, 4)
     for degree in max_degree:
         for degree2 in max_degree:
             for degree3 in max_degree:
 
                 model = {}
+
                 model["name"] = "w" + str(degree) + \
                                 "d" + str(degree2) + \
                                 "t" + str(degree3)
@@ -248,31 +232,37 @@ if __name__ == "__main__":
                 # Train the model with the training set #
                 # ##################################### #
 
-                model_training_x = numpy.concatenate(
-                    (train_polynomial_weight[:, :degree],
-                        train_polynomial_prod_distance[:, :degree2],
-                        train_polynomial_time_delivery[:, :degree3]),
-                    axis=1)
+                linear_regression.thetas = numpy.zeros(model["theta_shape"])
 
-                linear_regression.thetas = numpy.ones(model["theta_shape"])
-                linear_regression.fit_(model_training_x, y_train)
+                weights = x_train_polynomial[:, 0:degree]
+                prod = x_train_polynomial[:, 4:4 + degree2]
+                time = x_train_polynomial[:, 8:8 + degree3]
+                x_train_polynomial_model = numpy.concatenate(
+                    (weights, prod, time), axis=1)
+
+                linear_regression.fit_(
+                    x_train_polynomial_model, y_train_normalized)
+
                 model["theta"] = linear_regression.thetas
 
                 # ############################# #
                 # Evaluate the model prediction #
                 # ############################# #
 
-                model_test_x = numpy.concatenate(
-                    (test_polynomial_weight[:, :degree],
-                        test_polynomial_prod_distance[:, :degree2],
-                        test_polynomial_time_delivery[:, :degree3]),
-                    axis=1)
+                weights = x_test_polynomial[:, :degree]
+                prod = x_test_polynomial[:, 4:4 + degree2]
+                time = x_test_polynomial[:, 8:8 + degree3]
+                x_test_polynomial_model = numpy.concatenate(
+                    (weights, prod, time), axis=1)
 
-                model_y_hat = linear_regression.predict_(model_test_x)
-                model_cost = linear_regression.mse_(y_test,
-                                                    model_y_hat)
+                y_hat_test = linear_regression.predict_(
+                    x_test_polynomial_model)
 
-                model["cost"] = model_cost
+                denormalized_y_hat_test = linear_regression.denormalize(
+                    y_test, y_hat_test)
+
+                model["cost"] = linear_regression.loss_(
+                    y_test_normalized, y_hat_test)
 
                 print(model)
                 print()
@@ -284,28 +274,22 @@ if __name__ == "__main__":
 
                 fig, ax = plt.subplots(1, 3, figsize=(15, 7.5))
 
-                ax[0].scatter(x_test_denormalized[:, 0], y_test, color="blue")
-                ax[0].scatter(x_test_denormalized[:, 0], model_y_hat,
+                ax[0].scatter(x_test[:, 0], y_test, color="blue")
+                ax[0].scatter(x_test[:, 0], denormalized_y_hat_test,
                               color="red")
                 ax[0].set_title("Weight")
-                # ax[0].xlabel("Weight")
-                # ax[0].ylabel("Price")
 
-                ax[1].scatter(x_test_denormalized[:, 1], y_test, color="blue")
-                ax[1].scatter(x_test_denormalized[:, 1], model_y_hat,
+                ax[1].scatter(x_test[:, 1], y_test, color="blue")
+                ax[1].scatter(x_test[:, 1], denormalized_y_hat_test,
                               color="red")
                 ax[1].set_title("Product distance")
-                # plt.xlabel("Product distance")
-                # plt.ylabel("Price")
 
-                ax[2].scatter(x_test_denormalized[:, 2], y_test, color="blue")
-                ax[2].scatter(x_test_denormalized[:, 2], model_y_hat,
+                ax[2].scatter(x_test[:, 2], y_test, color="blue")
+                ax[2].scatter(x_test[:, 2], denormalized_y_hat_test,
                               color="red")
                 ax[2].set_title("Time delivery")
-                # plt.xlabel("Time delivery")
-                # plt.ylabel("Price")
 
-                plt.suptitle(model["name"] + " MSE : " + str(model_cost))
+                plt.suptitle(model["name"] + " MSE : " + str(model["cost"]))
                 plt.show()
 
     best_model = min(models, key=lambda x: x["cost"])
@@ -324,78 +308,3 @@ if __name__ == "__main__":
     plt.scatter(range(len(models)), [model["cost"] for model in models])
     plt.title("Cost of each model")
     plt.show()
-
-    # # plot the results on 3 graphs (one for each feature) for the best model
-    # degree = best_model["degres"][0]
-    # degree2 = best_model["degres"][1]
-    # degree3 = best_model["degres"][2]
-
-    # model_weight = polynomial_weight[:, :degree]
-    # model_prod_distance = polynomial_prod_distance[:, :degree2]
-    # model_time_delivery = polynomial_time_delivery[:, :degree3]
-
-    # x_train = numpy.concatenate(
-    #     (model_weight[:, :best_model["degres"][0]],
-    #         model_prod_distance[:, :best_model["degres"][1]],
-    #         model_time_delivery[:, :best_model["degres"][2]]),
-    #     axis=1)
-
-    # fig, ax = plt.subplots(1, 3)
-    # ax[0].scatter(x_test[:, 0], y_test, color="blue")
-    # ax[0].scatter(x_test[:, 0], y_hat, color="red")
-    # ax[0].set_title("Weight")
-    # ax[1].scatter(x_test[:, 1], y_test, color="blue")
-    # ax[1].scatter(x_test[:, 1], y_hat, color="red")
-    # ax[1].set_title("Product distance")
-    # ax[2].scatter(x_test[:, 2], y_test, color="blue")
-    # ax[2].scatter(x_test[:, 2], y_hat, color="red")
-    # ax[2].set_title("Time delivery")
-    # plt.show()
-
-    # Test end
-
-#    for feature_index in range(nb_features):
-#
-#        fix, ax = plt.subplots(1, 4)
-#        costs = []
-#
-#        for degree in range(max_degree):
-#
-#            # Use your polynomial_features method on your training set
-#            x_train_poly = add_polynomial_features(x_train[:, feature_index],
-#                                                   degree + 1)
-#
-#            # Fit the model
-#            linear_regression.thetas = numpy.ones((degree + 2, 1))
-#            linear_regression.fit_(x_train_poly, y_train)
-#
-#            # Use the cost function to evaluate the model on the test set
-#            x_test_poly = add_polynomial_features(x_test[:, feature_index],
-#                                                  degree + 1)
-#            y_hat = linear_regression.predict_(x_test_poly)
-#            cost = linear_regression.loss_(y_hat, y_test)
-#            costs.append(cost)
-#            print("Cost for degree " + str(degree) + " : " + str(cost))
-#
-#            x_denormalized = linear_regression.denormalize(
-#                x_test[:, feature_index])
-#
-#            ax[degree].scatter(x_denormalized, y_test, color="blue")
-#            ax[degree].scatter(x_denormalized, y_hat, color="red")
-#            ax[degree].set_title(
-#                "Degree " + str(degree + 1) + "\n Cost : " + str(cost))
-#
-#        plt.suptitle(features[feature_index])
-#        plt.show()
-#
-#        # Plot the cost depending on the degree
-#        plt.figure()
-#        plt.bar(range(1, max_degree + 1), costs)
-#        plt.xlabel("Degree")
-#        plt.ylabel("Cost")
-#        plt.show()
-#
-#        print("\n\nBest degree for feature {}: ".format(
-#            features[feature_index])
-#              + str(costs.index(min(costs)) + 1))
-#        print()
