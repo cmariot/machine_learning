@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 import pandas
 import numpy
 from my_linear_regression import MyLR as MyLR
-import json
+import yaml
 
 
 def get_dataset():
@@ -159,6 +159,35 @@ def print_model_info(model):
     print()
 
 
+class Normalizer:
+
+    def __init__(self, features_matrix) -> None:
+        if not isinstance(features_matrix, numpy.ndarray):
+            return None
+        if features_matrix.size == 0 or features_matrix.shape[1] < 1:
+            return None
+        self.denormalized_features = features_matrix.copy()
+        self.normalized_features = numpy.empty(features_matrix.shape)
+        nb_features = features_matrix.shape[1]
+        for feature_index in range(nb_features):
+            self.normalized_features[:, feature_index] = \
+                self.normalize(features_matrix[:, feature_index])
+            if self.normalized_features[:, feature_index] is None:
+                return None
+
+    def normalize(self, x):
+        if not isinstance(x, numpy.ndarray):
+            return None
+        if x.size == 0:
+            return None
+        self.mean = numpy.mean(x)
+        self.std = numpy.std(x)
+        return (x - self.mean) / self.std
+
+    def denormalize(self):
+        return self.denormalized_features
+
+
 if __name__ == "__main__":
 
     # Get the dataset in the file space_avocado.csv
@@ -177,13 +206,13 @@ if __name__ == "__main__":
     linear_regression = MyLR(alpha=0.075, max_iter=15_000)
 
     # Normalize the features
-    x_train_normalized = numpy.empty(x_train.shape)
-    x_test_normalized = numpy.empty(x_test.shape)
-    for feature_index in range(nb_features):
-        x_train_normalized[:, feature_index] = \
-            linear_regression.normalize(x_train[:, feature_index])
-        x_test_normalized[:, feature_index] = \
-            linear_regression.normalize(x_test[:, feature_index])
+    train_normalizer = Normalizer(x_train)
+    test_normalizer = Normalizer(x_test)
+    x_train_normalized = train_normalizer.normalized_features
+    x_test_normalized = test_normalizer.normalized_features
+
+    x_train_denormalized = train_normalizer.denormalize()
+    x_test_denormalized = test_normalizer.denormalize()
 
     train_polynomial_weight = add_polynomial_features(
         x_train_normalized[:, 0], 4)
@@ -227,7 +256,7 @@ if __name__ == "__main__":
 
                 linear_regression.thetas = numpy.ones(model["theta_shape"])
                 linear_regression.fit_(model_training_x, y_train)
-                model["theta"] = linear_regression.thetas.tolist()
+                model["theta"] = linear_regression.thetas
 
                 # ############################# #
                 # Evaluate the model prediction #
@@ -253,32 +282,37 @@ if __name__ == "__main__":
                 # Plot the results on 3 graphs  #
                 # ############################# #
 
-                # fig, ax = plt.subplots(1, 3)
+                fig, ax = plt.subplots(1, 3, figsize=(15, 7.5))
 
-                # ax[0].scatter(x_test[:, 0], y_test, color="blue")
-                # ax[0].scatter(x_test[:, 0], model_y_hat, color="red")
-                # ax[0].set_title("Weight")
+                ax[0].scatter(x_test_denormalized[:, 0], y_test, color="blue")
+                ax[0].scatter(x_test_denormalized[:, 0], model_y_hat,
+                              color="red")
+                ax[0].set_title("Weight")
+                # ax[0].xlabel("Weight")
+                # ax[0].ylabel("Price")
 
-                # ax[1].scatter(x_test[:, 1], y_test, color="blue")
-                # ax[1].scatter(x_test[:, 1], model_y_hat, color="red")
-                # ax[1].set_title("Product distance")
+                ax[1].scatter(x_test_denormalized[:, 1], y_test, color="blue")
+                ax[1].scatter(x_test_denormalized[:, 1], model_y_hat,
+                              color="red")
+                ax[1].set_title("Product distance")
+                # plt.xlabel("Product distance")
+                # plt.ylabel("Price")
 
-                # ax[2].scatter(x_test[:, 2], y_test, color="blue")
-                # ax[2].scatter(x_test[:, 2], model_y_hat, color="red")
-                # ax[2].set_title("Time delivery")
+                ax[2].scatter(x_test_denormalized[:, 2], y_test, color="blue")
+                ax[2].scatter(x_test_denormalized[:, 2], model_y_hat,
+                              color="red")
+                ax[2].set_title("Time delivery")
+                # plt.xlabel("Time delivery")
+                # plt.ylabel("Price")
 
-                # plt.suptitle(model["name"] +
-                #              " MSE : " + str(model_cost))
-                # plt.show()
+                plt.suptitle(model["name"] + " MSE : " + str(model_cost))
+                plt.show()
 
     best_model = min(models, key=lambda x: x["cost"])
 
-    # Save the models in the file models.json
-    with open("models.json", "w") as file:
-        for model in models:
-            file.write(json.dumps(model))
-            if model != models[-1]:
-                file.write(",\n")
+    # Save the models in the file models.yml
+    with open("models.yml", "w") as file:
+        file.write(yaml.dump(models))
 
     print("Best model is:")
     print(best_model)
