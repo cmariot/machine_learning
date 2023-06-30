@@ -28,13 +28,15 @@ def simple_predict(x, theta):
     if theta.shape != (n + 1, 1):
         return None
 
-    y_hat = np.zeros((m, 1))
-    for i in range(m):
-        y_hat[i] = theta[0]
-        for j in range(n):
-            y_hat[i] += theta[j + 1] * x[i][j]
-
-    return y_hat
+    try:
+        y_hat = np.zeros((m, 1))
+        for i in range(m):
+            y_hat[i] = theta[0]
+            for j in range(n):
+                y_hat[i] += theta[j + 1] * x[i][j]
+        return y_hat
+    except Exception:
+        return None
 
 
 if __name__ == "__main__":

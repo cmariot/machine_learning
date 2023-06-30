@@ -10,8 +10,11 @@ def loss_(y: np.ndarray, y_hat: np.ndarray):
         return None
     if y.shape != (m, 1) or y_hat.shape != (m, 1):
         return None
-    pred_sub_y = y_hat - y
-    return (np.dot(pred_sub_y.T, pred_sub_y) / (2 * m))[0, 0]
+    try:
+        pred_sub_y = y_hat - y
+        return (np.dot(pred_sub_y.T, pred_sub_y) / (2 * m))[0, 0]
+    except Exception:
+        return None
 
 
 if __name__ == "__main__":

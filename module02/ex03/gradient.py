@@ -32,9 +32,11 @@ def gradient(x, y, theta):
     elif theta.shape != (n + 1, 1):
         return None
 
-    X_prime = np.c_[np.ones(m), x]
-
-    return (X_prime.T @ (X_prime @ theta - y)) / m
+    try:
+        X_prime = np.c_[np.ones(m), x]
+        return (X_prime.T @ (X_prime @ theta - y)) / m
+    except Exception:
+        return None
 
 
 if __name__ == "__main__":

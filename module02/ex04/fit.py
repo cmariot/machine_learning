@@ -132,15 +132,18 @@ def fit_(x, y, theta, alpha, max_iter):
         return None
 
     # Train the model to fit the data
-    for _ in ft_progress(range(max_iter)):
-        gradient = gradient_(x, y, theta)
-        if gradient is None:
-            return None
-        elif all(val == [0.] for val in gradient):
-            break
-        theta = theta - alpha * gradient
-    print()
-    return theta
+    try:
+        for _ in ft_progress(range(max_iter)):
+            gradient = gradient_(x, y, theta)
+            if gradient is None:
+                return None
+            elif all(val == [0.] for val in gradient):
+                break
+            theta = theta - alpha * gradient
+        print()
+        return theta
+    except Exception:
+        return None
 
 
 if __name__ == "__main__":

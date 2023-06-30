@@ -147,7 +147,8 @@ if __name__ == "__main__":
     # array([[8.], [48.], [323.]])
 
     # Example 1:
-    mylr.loss_elem_(Y, y_hat)
+    loss_elem = mylr.loss_elem_(Y, y_hat)
+    print("loss_elem: \n", loss_elem)
     # Output:
     # array([[225.], [0.], [11025.]])
 
@@ -174,7 +175,8 @@ if __name__ == "__main__":
     # array([[23.417..], [47.489..], [218.065...]])
 
     # Example 5:
-    mylr.loss_elem_(Y, y_hat)
+    loss_elem = mylr.loss_elem_(Y, y_hat)
+    print("Updated loss elem\n", loss_elem)
     # Output:
     # array([[0.174..], [0.260..], [0.004..]])
 

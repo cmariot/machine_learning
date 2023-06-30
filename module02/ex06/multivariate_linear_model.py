@@ -7,7 +7,7 @@ import shutil
 
 class MyLR:
 
-    def __init__(self, thetas, alpha=0.0001, max_iter=500_000):
+    def __init__(self, thetas, alpha=0.0001, max_iter=300_000):
         if not isinstance(alpha, float) or alpha < 0.0:
             return None
         elif not isinstance(max_iter, int) or max_iter < 0:
@@ -160,7 +160,8 @@ if __name__ == "__main__":
         y_hat = linear_regression.predict_(x)
 
         # print MSE
-        print("MSE : {}".format(linear_regression.mse_(y, y_hat)))
+        print("\nMSE for feature {}: {}\n".format(
+            feature, linear_regression.mse_(y, y_hat)))
 
         # Plot the data and the prediction
         plt.scatter(x, y)
@@ -181,7 +182,7 @@ if __name__ == "__main__":
     # Print MSE with initial thetas (1.0)
     linear_regression.thetas = np.array([[1.0], [1.0], [1.0], [1.0]])
     y_hat = linear_regression.predict_(x)
-    print("MSE : {}".format(linear_regression.mse_(y, y_hat)))
+    print("initial MSE : {}".format(linear_regression.mse_(y, y_hat)))
 
     # Update thetas with appropriate values
     linear_regression.thetas = np.array([[385.21139513],
@@ -189,7 +190,7 @@ if __name__ == "__main__":
                                          [5.67045772],
                                          [-2.66684314]])
     linear_regression.alpha = 1e-5
-    linear_regression.max_iter = 900000
+    linear_regression.max_iter = 400000
 
     # Train the model and predict y_hat
     linear_regression.fit_(x, y)

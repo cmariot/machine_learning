@@ -24,10 +24,14 @@ def add_polynomial_features(x, power):
         return None
     if power == 0:
         return np.ones((x.size, 1))
-    res = np.ones((x.size, power))
-    for i in range(power):
-        res[:, i] = x.ravel() ** (i + 1)
-    return res
+
+    try:
+        res = np.ones((x.size, power))
+        for i in range(power):
+            res[:, i] = x.ravel() ** (i + 1)
+        return res
+    except Exception:
+        return None
 
 
 if __name__ == "__main__":

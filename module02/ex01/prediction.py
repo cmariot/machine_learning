@@ -25,10 +25,12 @@ def predict_(x, theta):
     if theta.shape != (x.shape[1] + 1, 1):
         return None
 
-    # Add a column of 1 to x -> X_prime
-    X_prime = np.c_[np.ones(x.shape[0]), x]
-
-    return X_prime @ theta
+    try:
+        # Add a column of 1 to x -> X_prime
+        X_prime = np.c_[np.ones(x.shape[0]), x]
+        return np.dot(X_prime, theta)
+    except Exception:
+        return None
 
 
 if __name__ == "__main__":

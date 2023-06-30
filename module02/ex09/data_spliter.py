@@ -9,12 +9,8 @@ def check_args(x, y, proportion):
     if m == 0 or n == 0:
         return None
     elif y.shape != (m, 1):
-        print("Error: y.shape != (m, 1)"
-              + str(y.shape)
-              + " != "
-              + str((m, 1)))
         return None
-    if not isinstance(proportion, float):
+    if not isinstance(proportion, (int, float)):
         return None
     elif proportion < 0.0 or proportion > 1.0:
         return None
@@ -27,7 +23,6 @@ def shuffle_data(x, y):
     m = x.shape[0]
     available_indexes = np.arange(m)
     for i in range(m):
-
         # Pick a random index in the available indexes and remove it
         index = np.random.choice(available_indexes)
         available_indexes = np.delete(available_indexes,
@@ -70,14 +65,16 @@ def data_spliter(x, y, proportion):
 
     shuffled_x, shuffled_y = shuffle_data(x, y)
 
-    proportin_index = int(x.shape[0] * proportion)
+    try:
+        proportion_index = int(x.shape[0] * proportion)
 
-    x_train = shuffled_x[:proportin_index]
-    x_test = shuffled_x[proportin_index:]
-    y_train = shuffled_y[:proportin_index]
-    y_test = shuffled_y[proportin_index:]
-
-    return (x_train, x_test, y_train, y_test)
+        x_train = shuffled_x[:proportion_index]
+        y_train = shuffled_y[:proportion_index]
+        x_test = shuffled_x[proportion_index:]
+        y_test = shuffled_y[proportion_index:]
+        return (x_train, x_test, y_train, y_test)
+    except Exception:
+        return None
 
 
 if __name__ == "__main__":

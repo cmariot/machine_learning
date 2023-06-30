@@ -252,6 +252,11 @@ if __name__ == "__main__":
         predicted_y = linear_regression.predict_(predicted_x)
         ax[(i - 1) // 3][(i - 1) % 3].plot(continuous_x, predicted_y,
                                            color='orange')
+        # Add title and axis names
+        ax[(i - 1) // 3][(i - 1) % 3].set_title(
+            "Degree {}, score : {}".format(i, mse_scores[i - 1]))
+        ax[(i - 1) // 3][(i - 1) % 3].set_xlabel("Micrograms")
+        ax[(i - 1) // 3][(i - 1) % 3].set_ylabel("Score")
 
         # Compute Loss
         loss = linear_regression.loss_(y, y_hat)
