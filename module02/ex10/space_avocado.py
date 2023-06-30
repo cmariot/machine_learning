@@ -289,8 +289,8 @@ if __name__ == "__main__":
     train_model_x = get_model_x(x_train_poly, best_model["degree"])
 
     # Train the model with the training set
-    learning_rate = 10e-7
-    n_cycle = 100_000
+    learning_rate = 10e-2
+    n_cycle = 2_000_000
     theta = numpy.array(best_model["theta"]).reshape(-1, 1)
 
     print(f"Training model {best_model['name']} ... ", end="")
@@ -356,18 +356,18 @@ if __name__ == "__main__":
             if j == 0:
                 ax[i, j].scatter(x_test[:, i],
                                  y_test,
-                                 color="blue", alpha=0.5)
+                                 color="blue", alpha=0.5, s=10)
             elif j == 1:
                 ax[i, j].scatter(x_test[:, i],
                                  y_hat_denormalized,
-                                 color="red", alpha=0.5)
+                                 color="red", alpha=0.5, s=5)
             elif j == 2:
                 ax[i, j].scatter(x_test[:, i],
                                  y_test,
-                                 color="blue", alpha=0.5)
+                                 color="blue", alpha=0.5, s=10)
                 ax[i, j].scatter(x_test[:, i],
                                  y_hat_denormalized,
-                                 color="red", alpha=0.5)
+                                 color="red", alpha=0.5, s=5)
             ax[i, j].set_xlabel(features[i])
             ax[i, j].set_ylabel("Price")
 
@@ -398,3 +398,32 @@ if __name__ == "__main__":
         ax[i].set_zlabel(features[2])
 
     plt.show()
+
+    def r2score_elem(y, y_hat):
+        m = y.shape[0]
+        mean = y.mean()
+        numerator = 0.
+        denominator = 0.
+        for i in range(m):
+            numerator += (y_hat[i] - y[i]) ** 2
+            denominator += (y[i] - mean) ** 2
+        return numerator / denominator
+
+    def r2score_(y, y_hat):
+        """
+            Description:
+                Calculate the R2score between the predicted output and the output.
+            Args:
+                y: has to be a numpy.array, a vector of dimension m * 1.
+                y_hat: has to be a numpy.array, a vector of dimension m * 1.
+            Returns:
+                r2score: has to be a float.
+                None if there is a matching dimension problem.
+            Raises:
+                This function should not raise any Exceptions.
+        """
+        print(f"y: {y.shape}")
+        print(f"y_hat: {y_hat.shape}")
+        return 1 - r2score_elem(y, y_hat)
+
+    print(f"R2 score: {r2score_(y_test, y_hat_denormalized)}")
