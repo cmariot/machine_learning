@@ -1,3 +1,5 @@
+import shutil
+import time
 from matplotlib import pyplot as plt
 import pandas
 import numpy
@@ -11,6 +13,7 @@ try:
 except Exception:
     print("Error loading the smodels.yml file.")
     print("Please train the models first.")
+    print("> python3 benchmark_train.py")
     exit(1)
 
 
@@ -35,6 +38,9 @@ def check_models():
         print("Please train the models first.")
         exit(1)
     if not all("degree" in model for model in models):
+        print("Please train the models first.")
+        exit(1)
+    if not all("theta" in model for model in models):
         print("Please train the models first.")
         exit(1)
 
@@ -205,6 +211,45 @@ def predict_(x: numpy.ndarray, theta: numpy.ndarray) -> numpy.ndarray:
         exit(1)
 
 
+def ft_progress(iterable,
+                length=shutil.get_terminal_size().columns - 2,
+                fill='█',
+                empty='░',
+                print_end='\r'):
+    total = len(iterable)
+    start = time.time()
+    for i, item in enumerate(iterable, start=1):
+        elapsed_time = time.time() - start
+        eta = elapsed_time * (total / i - 1)
+        current_percent = (i / total) * 100
+        filled_length = int(length * i / total)
+        if eta == 0.0:
+            eta_str = '[DONE]    '
+        elif eta < 60:
+            eta_str = f'[ETA {eta:.0f} s]'
+        elif eta < 3600:
+            eta_str = f'[ETA {eta / 60:.0f} m]'
+        else:
+            eta_str = f'[ETA {eta / 3600:.0f} h]'
+        percent_str = f'[{current_percent:6.2f} %] '
+        progress_str = str(fill * filled_length
+                           + empty * (length - filled_length))
+        counter_str = f' [{i:>{len(str(total))}}/{total}] '
+        if elapsed_time < 60:
+            et_str = f' [Elapsed-time {elapsed_time:.2f} s]'
+        elif elapsed_time < 3600:
+            et_str = f' [Elapsed-time {elapsed_time / 60:.2f} m]'
+        else:
+            et_str = f' [Elapsed-time {elapsed_time / 3600:.2f} h]'
+        bar = ("\033[F\033[K " + progress_str + "\n"
+               + et_str
+               + counter_str
+               + percent_str
+               + eta_str)
+        print(bar, end=print_end)
+        yield item
+
+
 def fit_(x: numpy.ndarray, y: numpy.ndarray, theta: numpy.ndarray,
          alpha: float, max_iter: int) -> tuple:
     try:
@@ -233,7 +278,7 @@ def fit_(x: numpy.ndarray, y: numpy.ndarray, theta: numpy.ndarray,
         elif max_iter < 0:
             print("Error: max_iter must be positive")
             exit(1)
-        for i in range(max_iter):
+        for i in ft_progress(range(max_iter)):
             y_hat = predict_(x, theta)
             gradient = numpy.dot(x.T, y_hat - y) / x.shape[0]
             theta -= (alpha * gradient)
@@ -256,7 +301,7 @@ train_model_x = get_model_x(x_train_poly, best_model["degree"])
 
 # Train the model with the training set
 learning_rate = 10e-7
-n_cycle = 1_000
+n_cycle = 100_000
 theta = numpy.array(best_model["theta"]).reshape(-1, 1)
 
 print(f"Training model {best_model['name']} ... ", end="")
@@ -322,20 +367,18 @@ y_hat_denormalized = denormalize_prediction(y_hat, y_min[0], y_max[0])
 fig, ax = plt.subplots(3, 3, figsize=(10, 10))
 
 for i in range(3):
+
     for j in range(3):
 
         if j == 0:
-            ax[i, j].set_title("Real")
             ax[i, j].scatter(x_test[:, i],
                              y_test,
                              color="blue", alpha=0.5)
         elif j == 1:
-            ax[i, j].set_title("Predicted")
             ax[i, j].scatter(x_test[:, i],
                              y_hat_denormalized,
                              color="red", alpha=0.5)
         elif j == 2:
-            ax[i, j].set_title("Both")
             ax[i, j].scatter(x_test[:, i],
                              y_test,
                              color="blue", alpha=0.5)
@@ -345,31 +388,28 @@ for i in range(3):
         ax[i, j].set_xlabel(features[i])
         ax[i, j].set_ylabel("Price")
 
+cols = ["Real values", "Predicted values", "Both"]
+
+for ax, col in zip(ax[0], cols):
+    ax.set_title(col)
+
+plt.tight_layout()
 plt.show()
 
-
 # Two 4D plots to visualize the model prediction and the real values
-fig, ax = plt.subplots(1, 2, figsize=(10, 5), subplot_kw={"projection": "3d"})
-
-ax[0].scatter(x_test[:, 0], x_test[:, 1], x_test[:, 2], c=y_test, alpha=0.5)
-ax[1].scatter(x_test[:, 0], x_test[:, 1], x_test[:, 2], c=y_hat_denormalized,
-              alpha=0.5)
+fig, ax = plt.subplots(1, 2, figsize=(15, 5), subplot_kw={"projection": "3d"})
 
 fig.colorbar(ax[0].scatter(x_test[:, 0], x_test[:, 1], x_test[:, 2], c=y_test),
-                ax=ax[0], label="Price")
-fig.colorbar(ax[1].scatter(x_test[:, 0], x_test[:, 1], x_test[:, 2], c=y_hat_denormalized), ax=ax[1], label="Price")
+             ax=ax[0], label="Price")
+fig.colorbar(ax[1].scatter(x_test[:, 0], x_test[:, 1], x_test[:, 2],
+                           c=y_hat_denormalized), ax=ax[1], label="Price")
 
 ax[0].set_title("Real")
 ax[1].set_title("Predicted")
 
-ax[0].set_xlabel(features[0])
-ax[0].set_ylabel(features[1])
-ax[0].set_zlabel(features[2])
-
-ax[1].set_xlabel(features[0])
-ax[1].set_ylabel(features[1])
-ax[1].set_zlabel(features[2])
+for i in range(2):
+    ax[i].set_xlabel(features[0])
+    ax[i].set_ylabel(features[1])
+    ax[i].set_zlabel(features[2])
 
 plt.show()
-
-
