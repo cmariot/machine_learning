@@ -43,7 +43,6 @@ if __name__ == "__main__":
             elif dataset.shape[1] != len(features):
                 print("Error: The dataset is missing one or more features")
                 exit(1)
-            print()
             return dataset
         except Exception:
             print("Error: Can't find the dataset file")
