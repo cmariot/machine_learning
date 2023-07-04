@@ -19,7 +19,7 @@ def sigmoid_(x):
         m = x.shape[0]
         if m == 0 or x.shape != (m, 1):
             return None
-        return 1. / (1. + np.exp(-x))
+        return 1.0 / (1.0 + np.exp(-x))
     except Exception:
         return None
 

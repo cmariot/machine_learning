@@ -95,7 +95,7 @@ if __name__ == "__main__":
             exit(1)
 
     features_train, features_test, target_train, target_test = \
-        split_dataframes(features_dataframe, target_dataframe, 0.5, zipcode)
+        split_dataframes(features_dataframe, target_dataframe, 0.8, zipcode)
 
     def normalize_train(training: np.ndarray) -> tuple:
         try:
@@ -357,20 +357,21 @@ if __name__ == "__main__":
     theta = np.zeros((x_train_normalized.shape[1] + 1, 1))
     logistic_regression = MyLogisticRegression(
         theta,
-        max_iter=500_000,
-        alpha=2)
+        max_iter=150_000,
+        alpha=1)
     logistic_regression.fit_(x_train_normalized, target_train)
 
-    # Calculate and display the fraction of correct predictions over
-    # the total number of predictions based on the test set.
-    y_hat = logistic_regression.predict_(x_test_normalized)
-    if y_hat is None:
-        exit()
 
-    y_hat = np.where(y_hat >= 0.5, 1, 0)
-    correct = np.sum(y_hat == target_test)
-    total = target_test.shape[0]
-    print(f'Correct predictions: {correct}/{total} ({correct / total:.2%})')
+#    # Calculate and display the fraction of correct predictions over
+#    # the total number of predictions based on the test set.
+#    y_hat = logistic_regression.predict_(x_test_normalized)
+#    if y_hat is None:
+#        exit()
+#
+#    y_hat = np.where(y_hat >= 0.5, 1, 0)
+#    correct = np.sum(y_hat == target_test)
+#    total = target_test.shape[0]
+#    print(f'Correct predictions: {correct}/{total} ({correct / total:.2%})')
 
     # Plot 3 scatter plots (one for each pair of citizen features) with
     # the dataset and the final prediction of the model.
@@ -391,6 +392,41 @@ if __name__ == "__main__":
     y_hat = logistic_regression.predict_(features)
     y_hat = np.where(y_hat >= 0.5, 1, 0)
 
+    # Calculate and display the fraction of correct predictions over the total
+    # number of predictions based on the test set.
+    def accuracy_score_(y, y_hat):
+        """
+        Compute the accuracy score.
+        Args:
+            y: a numpy.ndarray for the correct labels
+            y_hat:a numpy.ndarray for the predicted labels
+        Returns:
+            The accuracy score as a float.
+            None on any error.
+        Raises:
+            This function should not raise any Exception.
+        """
+
+        try:
+            if not isinstance(y, np.ndarray) \
+                    or not isinstance(y_hat, np.ndarray):
+                return None
+
+            if y.shape != y_hat.shape:
+                return None
+
+            if y.size == 0:
+                return None
+
+            true = np.where(y == y_hat)[0].shape[0]
+            return true / y.size
+
+        except Exception:
+            return None
+
+    accuracy_score = accuracy_score_(target, y_hat)
+    print("Accuracy score: {} %".format(accuracy_score * 100))
+
     colors = np.where(
         y_hat == target,
         np.where(
@@ -404,6 +440,8 @@ if __name__ == "__main__":
             'red'       # False negative
         )
     )
+
+    fig.suptitle(f'Logistic regression of citizens\' features\n')
 
     for i in range(3):
         index = i if i != 2 else -1

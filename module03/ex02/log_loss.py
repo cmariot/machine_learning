@@ -1,5 +1,6 @@
 import numpy as np
 import unittest
+import sklearn.metrics as skm
 
 
 def sigmoid_(x):
@@ -85,7 +86,7 @@ def log_loss_(y, y_hat, eps=1e-15):
 
     try:
         loss_elem = 0.0
-        for i in range(m):
+        for i in range(0, m):
             ep = eps if y_hat[i][0] == 0 or y_hat[i][0] == 1 else 0
             loss_elem += y[i] * np.log(y_hat[i] + ep) + \
                 (1 - y[i]) * np.log(1 - y_hat[i] + ep)
@@ -103,22 +104,24 @@ class TestLogLoss(unittest.TestCase):
         x1 = np.array([4]).reshape((-1, 1))
         theta1 = np.array([[2], [0.5]])
         y_hat1 = logistic_predict_(x1, theta1)
-        self.assertEqual(log_loss_(y1, y_hat1), 0.01814992791780973)
+        self.assertEqual(log_loss_(y1, y_hat1),
+                         skm.log_loss(y1, y_hat1, eps=1e-15, labels=[0, 1]))
 
     def test_example_two(self):
         y2 = np.array([[1], [0], [1], [0], [1]])
         x2 = np.array([[4], [7.16], [3.2], [9.37], [0.56]])
         theta2 = np.array([[2], [0.5]])
         y_hat2 = logistic_predict_(x2, theta2)
-        self.assertEqual(log_loss_(y2, y_hat2), 2.4825011602474483)
+        self.assertEqual(log_loss_(y2, y_hat2),
+                         skm.log_loss(y2, y_hat2, eps=1e-15, labels=[0, 1]))
 
     def test_example_three(self):
         y3 = np.array([[0], [1], [1]])
         x3 = np.array([[0, 2, 3, 4], [2, 4, 5, 5], [1, 3, 2, 7]])
         theta3 = np.array([[-2.4], [-1.5], [0.3], [-1.4], [0.7]])
         y_hat3 = logistic_predict_(x3, theta3)
-        self.assertEqual(log_loss_(y3, y_hat3), 2.9938533108607057)
-        # self.assertEqual(log_loss_(y3, y_hat3), 2.9938533108607053)
+        self.assertEqual(log_loss_(y3, y_hat3),
+                         skm.log_loss(y3, y_hat3, eps=1e-15, labels=[0, 1]))
 
 
 if __name__ == "__main__":
@@ -128,17 +131,20 @@ if __name__ == "__main__":
     theta1 = np.array([[2], [0.5]])
     y_hat1 = logistic_predict_(x1, theta1)
     print(log_loss_(y1, y_hat1))
+    print(skm.log_loss(y1, y_hat1, eps=1e-15, labels=[0, 1]))
 
     y2 = np.array([[1], [0], [1], [0], [1]])
     x2 = np.array([[4], [7.16], [3.2], [9.37], [0.56]])
     theta2 = np.array([[2], [0.5]])
     y_hat2 = logistic_predict_(x2, theta2)
     print(log_loss_(y2, y_hat2))
+    print(skm.log_loss(y2, y_hat2, eps=1e-15, labels=[0, 1]))
 
     y3 = np.array([[0], [1], [1]])
     x3 = np.array([[0, 2, 3, 4], [2, 4, 5, 5], [1, 3, 2, 7]])
     theta3 = np.array([[-2.4], [-1.5], [0.3], [-1.4], [0.7]])
     y_hat3 = logistic_predict_(x3, theta3)
     print(log_loss_(y3, y_hat3))
+    print(skm.log_loss(y3, y_hat3, eps=1e-15, labels=[0, 1]))
 
     unittest.main()

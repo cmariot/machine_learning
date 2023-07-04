@@ -282,7 +282,7 @@ if __name__ == "__main__":
             exit(1)
 
     features_train, features_test, target_train, target_test = \
-        split_dataframes(features_dataframe, target_dataframe, 0.5)
+        split_dataframes(features_dataframe, target_dataframe, 0.8)
 
     # Normalize the training and the test features,
     # keep the min/max for the denormalization
@@ -378,7 +378,6 @@ if __name__ == "__main__":
 
     # Calculate and display the fraction of correct predictions over the total
     # number of predictions based on the test set.
-
     def accuracy_score_(y, y_hat):
         """
         Compute the accuracy score.
@@ -410,18 +409,18 @@ if __name__ == "__main__":
             return None
 
     accuracy_score = accuracy_score_(total_target, y_predictions)
-
-    print("Accuracy score: {}".format(accuracy_score))
+    print("Accuracy score: {} %".format(accuracy_score * 100))
 
     def confusion_matrix_(y_true, y_hat, labels=None, df_option=False):
         """
-            Compute confusion matrix to evaluate the accuracy of a classification.
+            Compute confusion matrix to evaluate the accuracy
+            of a classification.
             Args:
                 y: a numpy.array for the correct labels
                 y_hat: a numpy.array for the predicted labels
                 labels: optional, a list of labels to index the matrix.
-                        This may be used to reorder or select a subset of labels.
-                        (default=None)
+                        This may be used to reorder or select a subset of
+                        labels. (default=None)
                 df_option: optional, if set to True the function will return a
                         pandas DataFrame instead of a numpy array.
                         (default=False)

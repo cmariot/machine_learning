@@ -1,6 +1,7 @@
 import shutil
 import time
 import numpy as np
+import sklearn.metrics as skm
 
 
 class MyLogisticRegression():
@@ -86,9 +87,12 @@ class MyLogisticRegression():
             elif y_hat.shape != (m, n):
                 return None
 
-            dot1 = y * (np.log(y_hat + eps))
-            dot2 = (1 - y) * np.log(1 - y_hat + eps)
-            return -(dot1 + dot2)
+            y_hat[y_hat == 0] = eps
+            y_hat[y_hat == 1] = 1 - eps
+
+            dot1 = y.T.dot(np.log(y_hat))
+            dot2 = (1 - y).T.dot(np.log(1 - y_hat))
+            return (dot1 + dot2)
 
         except Exception:
             return None
@@ -111,7 +115,7 @@ class MyLogisticRegression():
             loss_elem = self.loss_elem_(y, y_hat, eps)
             if loss_elem is None:
                 return None
-            return np.mean(loss_elem)
+            return (loss_elem / -y.shape[0]).sum()
 
         except Exception:
             return None
@@ -232,8 +236,9 @@ if __name__ == "__main__":
     #        [1. ]])
 
     # Example 1:
+    sklearn_loss = skm.log_loss(Y, y_hat, eps=1e-15, labels=[0, 1])
     loss = mylr.loss_(Y, y_hat)
-    print(loss)
+    print(loss, "vs", sklearn_loss)
     # Output:
     # 11.513157421577004
 
@@ -256,7 +261,8 @@ if __name__ == "__main__":
     #       [0.06562156]])
 
     # Example 4:
+    sklearn_loss = skm.log_loss(Y, y_hat, eps=1e-15, labels=[0, 1])
     loss = mylr.loss_(Y, y_hat)
-    print(loss)
+    print(loss, "vs", sklearn_loss)
     # Output:
     # 1.4779126923052268

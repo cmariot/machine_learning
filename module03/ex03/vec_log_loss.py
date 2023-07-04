@@ -1,5 +1,6 @@
 import numpy as np
 import unittest
+import sklearn.metrics as skm
 
 
 def sigmoid_(x):
@@ -68,8 +69,11 @@ def vec_log_loss_(y, y_hat, eps=1e-15):
         return None
 
     try:
-        dot1 = y.T.dot(np.log(y_hat + eps))
-        dot2 = (1 - y).T.dot(np.log(1 - y_hat + eps))
+        # Change the values of y_hat to avoid math error
+        y_hat[(y_hat == 0)] = eps
+        y_hat[(y_hat == 1)] = 1 - eps
+        dot1 = y.T.dot(np.log(y_hat))
+        dot2 = (1 - y).T.dot(np.log(1 - y_hat))
         return ((dot1 + dot2) / -m)[0][0]
 
     except Exception:
@@ -83,23 +87,47 @@ class TestLogLoss(unittest.TestCase):
         x1 = np.array([4]).reshape((-1, 1))
         theta1 = np.array([[2], [0.5]])
         y_hat1 = logistic_predict_(x1, theta1)
-        self.assertEqual(vec_log_loss_(y1, y_hat1), 0.018149927917808714)
+        self.assertEqual(vec_log_loss_(y1, y_hat1),
+                         skm.log_loss(y1, y_hat1, eps=1e-15, labels=[0, 1]))
 
     def test_example_two(self):
         y2 = np.array([[1], [0], [1], [0], [1]])
         x2 = np.array([[4], [7.16], [3.2], [9.37], [0.56]])
         theta2 = np.array([[2], [0.5]])
         y_hat2 = logistic_predict_(x2, theta2)
-        self.assertEqual(vec_log_loss_(y2, y_hat2), 2.482501160247234)
-        # self.assertEqual(vec_log_loss_(y2, y_hat2), 2.4825011602472347)
+        self.assertEqual(vec_log_loss_(y2, y_hat2),
+                         skm.log_loss(y2, y_hat2, eps=1e-15, labels=[0, 1]))
 
     def test_example_three(self):
         y3 = np.array([[0], [1], [1]])
         x3 = np.array([[0, 2, 3, 4], [2, 4, 5, 5], [1, 3, 2, 7]])
         theta3 = np.array([[-2.4], [-1.5], [0.3], [-1.4], [0.7]])
         y_hat3 = logistic_predict_(x3, theta3)
-        self.assertEqual(vec_log_loss_(y3, y_hat3), 2.993853310859968)
+        self.assertEqual(vec_log_loss_(y3, y_hat3),
+                         skm.log_loss(y3, y_hat3, eps=1e-15, labels=[0, 1]))
 
 
 if __name__ == "__main__":
+
+    y1 = np.array([1]).reshape((-1, 1))
+    x1 = np.array([4]).reshape((-1, 1))
+    theta1 = np.array([[2], [0.5]])
+    y_hat1 = logistic_predict_(x1, theta1)
+    print(vec_log_loss_(y1, y_hat1))
+    print(skm.log_loss(y1, y_hat1, eps=1e-15, labels=[0, 1]))
+
+    y2 = np.array([[1], [0], [1], [0], [1]])
+    x2 = np.array([[4], [7.16], [3.2], [9.37], [0.56]])
+    theta2 = np.array([[2], [0.5]])
+    y_hat2 = logistic_predict_(x2, theta2)
+    print(vec_log_loss_(y2, y_hat2))
+    print(skm.log_loss(y2, y_hat2, eps=1e-15, labels=[0, 1]))
+
+    y3 = np.array([[0], [1], [1]])
+    x3 = np.array([[0, 2, 3, 4], [2, 4, 5, 5], [1, 3, 2, 7]])
+    theta3 = np.array([[-2.4], [-1.5], [0.3], [-1.4], [0.7]])
+    y_hat3 = logistic_predict_(x3, theta3)
+    print(vec_log_loss_(y3, y_hat3))
+    print(skm.log_loss(y3, y_hat3, eps=1e-15, labels=[0, 1]))
+    
     unittest.main()
