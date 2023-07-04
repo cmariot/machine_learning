@@ -357,8 +357,8 @@ if __name__ == "__main__":
     theta = np.zeros((x_train_normalized.shape[1] + 1, 1))
     logistic_regression = MyLogisticRegression(
         theta,
-        max_iter=100_000,
-        alpha=1)
+        max_iter=500_000,
+        alpha=2)
     logistic_regression.fit_(x_train_normalized, target_train)
 
     # Calculate and display the fraction of correct predictions over
@@ -400,7 +400,7 @@ if __name__ == "__main__":
         ),
         np.where(
             y_hat == 1,
-            'yellow',   # False positive
+            'orange',   # False positive
             'red'       # False negative
         )
     )
@@ -427,7 +427,7 @@ if __name__ == "__main__":
                           label='True positive'),
             patches.Patch(color='blue',
                           label='True negative'),
-            patches.Patch(color='yellow',
+            patches.Patch(color='orange',
                           label='False positive'),
             patches.Patch(color='red',
                           label='False negative'),
@@ -464,7 +464,7 @@ if __name__ == "__main__":
                           label='True positive'),
             patches.Patch(color='blue',
                           label='True negative'),
-            patches.Patch(color='yellow',
+            patches.Patch(color='orange',
                           label='False positive'),
             patches.Patch(color='red',
                           label='False negative'),

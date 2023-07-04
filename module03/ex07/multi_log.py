@@ -1,7 +1,9 @@
+from matplotlib import patches, pyplot as plt
 import numpy as np
 import pandas
 import time
 import shutil
+import pandas as pd
 
 
 class MyLogisticRegression():
@@ -341,7 +343,7 @@ if __name__ == "__main__":
         # Train 4 logistic regression classifiers to discriminate each class
         # from the others
         theta = np.zeros((x_train_normalized.shape[1] + 1, 1))
-        logistic_regression = MyLogisticRegression(theta, 0.1, 100_000)
+        logistic_regression = MyLogisticRegression(theta, 1, 50_000)
 
         y: np.ndarray = target_train.copy()
 
@@ -357,24 +359,223 @@ if __name__ == "__main__":
 
     normalized_features = np.concatenate(
         (x_test_normalized, x_train_normalized),
-        axis=1)
+        axis=0)
+    denormalized_features = np.concatenate(
+        (features_test, features_train),
+        axis=0)
+    total_target = np.concatenate((target_test, target_train), axis=0)
     y_predictions = np.empty((normalized_features.shape[0], 1))
 
     for i in range(normalized_features.shape[0]):
-
         y_proba = np.empty((4, 1))
         for current_test in range(4):
             logistic_regression.theta = trained_thetas[current_test]
-            y_proba[current_test] = logistic_regression.predict_(
-                normalized_features[i].reshape(1, 3))
-
-        # max value index
+            y_proba[current_test] = \
+                logistic_regression.predict_(normalized_features[i].reshape(
+                    1, normalized_features.shape[1])
+                )
         y_predictions[i] = y_proba.argmax()
-
-    print(y_predictions)
 
     # Calculate and display the fraction of correct predictions over the total
     # number of predictions based on the test set.
 
+    def accuracy_score_(y, y_hat):
+        """
+        Compute the accuracy score.
+        Args:
+            y: a numpy.ndarray for the correct labels
+            y_hat:a numpy.ndarray for the predicted labels
+        Returns:
+            The accuracy score as a float.
+            None on any error.
+        Raises:
+            This function should not raise any Exception.
+        """
+
+        try:
+            if not isinstance(y, np.ndarray) \
+                    or not isinstance(y_hat, np.ndarray):
+                return None
+
+            if y.shape != y_hat.shape:
+                return None
+
+            if y.size == 0:
+                return None
+
+            true = np.where(y == y_hat)[0].shape[0]
+            return true / y.size
+
+        except Exception:
+            return None
+
+    accuracy_score = accuracy_score_(total_target, y_predictions)
+
+    print("Accuracy score: {}".format(accuracy_score))
+
+    def confusion_matrix_(y_true, y_hat, labels=None, df_option=False):
+        """
+            Compute confusion matrix to evaluate the accuracy of a classification.
+            Args:
+                y: a numpy.array for the correct labels
+                y_hat: a numpy.array for the predicted labels
+                labels: optional, a list of labels to index the matrix.
+                        This may be used to reorder or select a subset of labels.
+                        (default=None)
+                df_option: optional, if set to True the function will return a
+                        pandas DataFrame instead of a numpy array.
+                        (default=False)
+            Return:
+                The confusion matrix as a numpy array or a pandas DataFrame
+                according to df_option value.
+                None if any error.
+            Raises:
+                This function should not raise any Exception.
+        """
+
+        try:
+
+            if not isinstance(y_true, np.ndarray) \
+                    or not isinstance(y_hat, np.ndarray):
+                print("Not a numpy array")
+                return None
+
+            if y_true.shape != y_hat.shape:
+                print("Shape error")
+                return None
+
+            if y_true.size == 0 or y_hat.size == 0:
+                print("Empty array")
+                return None
+
+            if labels is None:
+                labels = np.unique(np.concatenate((y_true, y_hat)))
+
+            cm = np.zeros((len(labels), len(labels)), dtype=int)
+
+            for i in range(len(labels)):
+                for j in range(len(labels)):
+                    cm[i, j] = np.where((y_true == labels[i])
+                                        & (y_hat == labels[j]))[0].shape[0]
+
+            if df_option:
+                cm = pd.DataFrame(cm, index=labels, columns=labels)
+
+            return cm
+
+        except Exception:
+            return None
+
+    print("Confusion matrix:")
+    print(confusion_matrix_(total_target, y_predictions, df_option=True))
+
     # Plot 3 scatter plots (one for each pair of citizen features)
     # with the dataset and the final prediction of the model.
+    fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+
+    colors = np.where(
+        y_predictions < 2,
+        np.where(
+            y_predictions == 0,
+            'green',    # 0
+            'blue'      # 1
+        ),
+        np.where(
+            y_predictions == 2,
+            'orange',   # 2
+            'red'       # 3
+        )
+    )
+
+    real_colors = np.where(
+        total_target < 2,
+        np.where(
+            total_target == 0,
+            'green',    # 0
+            'blue'      # 1
+        ),
+        np.where(
+            total_target == 2,
+            'orange',   # 2
+            'red'       # 3
+        )
+    )
+
+    features_pairs = [
+        ('weight', 'height'),
+        ('weight', 'bone_density'),
+        ('height', 'bone_density')
+    ]
+
+    for i in range(3):
+        index = i if i != 2 else -1
+
+        ax[i].scatter(
+            denormalized_features[:, index],
+            denormalized_features[:, index + 1],
+            c=colors.flatten(),
+            marker='o',
+            alpha=0.5,
+            edgecolors=real_colors.flatten()
+        )
+
+        ax[i].set_xlabel(features_pairs[i][0])
+        ax[i].set_ylabel(features_pairs[i][1])
+        ax[i].set_title(f'{features_pairs[i][1]} vs {features_pairs[i][0]}')
+
+    fig.legend(
+        handles=[
+            patches.Patch(
+                          color='green',
+                          label='The flying cities of Venus'),
+            patches.Patch(
+                          color='blue',
+                          label='United Nations of Earth'),
+            patches.Patch(
+                          color='orange',
+                          label='Mars Republic'),
+            patches.Patch(
+                          color='red',
+                          label="The Asteroid's Belt colonies"),
+        ],
+        loc='lower center', ncol=4, fontsize='small',
+    )
+
+    plt.show()
+
+    # Plot a 3D scatter plot with the dataset and the final prediction
+    # of the model. The points must be colored following the real class
+    # of the citizen.
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.scatter(
+        denormalized_features[:, 0],
+        denormalized_features[:, 1],
+        denormalized_features[:, 2],
+        c=colors.flatten(),
+        marker='o',
+        alpha=0.5,
+        edgecolors=real_colors.flatten()
+    )
+
+    ax.set_xlabel('weight')
+    ax.set_ylabel('height')
+    ax.set_zlabel('bone_density')
+    ax.set_title('bone_density vs height vs weight')
+
+    fig.legend(
+        handles=[
+            patches.Patch(color='green',
+                          label='True positive'),
+            patches.Patch(color='blue',
+                          label='True negative'),
+            patches.Patch(color='orange',
+                          label='False positive'),
+            patches.Patch(color='red',
+                          label='False negative'),
+        ],
+        loc='lower center', ncol=4, fontsize='small',
+    )
+
+    plt.show()
