@@ -58,10 +58,10 @@ class MyLogisticRegression():
         This function should not raise any Exception.
         """
 
-        if not isinstance(x, np.ndarray):
-            return None
-
         try:
+            if not isinstance(x, np.ndarray):
+                return None
+
             m, n = x.shape
 
             if m == 0 or n == 0:
@@ -78,6 +78,7 @@ class MyLogisticRegression():
 
     def loss_elem_(self, y, y_hat, eps=1e-15):
         try:
+
             if not all(isinstance(x, np.ndarray) for x in [y, y_hat]):
                 return None
 
@@ -87,12 +88,15 @@ class MyLogisticRegression():
             elif y_hat.shape != (m, n):
                 return None
 
-            y_hat[y_hat == 0] += eps
-            y_hat[y_hat == 1] -= eps
+            y_hat = np.clip(y_hat, eps, 1 - eps)
 
-            dot1 = y.T.dot(np.log(y_hat))
-            dot2 = (1 - y).T.dot(np.log(1 - y_hat))
-            return (dot1 + dot2)[0, 0]
+            loss_elem = []
+            for y_value, y_hat_value in zip(y, y_hat):
+                dot1 = y_value * np.log(y_hat_value)
+                dot2 = (1 - y_value) * np.log(1 - y_hat_value)
+                loss = -(dot1 + dot2)
+                loss_elem.append(loss)
+            return loss_elem
 
         except Exception:
             return None
@@ -115,7 +119,7 @@ class MyLogisticRegression():
             loss_elem = self.loss_elem_(y, y_hat, eps)
             if loss_elem is None:
                 return None
-            return (loss_elem / -y.shape[0])
+            return np.mean(loss_elem)
 
         except Exception:
             return None
@@ -222,7 +226,7 @@ if __name__ == "__main__":
     X = np.array([[1., 1., 2., 3.],
                   [5., 8., 13., 21.],
                   [3., 5., 9., 14.]])
-    Y = np.array([[1], [0], [1]])
+    Y = np.array([[1.], [0.], [1.]])
     theta = np.array([[2], [0.5], [7.1], [-4.3], [2.09]])
 
     mylr = MyLogisticRegression(theta)
@@ -236,8 +240,9 @@ if __name__ == "__main__":
     #        [1. ]])
 
     # Example 1:
-    sklearn_loss = skm.log_loss(Y, y_hat, eps=1e-15, labels=[0, 1])
-    loss = mylr.loss_(Y, y_hat)
+    loss = mylr.loss_(Y, mylr.predict_(X))
+
+    sklearn_loss = skm.log_loss(Y, mylr.predict_(X))
     print(loss, "vs", sklearn_loss)
     # Output:
     # 11.513157421577004
@@ -262,6 +267,6 @@ if __name__ == "__main__":
 
     # Example 4:
     loss = mylr.loss_(Y, y_hat)
-    print(loss, "vs", skm.log_loss(Y, y_hat, eps=1e-15, labels=[0.0, 1.0]))
+    print(loss, "vs", skm.log_loss(Y, y_hat, eps=1e-15))
     # Output:
     # 1.4779126923052268
