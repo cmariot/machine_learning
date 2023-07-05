@@ -361,18 +361,6 @@ if __name__ == "__main__":
         alpha=1)
     logistic_regression.fit_(x_train_normalized, target_train)
 
-
-#    # Calculate and display the fraction of correct predictions over
-#    # the total number of predictions based on the test set.
-#    y_hat = logistic_regression.predict_(x_test_normalized)
-#    if y_hat is None:
-#        exit()
-#
-#    y_hat = np.where(y_hat >= 0.5, 1, 0)
-#    correct = np.sum(y_hat == target_test)
-#    total = target_test.shape[0]
-#    print(f'Correct predictions: {correct}/{total} ({correct / total:.2%})')
-
     # Plot 3 scatter plots (one for each pair of citizen features) with
     # the dataset and the final prediction of the model.
     # The points must be colored following the real class of the citizen.
@@ -411,13 +399,10 @@ if __name__ == "__main__":
             if not isinstance(y, np.ndarray) \
                     or not isinstance(y_hat, np.ndarray):
                 return None
-
             if y.shape != y_hat.shape:
                 return None
-
             if y.size == 0:
                 return None
-
             true = np.where(y == y_hat)[0].shape[0]
             return true / y.size
 
@@ -441,7 +426,7 @@ if __name__ == "__main__":
         )
     )
 
-    fig.suptitle(f'Logistic regression of citizens\' features\n')
+    fig.suptitle('Logistic regression\n')
 
     for i in range(3):
         index = i if i != 2 else -1

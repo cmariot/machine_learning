@@ -6,6 +6,9 @@ from sklearn.metrics import accuracy_score, precision_score, \
 def accuracy_score_(y, y_hat):
     """
     Compute the accuracy score.
+    Accuracy tells you the percentage of predictions that are accurate
+    (i.e. the correct class was predicted).
+    Accuracy doesn't give information about either error type.
     Args:
         y: a numpy.ndarray for the correct labels
         y_hat:a numpy.ndarray for the predicted labels
@@ -37,6 +40,11 @@ def accuracy_score_(y, y_hat):
 def precision_score_(y, y_hat, pos_label=1):
     """
     Compute the precision score.
+    Precision tells you how much you can trust your
+    model when it says that an object belongs to Class A.
+    More precisely, it is the percentage of the objects
+    assigned to Class A that really were A objects.
+    You use precision when you want to control for False positives.
     Args:
         y: a numpy.ndarray for the correct labels
         y_hat: a numpy.ndarray for the predicted labels
@@ -73,6 +81,11 @@ def precision_score_(y, y_hat, pos_label=1):
 def recall_score_(y, y_hat, pos_label=1):
     """
     Compute the recall score.
+    Recall tells you how much you can trust that your
+    model is able to recognize ALL Class A objects.
+    It is the percentage of all A objects that were properly
+    classified by the model as Class A.
+    You use recall when you want to control for False negatives.
     Args:
         y:a numpy.ndarray for the correct labels
         y_hat:a numpy.ndarray for the predicted labels
@@ -109,6 +122,9 @@ def recall_score_(y, y_hat, pos_label=1):
 def f1_score_(y, y_hat, pos_label=1):
     """
     Compute the f1 score.
+    F1 score combines precision and recall in one single measure.
+    You use the F1 score when want to control both
+    False positives and False negatives.
     Args:
         y:a numpy.ndarray for the correct labels
         y_hat:a numpy.ndarray for the predicted labels
