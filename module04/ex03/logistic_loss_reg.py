@@ -43,11 +43,12 @@ def reg_log_loss_(y, y_hat, theta, lambda_):
 
     try:
         m = y.shape[0]
-        return float(
-            - np.dot(y.T, np.log(y_hat)) / m -
-            np.dot((1 - y).T, np.log(1 - y_hat)) / m +
-            lambda_ * np.dot(theta[1:].T, theta[1:])[0, 0] / (2 * m)
-        )
+
+        loss = -1 / m * (y.T.dot(np.log(y_hat))
+                         + (1 - y).T.dot(np.log(1 - y_hat))) \
+                            + ((lambda_ / (2 * m)) * (theta[1:].T @ theta[1:]))
+        return loss[0][0]
+
     except Exception:
         return None
 
