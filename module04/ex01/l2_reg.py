@@ -1,14 +1,19 @@
 import numpy as np
 
 
-def check_args(theta):
-    if not isinstance(theta, np.ndarray):
-        return None
-    elif theta.size == 0:
-        return None
-    return True
+def checkargs_l2_(func):
+
+    def wrapper(theta):
+        if not isinstance(theta, np.ndarray):
+            return None
+        elif theta.size == 0:
+            return None
+        return func(theta)
+
+    return wrapper
 
 
+@checkargs_l2_
 def iterative_l2(theta):
     """
     Computes the L2 regularization of a non-empty numpy.ndarray,
@@ -23,19 +28,16 @@ def iterative_l2(theta):
     """
 
     try:
-        if check_args(theta) is None:
-            return None
-
         regularization = 0.0
         for i in range(1, theta.shape[0]):
-            regularization += theta[i][0] ** 2
-        return float(regularization)
+            regularization += theta[i, 0] ** 2
+        return regularization
 
-    except Exception as e:
-        print(e)
+    except Exception:
         return None
 
 
+@checkargs_l2_
 def l2(theta):
     """
     Computes the L2 regularization of a non-empty numpy.ndarray,
@@ -50,12 +52,9 @@ def l2(theta):
     """
 
     try:
-        if check_args(theta) is None:
-            return None
-
-        theta[0] = 0
-        regularization = np.dot(theta.T, theta)[0, 0]
-        return float(regularization)
+        theta[0, 0] = 0
+        regularization = np.dot(theta.T, theta)
+        return float(regularization[0, 0])
 
     except Exception:
         return None

@@ -1,28 +1,64 @@
 import numpy as np
 
 
+def checkargs_l2_(func):
+
+    def wrapper(theta):
+        if not isinstance(theta, np.ndarray):
+            return None
+        elif theta.size == 0:
+            return None
+        return func(theta)
+
+    return wrapper
+
+
+@checkargs_l2_
+def l2(theta):
+    """
+    Computes the L2 regularization of a non-empty numpy.ndarray,
+    without any for-loop.
+    Args:
+        theta: has to be a numpy.ndarray, a vector of shape n * 1.
+    Returns:
+        The L2 regularization as a float.
+        None if theta in an empty numpy.ndarray.
+    Raises:
+        This function should not raise any Exception.
+    """
+
+    try:
+        theta_prime = theta.copy()
+        theta_prime[0, 0] = 0
+        regularization = np.dot(theta_prime.T, theta_prime)
+        return float(regularization[0, 0])
+
+    except Exception:
+        return None
+
+
 def checkargs_reg_loss_(func):
+
     def wrapper(y, y_hat, theta, lambda_):
-        if not isinstance(y, np.ndarray) \
-            or not isinstance(y_hat, np.ndarray) \
-                or not isinstance(theta, np.ndarray):
+        try:
+            if not isinstance(y, np.ndarray) \
+                or not isinstance(y_hat, np.ndarray) \
+                    or not isinstance(theta, np.ndarray):
+                return None
+            m = y.shape[0]
+            n = theta.shape[0]
+            if m == 0 or n == 0:
+                return None
+            if y.shape != (m, 1) \
+                or y_hat.shape != (m, 1) \
+                    or theta.shape != (n, 1):
+                return None
+            if not isinstance(lambda_, float):
+                return None
+            return func(y, y_hat, theta, lambda_)
+        except Exception:
             return None
 
-        m = y.shape[0]
-        n = theta.shape[0]
-
-        if m == 0 or n == 0:
-            return None
-
-        if y.shape != (m, 1) \
-            or y_hat.shape != (m, 1) \
-                or theta.shape != (n, 1):
-            return None
-
-        if not isinstance(lambda_, float):
-            return None
-
-        return func(y, y_hat, theta, lambda_)
     return wrapper
 
 
@@ -46,10 +82,13 @@ def reg_loss_(y, y_hat, theta, lambda_):
 
     try:
         m = y.shape[0]
-        return float(
-            np.dot((y_hat - y).T, y_hat - y)[0, 0] / (2 * m) +
-            lambda_ * np.dot(theta[1:].T, theta[1:])[0, 0] / (2 * m)
-        )
+        const = 1 / (2 * m)
+        dot = (y_hat - y).T.dot(y_hat - y)
+        l2_ = l2(theta)
+        if l2_ is None:
+            return None
+        reg = lambda_ * l2_
+        return float(const * np.sum(dot + reg))
     except Exception:
         return None
 
@@ -73,4 +112,4 @@ if __name__ == "__main__":
     # Example :
     print(reg_loss_(y, y_hat, theta, .9))
     # Output:
-    # 1.116357142857143
+    # 1.1163571428571428
