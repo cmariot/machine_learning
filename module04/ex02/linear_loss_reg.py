@@ -83,12 +83,12 @@ def reg_loss_(y, y_hat, theta, lambda_):
     try:
         m = y.shape[0]
         const = 1 / (2 * m)
-        dot = (y_hat - y).T.dot(y_hat - y)
+        loss_elem = (y_hat - y).T.dot(y_hat - y)
         l2_ = l2(theta)
         if l2_ is None:
             return None
         reg = lambda_ * l2_
-        return float(const * np.sum(dot + reg))
+        return float(const * np.sum(loss_elem + reg))
     except Exception:
         return None
 

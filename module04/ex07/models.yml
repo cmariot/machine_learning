@@ -1,0 +1,457 @@
+- cost: 216572417.69748583
+  name: D4L0.0
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - &id001 !!python/name:numpy.ndarray ''
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 13
+      - 1
+    - &id002 !!python/object/apply:numpy.dtype
+      args:
+      - f8
+      - false
+      - true
+      state: !!python/tuple
+      - 3
+      - <
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - false
+    - !!binary |
+      d1otMDGvI0FCwuGhqT7zQE2fBme6ieHALYGZw6pFc0DOJ3C7WebbQDIteDKly8bA9NBDp37xUcBC
+      U/xpT3SPwEuSfD1eNMhAcRwBrDlkcsBqBwaV5OLSwEH2QxZM8uBAOfuAc+n3esA=
+- cost: 217698210.99900746
+  name: D4L0.2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 13
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0H4kdvF8z3zQAl0HiC1iOHA+B6t0qxEc0D+t6r1/uXbQE1nhb9OysbA65yj0SjyUcDV
+      861Yn1OPwJEgTJL1MshAoeerKOljcsBw6zaeD+HSwHG6otRN8eBAmVs9ikf3esA=
+- cost: 218823316.18579638
+  name: D4L0.4
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 13
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0FWaSP3PT3zQNdgse6vh+HAtcbB8K5Dc0CBhu80pOXbQMOz42j4yMbAcEBq79LyUcCr
+      Lsfj8TKPwLFnsgSNMchAyvyYqJhjcsBVmzLLOt/SwHlN96dP8OBA1HaWqKX2esA=
+- cost: 219947733.75877547
+  name: D4L0.6
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 13
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0HyGLg1iDzzQJ9dvdKqhuHA+2XWHbFCc0DZKT55SeXbQExikC6ix8bAWK2YAH3zUcAF
+      7wsLRxKPwMubrJQkMMhA3S/IK0hjcsBY6vUbZt3SwP6yP5BR7+BAS9eLzgP2esA=
+- cost: 221071464.21849564
+  name: D4L0.8
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 13
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0HLcJiB0jvzQBViQMylheHAaurpWbNBc0BCOZbC7uTbQBzDiBBMxsbAgtYvBSf0UcDw
+      /j/OnvGOwHbxN0K8LshAgFQ5svdicsBOq32QkdvSwDjueY1T7uBANggd/GH1esA=
+- cost: 222194508.06511763
+  name: D4L1.0
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 13
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0F7QcPaHDvzQERmONughOHAF0L7pLVAc0BOS/cQlOTbQM8myg72xMbAJq8w/dD0UcB2
+      PSct+dCOwOGcUQ1ULchAuj7sO6dicsDGscYovdnSwCQDpJ9V7eBAWJRJMcD0esA=
+- cost: 382899167.3212218
+  name: D3L0.0
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 10
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0EakD/WVKDyQCvhh0nDhNzAFH+TziiNdkBpUqXNApPVQBiXiDq91HrAH3IcRItRbcBE
+      NIGzcoHDwHqg1BHlD9tAnmgXUTfFg8A=
+- cost: 383797624.25025433
+  name: D3L0.2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 10
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0EY84jCqJ/yQFc6UbYGg9zAJhR1W3OLdkBaE4qxTZPVQDUxzYMT1XrAl3dZ1jVRbcB8
+      5XVyd33DwJWAli0uDttAqQwDHHbEg8A=
+- cost: 384695558.09019715
+  name: D3L0.4
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 10
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0GJHAS8/J7yQDou1EhKgdzArDDTCr6JdkBrV/uMmJPVQGqQ+MRp1XrA9W7La+BQbcDv
+      QoaHfHnDwEbYrW53DNtA4zLp9LTDg8A=
+- cost: 385592969.24147797
+  name: D3L0.6
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 10
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0FO06/CUJ7yQGYZDQGOf9zAE7eq3AiIdkAp8Plf45PVQFReC/6/1XrA7h9yBItQbcBS
+      PqrygXXDwAMNF9XACttAu5zI2/PCg8A=
+- cost: 386489858.104198
+  name: D3L0.8
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 10
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0Gz3orWpJ3yQLZY+N7RfdzAWIr40FOGdkDCrYYqLpTVQGJOBi8W1nrAs1JNoDVQbcAw
+      y9mzh3HDwKmEzmAKCdtAYwug0DLCg8A=
+- cost: 387386225.0781385
+  name: D3L1.0
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 10
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0HyBZT3+JzyQH5IkuIVfNzA8Y25556EdkAVYaLseJTVQB8t6lds1nrALNBcP+BPbcCq
+      3AzLjW3DwAyl0BFUB9tAX0Bu03HBg8A=
+- cost: 528467235.8752804
+  name: D1L0.0
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 4
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0EkrpDwTVf2QJpbUdQqDrTAIt9IacXrfcA=
+- cost: 529309037.1517342
+  name: D1L0.2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 4
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0E1Rs5NA1f2QKsdJj/xDbTARUb9pi3rfcA=
+- cost: 530150687.7349477
+  name: D1L0.4
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 4
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0H3pv2suFb2QIQ+Pau3DbTA1MTs6ZXqfcA=
+- cost: 530992187.65784097
+  name: D1L0.6
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 4
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0EivR4Oblb2QNGzlhh+DbTA9BoXMv7pfcA=
+- cost: 531833536.9533251
+  name: D1L0.8
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 4
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0FsdTFxI1b2QGJzModEDbTAyQh8f2bpfcA=
+- cost: 532674735.65429974
+  name: D1L1.0
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 4
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0FOvDXW2FX2QPFyEPcKDbTAbE4b0s7ofcA=
+- cost: 543298162.4628108
+  name: D2L0.0
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0HU8b16V0LxQDJk9QbwJtHAbKfa1XknZEA4GM5w4ejSQKaCrSA9iMtA4M9LeDUDhcA=
+- cost: 543928839.2672387
+  name: D2L0.2
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0HQg8xm4kHxQLlNPxXvJdHA/+QG8ockZECVMz6sIOrSQOlJbz9GhstALOKCx1oChcA=
+- cost: 544559289.1529778
+  name: D2L0.4
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0Gj6WZbbUHxQF1WlDnuJNHA8tn1UpYhZEAes23HX+vSQEi0AIpPhMtA7gCnJ4ABhcA=
+- cost: 545189512.2813177
+  name: D2L0.6
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0FDVoxY+EDxQF5Y8nPtI9HAkdeg+KQeZED1wl/CnuzSQE57XQBZgstAV5S2mKUAhcA=
+- cost: 545819508.8134197
+  name: D2L0.8
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0E4/Dteg0DxQCIuV8TsItHAii8B47MbZEAIkBed3e3SQMVYgaJigMtAwwSwGsv/hMA=
+- cost: 546449278.9103101
+  name: D2L1.0
+  theta: !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - !!binary |
+      Yg==
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 7
+      - 1
+    - *id002
+    - false
+    - !!binary |
+      d1otMDGvI0FdDnVsDkDxQBKywCrsIdHAQDUQEsMYZED9RZhXHO/SQGsGaHBsfstAA7uRrfD+hMA=
