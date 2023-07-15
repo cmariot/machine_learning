@@ -64,11 +64,11 @@ class MyRidge:
         """
         Check the arguments of set_params_ with a decorator.
         """
-        def wrapper(self, dict):
+        def wrapper(self, dict_):
             try:
-                if not isinstance(dict, dict):
-                    raise TypeError("dict must be a dictionary")
-                return func(self, dict)
+                if not isinstance(dict_, dict):
+                    raise TypeError("dict_ must be a dictionary")
+                return func(self, dict_)
             except Exception as e:
                 print("MyRidge set_params error :", e)
                 return None
@@ -304,9 +304,8 @@ class MyRidge:
                 gradient = self.gradient_(x, y)
                 if gradient is None:
                     return None
-                self.theta -= self.alpha * gradient
-                loss = self.loss_(y, self.predict_(x))
-                self.losses.append(loss)
+                self.theta = self.theta - (self.alpha * gradient)
+                self.losses.append(self.loss_(y, self.predict_(x)))
             return self.theta
         except Exception:
             return None
@@ -353,3 +352,89 @@ if __name__ == "__main__":
 
     myridge = MyRidge(np.array([[1], [2]]))
     print(myridge.get_params_())
+
+    y = np.array([2, 14, -13, 5, 12, 4, -19]).reshape((-1, 1))
+    y_hat = np.array([3, 13, -11.5, 5, 11, 5, -20]).reshape((-1, 1))
+    theta = np.array([1, 2.5, 1.5, -0.9]).reshape((-1, 1))
+
+    dictionary: dict = {
+        "theta": theta,
+        "lambda_": 0.5
+    }
+
+    myridge.set_params_(dictionary)
+    print(myridge.get_params_())
+
+    # Example :
+    print(myridge.loss_(y, y_hat))
+    # Output:
+    # 0.8503571428571429
+
+    # Example :
+    dictionary = {
+        "theta": theta,
+        "lambda_": 0.05
+    }
+
+    myridge.set_params_(dictionary)
+    print(myridge.loss_(y, y_hat))
+    # Output:
+    # 0.5511071428571429
+
+    # Example :
+    dictionary = {
+        "theta": theta,
+        "lambda_": 0.9
+    }
+
+    myridge.set_params_(dictionary)
+    print(myridge.loss_(y, y_hat))
+    # Output:
+    # 1.1163571428571428
+
+    x = np.array([[-6, -7, -9],
+                  [13, -2, 14],
+                  [-7, 14, -1],
+                  [-8, -4, 6],
+                  [-5, -9, 6],
+                  [1, -5, 11],
+                  [9, -11, 8]])
+    y = np.array([[2], [14], [-13], [5], [12], [4], [-19]])
+    theta = np.array([[7.01], [3], [10.5], [-6]])
+
+    # Example 1.1:
+    dictionary = {
+        "theta": theta,
+        "lambda_": 1
+    }
+    myridge.set_params_(dictionary)
+    print(myridge.gradient_(x, y))
+    # Output:
+    # array([[ -60.99 ],
+    #        [-195.64714286],
+    #        [ 863.46571429],
+    #        [-644.52142857]])
+
+    # Example 2.1:
+    dictionary = {
+        "lambda_": 0.5
+    }
+    myridge.set_params_(dictionary)
+    print(myridge.gradient_(x, y))
+    # Output:
+    # array([[ -60.99 ],
+    #        [-195.86142857],
+    #        [ 862.71571429],
+    #        [-644.09285714]])
+
+    # Example 3.1:
+    dictionary = {
+        "lambda_": 0
+    }
+    myridge.set_params_(dictionary)
+    print(myridge.gradient_(x, y))
+    # Output:
+    # array([[ -60.99 ],
+    #        [-196.07571429],
+    #        [ 861.96571429],
+    #        [-643.66428571]])
