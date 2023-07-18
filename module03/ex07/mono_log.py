@@ -426,7 +426,7 @@ if __name__ == "__main__":
         )
     )
 
-    fig.suptitle('Logistic regression\n')
+    fig.suptitle('Logistic regression')
 
     for i in range(3):
         index = i if i != 2 else -1
