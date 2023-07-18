@@ -70,8 +70,7 @@ def vec_log_loss_(y, y_hat, eps=1e-15):
 
     try:
         # Change the values of y_hat to avoid math error
-        y_hat[(y_hat == 0)] = eps
-        y_hat[(y_hat == 1)] = 1 - eps
+        y_hat = np.clip(y_hat, eps, 1 - eps)
         dot1 = y.T.dot(np.log(y_hat))
         dot2 = (1 - y).T.dot(np.log(1 - y_hat))
         return ((dot1 + dot2) / -m)[0][0]

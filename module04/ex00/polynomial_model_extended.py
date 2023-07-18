@@ -39,9 +39,11 @@ def add_polynomial_features(x, power):
 if __name__ == "__main__":
 
     x = np.arange(1, 11).reshape(5, 2)
+    print("x :")
     print(x)
 
     polynomial_matrix = add_polynomial_features(x, 3)
+    print("\npolynomial matrix of x by degree 3 :")
     print(polynomial_matrix)
     # Output:
     # array([[   1,    2,    1,    4,    1,    8],
@@ -51,6 +53,7 @@ if __name__ == "__main__":
     #        [   9,   10,   81,  100,  729, 1000]])
 
     polynomial_matrix = add_polynomial_features(x, 4)
+    print("\npolynomial matrix of x by degree 4 :")
     print(polynomial_matrix)
     # Output:
     # array([[    1,     2,     1,     4,     1,     8,     1,    16],

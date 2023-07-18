@@ -4,11 +4,17 @@ import numpy as np
 def checkargs_l2_(func):
 
     def wrapper(theta):
-        if not isinstance(theta, np.ndarray):
+        try:
+            if not isinstance(theta, np.ndarray):
+                return None
+            m = theta.shape[0]
+            if m == 0:
+                return None
+            elif theta.shape != (m, 1):
+                return None
+            return func(theta)
+        except Exception:
             return None
-        elif theta.size == 0:
-            return None
-        return func(theta)
 
     return wrapper
 
@@ -28,9 +34,9 @@ def l2(theta):
     """
 
     try:
-        theta_prime = theta.copy()
-        theta_prime[0, 0] = 0
-        regularization = np.dot(theta_prime.T, theta_prime)
+        theta_copy = theta.copy()
+        theta_copy[0, 0] = 0
+        regularization = np.dot(theta_copy.T, theta_copy)
         return float(regularization[0, 0])
 
     except Exception:

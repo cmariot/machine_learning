@@ -4,11 +4,17 @@ import numpy as np
 def checkargs_l2_(func):
 
     def wrapper(theta):
-        if not isinstance(theta, np.ndarray):
+        try:
+            if not isinstance(theta, np.ndarray):
+                return None
+            m = theta.shape[0]
+            if m == 0:
+                return None
+            elif theta.shape != (m, 1):
+                return None
+            return func(theta)
+        except Exception:
             return None
-        elif theta.size == 0:
-            return None
-        return func(theta)
 
     return wrapper
 
@@ -52,8 +58,9 @@ def l2(theta):
     """
 
     try:
-        theta[0, 0] = 0
-        regularization = np.dot(theta.T, theta)
+        theta_copy = theta.copy()
+        theta_copy[0, 0] = 0
+        regularization = np.dot(theta_copy.T, theta_copy)
         return float(regularization[0, 0])
 
     except Exception:
@@ -62,26 +69,26 @@ def l2(theta):
 
 if __name__ == "__main__":
 
-    x = np.array([2, 14, -13, 5, 12, 4, -19]).reshape((-1, 1))
+    theta = np.array([2, 14, -13, 5, 12, 4, -19]).reshape((-1, 1))
 
     # Example 1:
-    print(iterative_l2(x))
+    print(iterative_l2(theta))
     # Output:
     # 911.0
 
     # Example 2:
-    print(l2(x))
+    print(l2(theta))
     # Output:
     # 911.0
 
-    y = np.array([3, 0.5, -6]).reshape((-1, 1))
+    theta = np.array([3, 0.5, -6]).reshape((-1, 1))
 
     # Example 3:
-    print(iterative_l2(y))
+    print(iterative_l2(theta))
     # Output:
     # 36.25
 
     # Example 4:
-    print(l2(y))
+    print(l2(theta))
     # Output:
     # 36.25
