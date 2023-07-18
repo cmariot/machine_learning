@@ -127,9 +127,11 @@ if __name__ == "__main__":
             # ########################################## #
 
             y_hat = ridge.predict_(x_val_degree)
+            model["y_hat"] = y_hat
+
             cost = ridge.loss_(y_val, y_hat)
-            print(f"cost = {cost}")
             model["cost"] = cost
+            print(f"cost = {cost}")
 
             models.append(model)
             print()
@@ -171,6 +173,10 @@ if __name__ == "__main__":
               + " their cost (lower is better)")
     plt.show()
 
+    # Save the models in the file "models.yml"
+    with open("models.yml", "w") as file:
+        yaml.dump(models, file)
+
     # Sort the models by cost
     models = sorted(models, key=lambda k: k['cost'])
 
@@ -192,10 +198,5 @@ if __name__ == "__main__":
     cost = ridge.loss_(y_test, y_hat)
     print(f"cost = {cost}")
 
-    # Save the models in the file "models.yml"
-    with open("models.yml", "w") as file:
-        yaml.dump(models, file)
-
     print("Models saved in the file \"models.yml\"")
-
     print("Done")

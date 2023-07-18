@@ -110,6 +110,7 @@ if __name__ == "__main__":
     plt.show()
 
     # Load the best model variables
+    models = sorted(models, key=lambda k: k['cost'])
     best_model = models[0]
     print(best_model)
     best_model_name = best_model["name"]

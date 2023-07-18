@@ -224,7 +224,6 @@ class MyLogisticRegression():
 
 if __name__ == "__main__":
 
-    # Split the dataset into a training and a test set.
     def get_dataframe(path: str, features: list) -> pandas.DataFrame:
         try:
             dataset = pandas.read_csv(path)[features]
