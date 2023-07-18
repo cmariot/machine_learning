@@ -151,8 +151,8 @@ def reg_logistic_grad(y, x, theta, lambda_):
                 gradient[j] += (y_hat[i] - y[i]) * x[i, j - 1]
             gradient[j, 0] += lambda_ * theta[j, 0]
         return gradient / m
-    except Exception as e:
-        print(e)
+
+    except Exception:
         return None
 
 
@@ -175,8 +175,7 @@ def vec_reg_logistic_grad(y, x, theta, lambda_):
         This function should not raise any Exception.
     """
     try:
-        m, n = x.shape
-
+        m, _ = x.shape
         X_prime = np.hstack((np.ones((m, 1)), x))
         y_hat = logistic_predict_(x, theta)
         if y_hat is None:
@@ -184,8 +183,8 @@ def vec_reg_logistic_grad(y, x, theta, lambda_):
         theta_prime = theta.copy()
         theta_prime[0, 0] = 0.0
         return (X_prime.T.dot(y_hat - y) + (lambda_ * theta_prime)) / m
-    except Exception as e:
-        print(e)
+
+    except Exception:
         return None
 
 

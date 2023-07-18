@@ -29,6 +29,7 @@ class MyRidge:
                 elif lambda_ < 0:
                     raise ValueError("lambda_ must be positive")
                 return func(self, theta, alpha, max_iter, lambda_)
+
             except Exception as e:
                 print("MyRidge initialization error :", e)
                 return None

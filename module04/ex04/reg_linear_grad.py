@@ -59,8 +59,7 @@ def reg_linear_grad(y, x, theta, lambda_):
             gradient[j, 0] += lambda_ * theta_prime[j, 0]
         return gradient / m
 
-    except Exception as e:
-        print(e)
+    except Exception:
         return None
 
 
