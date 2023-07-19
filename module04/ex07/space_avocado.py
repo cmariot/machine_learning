@@ -93,7 +93,6 @@ if __name__ == "__main__":
             exit(1)
 
     # Split your dataset into a training, a cross-validation and a test sets.
-    # Shuffle and split the dataset into training and test sets
     (x_train, y_train,
      x_val, y_val,
      x_test, y_test) = split_dataset(dataset, (0.6, 0.2, 0.2))
@@ -105,19 +104,27 @@ if __name__ == "__main__":
     plt.xticks(rotation=90)
     plt.ylabel("Cost")
     plt.xlabel("Model name")
-    plt.title("Comparaison of the models based on"
-              + " their cost (lower is better)")
+    plt.title("Comparaison of the models based on their cost " +
+              "(lower is better)")
     plt.show()
 
     # Load the best model variables
-    models = sorted(models, key=lambda k: k['cost'])
-    best_model = models[0]
-    print(best_model)
-    best_model_name = best_model["name"]
-    best_model_degree = best_model["degree"]
+    sorted_models = sorted(models, key=lambda k: k['cost'])
+    best_model = sorted_models[0]
+
+    name = best_model["name"]
+    degree = best_model["degree"]
+    lambda_ = best_model["lambda_"]
+    print(f"Best model: {name} (degree={degree}, lambda={lambda_})")
+
+    # Get the models of the best model degree
+    degree_models = [model
+                     for model in models
+                     if model["degree"] == degree]
+    degree_models.remove(best_model)
 
     # Instantiate the ridge model
-    theta_shape = (x_train.shape[1] * best_model_degree + 1, 1)
+    theta_shape = (x_train.shape[1] * degree + 1, 1)
 
     learning_rate = 10e-4
     n_cycle = 50_000
@@ -126,53 +133,46 @@ if __name__ == "__main__":
                     max_iter=n_cycle)
 
     # Add polynomial features to the dataset with the best degree
-    print(f"Adding polynomial features with degree {best_model_degree}...")
-    x_train_degree = ridge.add_polynomial_features(x_train, best_model_degree)
-    x_val_degree = ridge.add_polynomial_features(x_val, best_model_degree)
-    x_test_degree = ridge.add_polynomial_features(x_test, best_model_degree)
+    print(f"Adding polynomial features with degree {degree}...")
+    x_train_degree = ridge.add_polynomial_features(x_train, degree)
+    x_val_degree = ridge.add_polynomial_features(x_val, degree)
+    x_test_degree = ridge.add_polynomial_features(x_test, degree)
 
-    x_train_degree = ridge.add_polynomial_features(x_train, best_model_degree)
-    x_val_degree = ridge.add_polynomial_features(x_val, best_model_degree)
-    x_test_degree = ridge.add_polynomial_features(x_test, best_model_degree)
+    x_train_degree = ridge.add_polynomial_features(x_train, degree)
+    x_val_degree = ridge.add_polynomial_features(x_val, degree)
+    x_test_degree = ridge.add_polynomial_features(x_test, degree)
 
-    lambdas = numpy.arange(0.0, 1.2, 0.2)
-    trained_models = []
-    for lambda_ in lambdas:
+    model = {}
+    model["name"] = f"D{degree}L{lambda_:.1f}"
+    model["degree"] = degree
+    print(f"Training model {model['name']}")
 
-        model = {}
-        model["name"] = f"D{best_model_degree}L{lambda_:.1f}"
-        model["degree"] = best_model_degree
-        print(f"Training model {model['name']}")
+    # ###################################### #
+    # Initialize the model's hyperparameters #
+    # ###################################### #
 
-        # ###################################### #
-        # Initialize the model's hyperparameters #
-        # ###################################### #
+    theta = numpy.zeros(theta_shape)
+    ridge = MyRidge(theta, alpha=learning_rate,
+                    max_iter=n_cycle, lambda_=lambda_)
 
-        theta = numpy.zeros(theta_shape)
-        lambda_ = lambda_
+    # ##################################### #
+    # Train the model with the training set #
+    # ##################################### #
 
-        ridge = MyRidge(theta, alpha=learning_rate,
-                        max_iter=n_cycle, lambda_=lambda_)
+    ridge.thetas = ridge.fit_(x_train_degree, y_train)
 
-        # ##################################### #
-        # Train the model with the training set #
-        # ##################################### #
+    # ########################################## #
+    # Evaluate the model with the validation set #
+    # ########################################## #
 
-        ridge.thetas = ridge.fit_(x_train_degree, y_train)
+    y_hat = ridge.predict_(x_test_degree)
+    cost = ridge.loss_(y_test, y_hat)
 
-        # ########################################## #
-        # Evaluate the model with the validation set #
-        # ########################################## #
+    model["theta"] = ridge.thetas
+    model["y_hat"] = y_hat
+    model["cost"] = cost
 
-        y_hat = ridge.predict_(x_test_degree)
-        cost = ridge.loss_(y_test, y_hat)
-
-        model["theta"] = ridge.thetas
-        model["y_hat"] = y_hat
-        model["cost"] = cost
-
-        trained_models.append(model)
-        print()
+    print()
 
     # Plot the true price and the predicted price obtain
     # via your best model for each features with the different λ values
@@ -189,13 +189,41 @@ if __name__ == "__main__":
         # Plot the dataset
         axs[i].scatter(x_test_degree[:, i], y_test, label="Dataset")
 
-        # Plot the predicted curves
-        for model in trained_models:
-            axs[i].scatter(x_test_degree[:, i], model["y_hat"],
-                           label=model["name"], marker='.')
+        # Plot the trained best model
+        axs[i].scatter(x_test_degree[:, i], y_hat, label="Prediction")
+
+        # Plot the pre-trained models of the same degree, but different lambda_
+        for model_ in degree_models:
+            axs[i].scatter(model_["x_val"][:, i], model_["y_hat"],
+                           label=model_["name"], marker='.')
 
         axs[i].set_xlabel(feature)
         axs[i].set_ylabel("price")
         axs[i].legend()
+
+    plt.show()
+
+    # Two 4D plots to visualize the model prediction and the real values
+    fig, ax = plt.subplots(1, 2,
+                           figsize=(15, 5),
+                           subplot_kw={"projection": "3d"})
+
+    fig.colorbar(ax[0].scatter(x_test_degree[:, 0],
+                               x_test_degree[:, 1],
+                               x_test_degree[:, 2],
+                               c=y_test), ax=ax[0], label="Price")
+
+    fig.colorbar(ax[1].scatter(x_test_degree[:, 0],
+                               x_test_degree[:, 1],
+                               x_test_degree[:, 2],
+                               c=y_hat), ax=ax[1], label="Price")
+
+    ax[0].set_title("Real")
+    ax[1].set_title("Predicted")
+
+    for i in range(2):
+        ax[i].set_xlabel(features[0])
+        ax[i].set_ylabel(features[1])
+        ax[i].set_zlabel(features[2])
 
     plt.show()

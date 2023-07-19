@@ -28,9 +28,9 @@ if __name__ == "__main__":
             exit(1)
 
     # Load the dataset
-    dataset_path = "../ressources/space_avocado.csv"
     features = ["weight", "prod_distance", "time_delivery"]
     target = ["target"]
+    dataset_path = "../ressources/space_avocado.csv"
     dataset = get_dataset(dataset_path, features + target)
 
     def split_dataset(dataset: pandas.DataFrame, ratios: float) -> tuple:
@@ -48,8 +48,7 @@ if __name__ == "__main__":
                 return (x_norm, x_means, x_stds)
 
             # Normalize the dataset
-            dataset, min_, max_ = normalize(dataset)
-            dataset = pandas.DataFrame(dataset, columns=features + target)
+            dataset, x_means, x_stds = normalize(dataset)
 
             # Training set = set of data that is used to train and
             # make the model learn
@@ -113,20 +112,21 @@ if __name__ == "__main__":
             # ##################################### #
 
             # Train the model with the training set
-            learning_rate = 10e-5
-            n_cycle = 200_000
+            learning_rate = 10e-4
+            n_cycle = 25_000
             theta = numpy.zeros((x_train_degree.shape[1] + 1, 1))
 
             ridge = MyRidge(theta, learning_rate, n_cycle, lambda_)
 
-            ridge.thetas = ridge.fit_(x_train_degree, y_train)
-            model["theta"] = ridge.thetas
+            ridge.theta = ridge.fit_(x_train_degree, y_train)
+            model["theta"] = ridge.theta
 
             # ########################################## #
             # Evaluate the model with the validation set #
             # ########################################## #
 
             y_hat = ridge.predict_(x_val_degree)
+            model["x_val"] = x_val_degree
             model["y_hat"] = y_hat
 
             cost = ridge.loss_(y_val, y_hat)
@@ -136,31 +136,30 @@ if __name__ == "__main__":
             models.append(model)
             print()
 
-            # # ######################################### #
-            # # Plot the model's predictions with the test #
-            # # ######################################### #
+            if lambda_ == 0.0:
 
-            # # Plot the model's predictions with the test set
-            # for i in range(3):
-            #     plt.scatter(x_test_degree[:, i], y_test, color="blue")
-            #     plt.scatter(x_test_degree[:, i], y_hat, color="red")
-            #     plt.title(f"Model {model['name']}")
-            #     plt.xlabel("x")
-            #     plt.ylabel("y")
-            #     plt.legend(["y", "y_hat"])
-            #     plt.show()
+                # ############################ #
+                # Plot the model's predictions #
+                # ############################ #
 
-            # # # ############################### #
-            # # # Plot the model's cost evolution #
-            # # # ############################### #
+                for i in range(3):
+                    plt.scatter(x_val_degree[:, i], y_val, color="blue")
+                    plt.scatter(x_val_degree[:, i], y_hat, color="red")
+                    plt.title(f"Model {model['name']}")
+                    plt.xlabel("x")
+                    plt.ylabel("y")
+                    plt.legend(["y", "y_hat"])
+                    plt.show()
 
-            # # Plot the model's cost evolution
-            # if lambda_ == 0.0:
-            #     plt.plot(ridge.losses)
-            #     plt.title(f"Model {model['name']}")
-            #     plt.xlabel("n_cycle")
-            #     plt.ylabel("cost")
-            #     plt.show()
+                # ############################### #
+                # Plot the model's cost evolution #
+                # ############################### #
+
+                plt.plot(ridge.losses)
+                plt.title(f"Model {model['name']}")
+                plt.xlabel("n_cycle")
+                plt.ylabel("cost")
+                plt.show()
 
     # Plot bar chart of the models cost
     costs = [model["cost"] for model in models]
@@ -169,13 +168,14 @@ if __name__ == "__main__":
     plt.xticks(rotation=90)
     plt.ylabel("Cost")
     plt.xlabel("Model name")
-    plt.title("Comparaison of the models based on"
-              + " their cost (lower is better)")
+    plt.title("Comparaison of the models based on their cost " +
+              "(lower is better)")
     plt.show()
 
     # Save the models in the file "models.yml"
     with open("models.yml", "w") as file:
         yaml.dump(models, file)
+    print("Models saved in the file \"models.yml\"")
 
     # Sort the models by cost
     models = sorted(models, key=lambda k: k['cost'])
@@ -187,16 +187,10 @@ if __name__ == "__main__":
 
     # Evalue the best model with the test set
     best_model = models[0]
-    print(f"\nEvaluating the best model {best_model['name']}\
-        with the test set")
-    degree = best_model["degree"]
-    lambda_ = best_model["lambda_"]
-    theta = best_model["theta"]
-    ridge = MyRidge(theta, lambda_)
-    x_test_degree = ridge.add_polynomial_features(x_test, degree)
+    print(f"\nEvaluating the best model {best_model['name']}",
+          "with the test set")
+    ridge = MyRidge(theta=best_model["theta"], lambda_=best_model["lambda_"])
+    x_test_degree = ridge.add_polynomial_features(x_test, best_model["degree"])
     y_hat = ridge.predict_(x_test_degree)
     cost = ridge.loss_(y_test, y_hat)
     print(f"cost = {cost}")
-
-    print("Models saved in the file \"models.yml\"")
-    print("Done")
