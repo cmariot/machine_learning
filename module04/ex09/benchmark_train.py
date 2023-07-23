@@ -1,7 +1,9 @@
+import pickle
 import pandas
 import numpy as np
 from my_logistic_regression import MyLogisticRegression
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+
 
 def get_dataset(path, features) -> pandas.DataFrame:
 
@@ -52,11 +54,12 @@ def split_dataset(dataset: pandas.DataFrame, ratios: float) -> tuple:
 
         # Return the splitted dataset as Numpy arrays
         return (x_train.to_numpy(), y_train.to_numpy(),
-                x_validation.to_numpy(), y_validation.to_numpy(),
-                x_test.to_numpy(), y_test.to_numpy())
+                x_test.to_numpy(), y_test.to_numpy(),
+                x_validation.to_numpy(), y_validation.to_numpy())
 
-    except Exception:
+    except Exception as e:
         print("Error: Can't split the dataset")
+        print(e)
         exit(1)
 
 
@@ -204,13 +207,12 @@ if __name__ == "__main__":
     # Split the dataset into a training, a cross-validation and a test sets.
     (x_train, y_train,
      x_val, y_val,
-     x_test, y_test) = split_dataset(dataset, (0.8, 0.1, 0.1))
+     x_test, y_test) = split_dataset(dataset, (0.6, 0.4, 0))
 
-    # Normalize the training features and se the same parameters
+    # Normalize the training features and use the same parameters
     # to normalize the validation and the test features.
     x_train_normalized, x_min, x_max = normalize_train(x_train)
     x_val_normalized = normalize_test(x_val, x_min, x_max)
-    x_test_normalized = normalize_test(x_test, x_min, x_max)
 
     # Train different regularized logistic regression models with
     # a polynomial hypothesis of degree 3.
@@ -219,10 +221,10 @@ if __name__ == "__main__":
         x_train_normalized, polynomial_hypothesis)
     x_val_poly = add_polynomial_features(
         x_val_normalized, polynomial_hypothesis)
-    x_test_poly = add_polynomial_features(
-        x_test_normalized, polynomial_hypothesis)
 
     theta_shape = (x.shape[1] * polynomial_hypothesis + 1, 1)
+
+    models = []
 
     # The models will be trained with different λ values, ranging from 0 to 1.
     lambdas = np.linspace(0.0, 1.0, num=6)
@@ -231,17 +233,19 @@ if __name__ == "__main__":
         print(f"One vs. all for lambda : {lambda_:.1f}")
 
         # Train 4 logistic regression to discriminate each planet
-        models = []
+        one_vs_all = {}
+        one_vs_all["lambda"] = lambda_
+
         for current_train in range(len(origins)):
 
-            print(f"Training model {current_train + 1} / 4 ... " +
-                  f"From {origins[current_train]} ?")
+            print(f"Training model {current_train + 1} / 4 : " +
+                  f"Is from {origins[current_train]} ?")
 
             model = {}
             model["name"] = f"D{3}F{current_train}L{lambda_}"
             logistic_regression = MyLogisticRegression(
                 theta=np.zeros(theta_shape),
-                alpha=2.5,
+                alpha=5,
                 max_iter=50_000,
                 lambda_=lambda_
             )
@@ -255,35 +259,45 @@ if __name__ == "__main__":
             # plt.ylabel("Loss")
             # plt.show()
 
-            models.append(model)
+            one_vs_all[current_train] = model
 
         # Evaluate the model with f1-score on the cross-validation set
         # For each element of the dataset
-        nb_elmts = y_train.shape[0]
+        nb_elmts = y_val.shape[0]
         y_predictions = np.empty((nb_elmts, 1))
         for i in range(nb_elmts):
             # Compute the probability of being from each planet
             y_probas = np.zeros((len(origins), 1))
             for current_test in range(len(origins)):
                 current_lr = MyLogisticRegression(
-                    theta=models[current_test]["theta"],
+                    theta=one_vs_all[current_test]["theta"],
                     alpha=1,
                     max_iter=50_000,
                     lambda_=lambda_
                 )
-                current_x = x_train_poly[i].reshape(1, -1)
+                current_x = x_val_poly[i].reshape(1, -1)
                 proba = current_lr.predict_(current_x)
                 y_probas[current_test] = proba
             y_predictions[i] = y_probas.argmax()
 
+        f1_score = logistic_regression.f1_score_(y_val, y_predictions)
+        print("F1-score :", f1_score)
+        one_vs_all["f1_score"] = f1_score
+
+        accuracy = logistic_regression.accuracy_score_(y_val, y_predictions)
+        print("Accuracy :", accuracy)
+        one_vs_all["accuracy"] = accuracy
+
         confusion_matrix = \
-            confusion_matrix_(y_train, y_predictions,
+            confusion_matrix_(y_val, y_predictions,
                               df_option=True, labels=[0, 1, 2, 3])
         print("Confusion matrix :\n", confusion_matrix)
+        one_vs_all["confusion_matrix"] = confusion_matrix
 
-        f1_score = logistic_regression.f1_score_(y_train, y_predictions)
-        print("F1-score :", f1_score)
+        models.append(one_vs_all)
 
-        accuracy = logistic_regression.accuracy_score_(y_train, y_predictions)
-        print("Accuracy :", accuracy)
         print()
+
+    # Save the different models into a models.pickle.
+    with open("models.pickle", "wb") as f:
+        pickle.dump(models, f)
