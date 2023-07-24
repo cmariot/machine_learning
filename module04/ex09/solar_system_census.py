@@ -117,7 +117,7 @@ if __name__ == "__main__":
     # Split the dataset into a training, a cross-validation and a test sets.
     (x_train, y_train,
      x_val, y_val,
-     x_test, y_test) = split_dataset(dataset, (0.7, 0, 0.3))
+     x_test, y_test) = split_dataset(dataset, (0.8, 0, 0.2))
 
     # Normalize the training features and use the same parameters
     # to normalize the validation and the test features.
@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
         # Print the f1 score of all the models calculated on the test set.
         y_hat = mylr.predict_(x_test_poly)
-        y_hat = np.where(y_hat >= 0.5, 1, 0)
+        y_hat = np.where(y_hat >= 0.3, 1, 0)
         current_y_test = np.where(y_test == i, 1, 0)
         f1_score = mylr.f1_score_(current_y_test, y_hat)
         print(f"f1 score: {f1_score}")

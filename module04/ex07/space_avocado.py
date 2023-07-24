@@ -30,10 +30,6 @@ def get_dataset(path: str, features: list) -> pandas.DataFrame:
         if dataset.shape[0] == 0 or dataset.shape[1] != 4:
             print("Error: The dataset is empty or has a wrong shape")
             exit(1)
-        print("Dataset loaded.\n" +
-              "Dataset description :\n" +
-              dataset + "\n" +
-              dataset.describe() + "\n")
         return dataset
     except Exception as e:
         print(e)
@@ -119,11 +115,10 @@ if __name__ == "__main__":
 
     # Load the yml file with the benchmark parameters
     models = get_models("models.yml")
-    plot_models_costs(models)
     name, degree, lambda_ = get_best_model(models)
-    trained_models = [model
-                     for model in models
-                     if model["degree"] == degree and model["lambda_" != lambda_]]
+    trained_models = [model for model in models if (model["degree"] == degree and model["lambda_"] != lambda_)]
+
+    plot_models_costs(models)
 
     # Load the dataset
     features = ["weight", "prod_distance", "time_delivery"]
@@ -135,9 +130,21 @@ if __name__ == "__main__":
      x_val, y_val,
      x_test, y_test) = split_dataset(dataset, (0.6, 0.2, 0.2))
 
-    # TODO
     # Normalize features of the training and the test sets,
     # save variables for denormalization
+    def normalize_train(x: numpy.ndarray) -> tuple:
+        x_means = x.mean(axis=0)
+        x_stds = x.std(axis=0)
+        x_norm = (x - x_means) / x_stds
+        return (x_norm, x_means, x_stds)
+
+    def normalize(x, x_means, x_stds):
+        return (x - x_means) / x_stds
+
+    # Normalize the dataset
+    x_train_norm, x_means, x_stds = normalize_train(x_train)
+    x_val_norm = normalize(x_val, x_means, x_stds)
+    x_test_norm = normalize(x_test, x_means, x_stds)
 
     # ###################################### #
     # Initialize the model's hyperparameters #
@@ -145,16 +152,16 @@ if __name__ == "__main__":
 
     theta_shape = (x_train.shape[1] * degree + 1, 1)
     learning_rate = 10e-4
-    n_iter = 50_000
+    n_iter = 30_000
     ridge = MyRidge(numpy.zeros(theta_shape),
                     alpha=learning_rate,
                     max_iter=n_iter,
                     lambda_=lambda_)
 
     # Add polynomial features to the dataset with the best degree
-    x_train_degree = ridge.add_polynomial_features(x_train, degree)
-    x_val_degree = ridge.add_polynomial_features(x_val, degree)
-    x_test_degree = ridge.add_polynomial_features(x_test, degree)
+    x_train_degree = ridge.add_polynomial_features(x_train_norm, degree)
+    x_val_degree = ridge.add_polynomial_features(x_val_norm, degree)
+    x_test_degree = ridge.add_polynomial_features(x_test_norm, degree)
 
     # ##################################### #
     # Train the model with the training set #
@@ -176,35 +183,36 @@ if __name__ == "__main__":
     # Subplot for each feature
     fig, axs = plt.subplots(1, 3, figsize=(20, 10))
 
+    # Concatenate the validation and the test sets
+    x = numpy.concatenate((x_val_degree, x_test_degree))
+    y = numpy.concatenate((y_val, y_test))
+    y_hat = ridge.predict_(x)
+
     for i, feature in enumerate(features):
 
-        # TODO
-        # x_test_denormalized = pass
-
-        # TODO
-        # Plot denormalized x (test)
-        axs[i].scatter(x_test_degree[:, i], y_test, label="Dataset")
+        axs[i].scatter(x[:, i], y, label="Dataset")
 
         # Plot the trained best model
-        # TODO
-        # Plot denormalized x (test)
-        # Plot denormalized y_hat
-        axs[i].scatter(x_test_degree[:, i], y_hat, label="Prediction")
-
-        # Plot the pre-trained models of the same degree, but different lambda_
-        for model_ in trained_models:
-            model_ridge = MyRidge(model_["theta"], alpha=learning_rate,
-                                max_iter=n_iter, lambda_=model_["lambda_"])
-            model_y_hat = model_ridge.predict_(x_test_degree)
-
-            # TODO
-            # Plot denormalized x (test)
-            # Plot denormalized y_hat
-            axs[i].scatter(x_test_degree[:, i], model_y_hat,
-                           label=model_["name"], marker='.')
+        axs[i].scatter(x[:, i], y_hat, label="Prediction")
 
         axs[i].set_xlabel(feature)
         axs[i].set_ylabel("Price")
+
+
+    # Plot the pre-trained models of the same degree, but different lambda_
+    for model_ in trained_models:
+        print(model_["name"])
+        model_ridge = MyRidge(model_["theta"], alpha=learning_rate,
+                                max_iter=n_iter, lambda_=model_["lambda_"])
+        print(model_ridge.theta)
+        #model_ridge.fit_(x_train_degree, y_train)
+        model_y_hat = model_ridge.predict_(x)
+
+        for i, feature in enumerate(features):
+            axs[i].scatter(x[:, i], model_y_hat,
+                            label=model_["name"], marker='.')
+
+    for i in range(len(features)):
         axs[i].legend()
 
     plt.show()

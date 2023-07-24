@@ -119,6 +119,16 @@ if __name__ == "__main__":
             ridge = MyRidge(theta, learning_rate, n_cycle, lambda_)
 
             ridge.theta = ridge.fit_(x_train_degree, y_train)
+
+            denormalized_theta = ridge.theta.copy()
+            for i in range(1, degree + 1):
+                denormalized_theta[i] = (denormalized_theta[i] *
+                                         x_train[:, i - 1].std() /
+                                         x_train[:, i - 1].mean())
+                
+
+
+
             model["theta"] = ridge.theta
 
             # ########################################## #
