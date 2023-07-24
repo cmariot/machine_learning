@@ -279,7 +279,8 @@ class MyLogisticRegression:
                         or self.theta.shape != (n + 1, 1):
                     return None
                 return func(self, x, y)
-            except Exception:
+            except Exception as e:
+                print(e)
                 return None
         return wrapper
 
