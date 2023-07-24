@@ -101,9 +101,9 @@ if __name__ == "__main__":
         for lambda_ in lambdas:
 
             model = {}
+            model["name"] = f"D{degree}L{lambda_:.1f}"
             model["degree"] = degree
             model["lambda_"] = lambda_
-            model["name"] = f"D{degree}L{lambda_:.1f}"
 
             print(f"Training model {model['name']}")
 
@@ -126,12 +126,10 @@ if __name__ == "__main__":
             # ########################################## #
 
             y_hat = ridge.predict_(x_val_degree)
-            model["x_val"] = x_val_degree
-            model["y_hat"] = y_hat
 
             cost = ridge.loss_(y_val, y_hat)
             model["cost"] = cost
-            print(f"cost = {cost}")
+            print(f"cost (evaluated with validation set) : {cost}")
 
             models.append(model)
             print()
@@ -193,4 +191,5 @@ if __name__ == "__main__":
     x_test_degree = ridge.add_polynomial_features(x_test, best_model["degree"])
     y_hat = ridge.predict_(x_test_degree)
     cost = ridge.loss_(y_test, y_hat)
-    print(f"cost = {cost}")
+    print(f"cost (evaluated with validation set) : {best_model['cost']}")
+    print(f"cost (evaluated with test set) : {cost}")
