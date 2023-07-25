@@ -85,12 +85,14 @@ def plot_models_costs(models):
     try:
         costs = [model["cost"] for model in models]
         names = [model["name"] for model in models]
+        plt.subplots(figsize=(10, 8))
         plt.bar(names, costs)
         plt.xticks(rotation=90)
         plt.ylabel("Cost")
         plt.xlabel("Model name")
         plt.title("Comparaison of the models based on their cost " +
                   "(lower is better)")
+        plt.rcParams["figure.figsize"] = (30, 20)
         plt.show()
     except Exception:
         print("Error: Can't plot the model costs")
@@ -202,9 +204,9 @@ if __name__ == "__main__":
                     lambda_=lambda_)
 
     # Add polynomial features to the dataset with the best degree
-    x_train_degree = ridge.add_polynomial_features(x_train_norm, degree)
-    x_val_degree = ridge.add_polynomial_features(x_val_norm, degree)
-    x_test_degree = ridge.add_polynomial_features(x_test_norm, degree)
+    x_train_degree = add_polynomial_features(x_train_norm, degree)
+    x_val_degree = add_polynomial_features(x_val_norm, degree)
+    x_test_degree = add_polynomial_features(x_test_norm, degree)
 
     # ##################################### #
     # Train the model with the training set #
@@ -218,6 +220,7 @@ if __name__ == "__main__":
 
     y_hat = ridge.predict_(x_val_degree)
     cost = ridge.loss_(y_val, y_hat)
+    print(f"\nCost: {cost}")
 
     # Plot the true price and the predicted price obtain
     # via your best model for each features with the different λ values
@@ -227,37 +230,35 @@ if __name__ == "__main__":
     fig, axs = plt.subplots(1, 3, figsize=(20, 10))
 
     # Concatenate the validation, test and train x
-    x = numpy.concatenate((x_val_degree, x_test_degree, x_train_degree))
+    x = numpy.concatenate((x_val, x_test, x_train))
+    x = add_polynomial_features(x, degree)
+    x_norm = numpy.concatenate((x_val_degree, x_test_degree, x_train_degree))
 
     # Concatenate the validation, test and train y
     y = numpy.concatenate((y_val, y_test, y_train))
 
-    # Predict
-    y_hat = ridge.predict_(x)
-
-    for i, feature in enumerate(features):
-
-        axs[i].scatter(x[:, i], y, label="Dataset")
-
-        # Plot the trained best model
-        axs[i].scatter(x[:, i], y_hat, label="Prediction", marker='.')
-
-        axs[i].set_xlabel(feature)
-        axs[i].set_ylabel("Price")
+    # Predict the price for the whole dataset with the best model
+    y_hat = ridge.predict_(x_norm)
 
     # Plot the pre-trained models of the same degree, but different lambda_
     for model_ in trained_models:
-
         model_ridge = MyRidge(model_["theta"],
                               alpha=learning_rate,
                               max_iter=n_iter,
                               lambda_=model_["lambda_"])
-
-        model_y_hat = model_ridge.predict_(x)
-
+        model_y_hat = model_ridge.predict_(x_norm)
         for i, feature in enumerate(features):
-            axs[i].scatter(x[:, i], model_y_hat,
-                           label=model_["name"], marker='.')
-            axs[i].legend()
+            axs[i].scatter(x[:, i], model_y_hat, label=model_["name"], marker='.')
+
+    for i, feature in enumerate(features):
+
+        # Plot the real values
+        axs[i].scatter(x[:, i], y, label="Dataset", marker='.', color="blue")
+
+        # Plot the trained best model
+        axs[i].scatter(x[:, i], y_hat, label="Prediction", marker='.', color="red")
+        axs[i].set_xlabel(feature)
+        axs[i].set_ylabel("Price")
+        axs[i].legend()
 
     plt.show()

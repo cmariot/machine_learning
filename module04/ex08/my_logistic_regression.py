@@ -49,14 +49,18 @@ class MyLogisticRegression:
         def wrapper(self, x):
             try:
                 if not isinstance(x, np.ndarray):
+                    print("x is not a np.ndarray")
                     return None
                 m, n = x.shape
                 if m == 0 or n == 0:
+                    print("m or n is 0")
                     return None
                 elif self.theta.shape != ((n + 1), 1):
+                    print("theta has a wrong shape")
                     return None
                 return func(self, x)
-            except Exception:
+            except Exception as e:
+                print("CHECK:", e)
                 return None
         return wrapper
 
@@ -67,7 +71,8 @@ class MyLogisticRegression:
             x_prime = np.hstack((np.ones((m, 1)), x))
             y_hat = self.sigmoid_(x_prime.dot(self.theta))
             return y_hat
-        except Exception:
+        except Exception as e:
+            print("PREDICT:", e)
             return None
 
     def checkargs_l2_(func):

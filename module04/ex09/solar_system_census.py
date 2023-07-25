@@ -80,10 +80,125 @@ def plot_models_scores(models: list):
 
 def get_best_model(models: list):
     try:
-        return max(models, key=lambda x: x["f1_score"])
+        best_model = max(models, key=lambda x: x["f1_score"])
+        print("Training the best model with λ =",
+              best_model["lambda"])
+        return best_model
+
     except Exception as e:
         print(e)
         exit(1)
+
+
+def f1_score(x_test_poly, y_test, trained_thetas, best_model):
+    # Compute the F1 score of the model
+    nb_elmts = x_test_poly.shape[0]
+    y_hat_test = np.empty((nb_elmts, 1))
+    for i in range(nb_elmts):
+        y_probas = np.zeros((len(origins), 1))
+        for current_test in range(len(origins)):
+            current_lr = MyLR(
+                theta=trained_thetas[current_test],
+                alpha=1,
+                max_iter=50_000,
+                lambda_=best_model["lambda"]
+            )
+            current_x = x_test_poly[i].reshape(1, -1)
+            proba = current_lr.predict_(current_x)
+            y_probas[current_test] = proba
+        y_hat_test[i] = y_probas.argmax()
+    f1_score = mylr.f1_score_(y_test, y_hat_test)
+    print(f"F1 score: {f1_score}")
+
+
+def get_colors(y):
+    "Return a numpy array of colors for the plots."
+    return np.where(
+        y < 2,
+        np.where(
+            y == 0,
+            'green',    # 0
+            'blue'      # 1
+        ),
+        np.where(
+            y == 2,
+            'orange',   # 2
+            'red'       # 3
+        )
+    )
+
+
+def plot_prediction(y_predictions, all_y, all_x_denormalized):
+    fig, ax = plt.subplots(1, 3, figsize=(20, 10))
+
+    features_pairs = [
+        ('weight', 'height'),
+        ('weight', 'bone_density'),
+        ('height', 'bone_density')
+    ]
+
+    predicted_colors = get_colors(y_predictions.flatten())
+    real_colors = get_colors(all_y.flatten())
+
+    for i in range(3):
+        index = i if i != 2 else -1
+        ax[i].scatter(
+            all_x_denormalized[:, index],
+            all_x_denormalized[:, index + 1],
+            c=predicted_colors.flatten(),
+            marker='o',
+            alpha=0.5,
+        )
+        ax[i].scatter(
+            all_x_denormalized[:, index],
+            all_x_denormalized[:, index + 1],
+            c=real_colors.flatten(),
+            marker='.',
+            alpha=0.5,
+        )
+        ax[i].set_xlabel(features_pairs[i][0])
+        ax[i].set_ylabel(features_pairs[i][1])
+        ax[i].set_title(f'{features_pairs[i][1]} vs {features_pairs[i][0]}')
+
+    fig.legend(
+        handles=[
+            patches.Patch(
+                        color='green',
+                        label='The flying cities of Venus'),
+            patches.Patch(
+                        color='blue',
+                        label='United Nations of Earth'),
+            patches.Patch(
+                        color='orange',
+                        label='Mars Republic'),
+            patches.Patch(
+                        color='red',
+                        label="The Asteroid's Belt colonies"),
+        ],
+        loc='lower center', ncol=4, fontsize='small',
+    )
+
+    plt.show()
+
+
+def model_prediction(all_x, all_y):
+    nb_elmts = all_y.shape[0]
+    y_predictions = np.empty((nb_elmts, 1))
+    for i in range(nb_elmts):
+        # Compute the probability of being from each planet
+        y_probas = np.zeros((len(origins), 1))
+        for current_test in range(len(origins)):
+            current_lr = MyLR(
+                theta=trained_thetas[current_test],
+                alpha=1,
+                max_iter=50_000,
+                lambda_=best_model["lambda"]
+            )
+            current_x = all_x[i].reshape(1, -1)
+            proba = current_lr.predict_(current_x)
+            y_probas[current_test] = proba
+        y_predictions[i] = y_probas.argmax()
+    return y_predictions
 
 
 if __name__ == "__main__":
@@ -126,137 +241,38 @@ if __name__ == "__main__":
 
     # Train different regularized logistic regression models with
     # a polynomial hypothesis of degree 3.
-    polynomial_hypothesis = 3
-    x_train_poly = add_polynomial_features(
-        x_train_normalized, polynomial_hypothesis)
-    x_test_poly = add_polynomial_features(
-        x_test_normalized, polynomial_hypothesis)
-
-    theta_shape = (x.shape[1] * polynomial_hypothesis + 1, 1)
+    x_train_poly = add_polynomial_features(x_train_normalized, 3)
+    x_test_poly = add_polynomial_features(x_test_normalized, 3)
 
     # Train the model with the best λ value on the training set
     # and evaluate its performance on the test set.
-    lambda_ = best_model["lambda"]
-    print(f"Training the best model with λ = {lambda_}")
-
+    theta_shape = (x.shape[1] * 3 + 1, 1)
     trained_thetas = []
     for i in range(len(origins)):
-
         print(f"Training model for {origins[i]}")
-
         mylr = MyLR(np.zeros(theta_shape),
-                    alpha=1,
-                    max_iter=100_000,
-                    lambda_=lambda_)
-
+                    alpha=5,
+                    max_iter=50_000,
+                    lambda_=best_model["lambda"])
         current_y_train = np.where(y_train == i, 1, 0)
         theta = mylr.fit_(x_train_poly, current_y_train)
         trained_thetas.append(theta)
 
-        # Print the f1 score of all the models calculated on the test set.
-        y_hat = mylr.predict_(x_test_poly)
-        y_hat = np.where(y_hat >= 0.3, 1, 0)
-        current_y_test = np.where(y_test == i, 1, 0)
-        f1_score = mylr.f1_score_(current_y_test, y_hat)
-        print(f"f1 score: {f1_score}")
+    f1_score(x_test_poly, y_test, trained_thetas, best_model)
 
-    all_x = np.concatenate((x_train_poly, x_test_poly))
-    all_x_denormalized = np.concatenate((x_train, x_test))
-    all_y = np.concatenate((y_train, y_test))
-    nb_elmts = all_y.shape[0]
-    y_predictions = np.empty((nb_elmts, 1))
-    for i in range(nb_elmts):
-        # Compute the probability of being from each planet
-        y_probas = np.zeros((len(origins), 1))
-        for current_test in range(len(origins)):
-            current_lr = MyLR(
-                theta=trained_thetas[current_test],
-                alpha=1,
-                max_iter=50_000,
-                lambda_=lambda_
-            )
-            current_x = all_x[i].reshape(1, -1)
-            proba = current_lr.predict_(current_x)
-            y_probas[current_test] = proba
-        y_predictions[i] = y_probas.argmax()
+    x = np.concatenate((x_train_poly, x_test_poly))
+    y = np.concatenate((y_train, y_test))
+    y_hat = model_prediction(x, y)
 
     # Confusion matrix
-    confusion_matrix = confusion_matrix_(all_y, y_predictions,
+    confusion_matrix = confusion_matrix_(y, y_hat,
                                          labels=[0, 1, 2, 3],
-                                         df_option=True)
+                                         df_option=True
+                                         )
     print(confusion_matrix)
 
     # Visualize the target values and the predicted values of the best model
     # on the same scatterplot.
     # Make some effort to have a readable figure.
-    fig, ax = plt.subplots(1, 3)
-
-    colors = np.where(
-        y_predictions < 2,
-        np.where(
-            y_predictions == 0,
-            'green',    # 0
-            'blue'      # 1
-        ),
-        np.where(
-            y_predictions == 2,
-            'orange',   # 2
-            'red'       # 3
-        )
-    )
-
-    real_colors = np.where(
-        all_y < 2,
-        np.where(
-            all_y == 0,
-            'green',    # 0
-            'blue'      # 1
-        ),
-        np.where(
-            all_y == 2,
-            'orange',   # 2
-            'red'       # 3
-        )
-    )
-
-    features_pairs = [
-        ('weight', 'height'),
-        ('weight', 'bone_density'),
-        ('height', 'bone_density')
-    ]
-
-    for i in range(3):
-        index = i if i != 2 else -1
-
-        ax[i].scatter(
-            all_x_denormalized[:, index],
-            all_x_denormalized[:, index + 1],
-            c=colors.flatten(),
-            marker='o',
-            alpha=0.5,
-            edgecolors=real_colors.flatten()
-        )
-
-        ax[i].set_xlabel(features_pairs[i][0])
-        ax[i].set_ylabel(features_pairs[i][1])
-        ax[i].set_title(f'{features_pairs[i][1]} vs {features_pairs[i][0]}')
-
-    fig.legend(
-        handles=[
-            patches.Patch(
-                          color='green',
-                          label='The flying cities of Venus'),
-            patches.Patch(
-                          color='blue',
-                          label='United Nations of Earth'),
-            patches.Patch(
-                          color='orange',
-                          label='Mars Republic'),
-            patches.Patch(
-                          color='red',
-                          label="The Asteroid's Belt colonies"),
-        ],
-        loc='lower center', ncol=4, fontsize='small',
-    )
-
-    plt.show()
+    x = np.concatenate((x_train, x_test))
+    plot_prediction(y_hat, y, x)
