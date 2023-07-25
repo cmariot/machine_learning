@@ -90,7 +90,7 @@ def plot_models_costs(models):
         plt.ylabel("Cost")
         plt.xlabel("Model name")
         plt.title("Comparaison of the models based on their cost " +
-                "(lower is better)")
+                  "(lower is better)")
         plt.show()
     except Exception:
         print("Error: Can't plot the model costs")
@@ -104,20 +104,73 @@ def get_best_model(models):
         name = best_model["name"]
         degree = best_model["degree"]
         lambda_ = best_model["lambda_"]
-        print(f"Best model: {name} (degree={degree}, lambda={lambda_})")
+        print("\nAccording to the model benchmark,",
+              f"we gonna train the model {best_model['name']}",
+              f"(degree {best_model['degree']},",
+              f"lambda {best_model['lambda_']})\n")
         return (name, degree, lambda_)
     except Exception:
         print("Error: Model selection failed.")
         exit()
 
 
+def normalize_train(x: numpy.ndarray) -> tuple:
+    x_means = x.mean(axis=0)
+    x_stds = x.std(axis=0)
+    x_norm = (x - x_means) / x_stds
+    return (x_norm, x_means, x_stds)
+
+
+def normalize(x, x_means, x_stds):
+    return (x - x_means) / x_stds
+
+
+def add_polynomial_features(x, power):
+    """
+    Add polynomial features to matrix x by raising its columns
+    to every power in the range of 1 up to the power given in argument.
+    Args:
+        x: has to be an numpy.ndarray, a matrix of shape m * n.
+        power: has to be an int, the power up to which the columns
+                of matrix x are going to be raised.
+    Returns:
+        The matrix of polynomial features as a numpy.ndarray,
+            of shape m * (np), containg the polynomial feature values
+            for all training examples.
+        None if x is an empty numpy.ndarray.
+    Raises:
+        This function should not raise any Exception.
+    """
+
+    try:
+        if not isinstance(x, numpy.ndarray):
+            return None
+        m, n = x.shape
+        if m == 0 or n == 0:
+            return None
+        if not isinstance(power, int) or power < 1:
+            return None
+        polynomial_matrix = x
+        for i in range(2, power + 1):
+            new_column = x ** i
+            polynomial_matrix = numpy.c_[polynomial_matrix, new_column]
+        return polynomial_matrix
+
+    except Exception:
+        return None
+
+
 if __name__ == "__main__":
 
-    # Load the yml file with the benchmark parameters
+    # Load the models' file with the benchmark parameters
     models = get_models("models.yml")
     name, degree, lambda_ = get_best_model(models)
-    trained_models = [model for model in models if (model["degree"] == degree and model["lambda_"] != lambda_)]
+    trained_models = [model for model in models
+                      if (model["degree"] == degree
+                          and model["lambda_"] != lambda_)]
 
+    # Plot the evaluation curve which help you to select the best model
+    # (evaluation metrics vs models + λ factor).
     plot_models_costs(models)
 
     # Load the dataset
@@ -128,20 +181,10 @@ if __name__ == "__main__":
     # Split your dataset into a training, a cross-validation and a test sets.
     (x_train, y_train,
      x_val, y_val,
-     x_test, y_test) = split_dataset(dataset, (0.6, 0.2, 0.2))
+     x_test, y_test) = split_dataset(dataset, (0.8, 0.1, 0.1))
 
     # Normalize features of the training and the test sets,
     # save variables for denormalization
-    def normalize_train(x: numpy.ndarray) -> tuple:
-        x_means = x.mean(axis=0)
-        x_stds = x.std(axis=0)
-        x_norm = (x - x_means) / x_stds
-        return (x_norm, x_means, x_stds)
-
-    def normalize(x, x_means, x_stds):
-        return (x - x_means) / x_stds
-
-    # Normalize the dataset
     x_train_norm, x_means, x_stds = normalize_train(x_train)
     x_val_norm = normalize(x_val, x_means, x_stds)
     x_test_norm = normalize(x_test, x_means, x_stds)
@@ -152,7 +195,7 @@ if __name__ == "__main__":
 
     theta_shape = (x_train.shape[1] * degree + 1, 1)
     learning_rate = 10e-4
-    n_iter = 30_000
+    n_iter = 40_000
     ridge = MyRidge(numpy.zeros(theta_shape),
                     alpha=learning_rate,
                     max_iter=n_iter,
@@ -183,9 +226,13 @@ if __name__ == "__main__":
     # Subplot for each feature
     fig, axs = plt.subplots(1, 3, figsize=(20, 10))
 
-    # Concatenate the validation and the test sets
-    x = numpy.concatenate((x_val_degree, x_test_degree))
-    y = numpy.concatenate((y_val, y_test))
+    # Concatenate the validation, test and train x
+    x = numpy.concatenate((x_val_degree, x_test_degree, x_train_degree))
+
+    # Concatenate the validation, test and train y
+    y = numpy.concatenate((y_val, y_test, y_train))
+
+    # Predict
     y_hat = ridge.predict_(x)
 
     for i, feature in enumerate(features):
@@ -193,26 +240,25 @@ if __name__ == "__main__":
         axs[i].scatter(x[:, i], y, label="Dataset")
 
         # Plot the trained best model
-        axs[i].scatter(x[:, i], y_hat, label="Prediction")
+        axs[i].scatter(x[:, i], y_hat, label="Prediction", marker='.')
 
         axs[i].set_xlabel(feature)
         axs[i].set_ylabel("Price")
 
-
     # Plot the pre-trained models of the same degree, but different lambda_
     for model_ in trained_models:
-        print(model_["name"])
-        model_ridge = MyRidge(model_["theta"], alpha=learning_rate,
-                                max_iter=n_iter, lambda_=model_["lambda_"])
-        print(model_ridge.theta)
-        #model_ridge.fit_(x_train_degree, y_train)
+
+        model_ridge = MyRidge(model_["theta"],
+                              alpha=learning_rate,
+                              max_iter=n_iter,
+                              lambda_=model_["lambda_"])
+
         model_y_hat = model_ridge.predict_(x)
 
         for i, feature in enumerate(features):
             axs[i].scatter(x[:, i], model_y_hat,
-                            label=model_["name"], marker='.')
+                           label=model_["name"], marker='.')
+            axs[i].legend()
 
-    for i in range(len(features)):
-        axs[i].legend()
 
     plt.show()
