@@ -63,6 +63,9 @@ def load_models(path):
 
 def plot_models_scores(models: list):
     try:
+        print("Models scores depending on λ (trained during benchmark) :")
+        for model in models:
+            print(f"λ = {model['lambda']:.1f} | F1 score = {model['f1_score']:.3f}")
         plt.bar(
             [model["lambda"] for model in models],
             [model["f1_score"] for model in models],
@@ -71,7 +74,7 @@ def plot_models_scores(models: list):
         )
         plt.xlabel("λ")
         plt.ylabel("F1 score")
-        plt.title("Models scores")
+        plt.title("Models scores depending on λ (trained during benchmark)")
         plt.show()
     except Exception as e:
         print(e)
@@ -81,8 +84,9 @@ def plot_models_scores(models: list):
 def get_best_model(models: list):
     try:
         best_model = max(models, key=lambda x: x["f1_score"])
-        print("Training the best model with λ =",
-              best_model["lambda"])
+        print("\nAccording to the benchmark scores,",
+              "we gonna train the model with λ =",
+              best_model["lambda"], "\n")
         return best_model
 
     except Exception as e:
@@ -108,7 +112,8 @@ def f1_score(x_test_poly, y_test, trained_thetas, best_model):
             y_probas[current_test] = proba
         y_hat_test[i] = y_probas.argmax()
     f1_score = mylr.f1_score_(y_test, y_hat_test)
-    print(f"F1 score: {f1_score}")
+    print(f"\nF1 score (on the test set) : {f1_score}")
+    print("Number of test samples :", nb_elmts, "\n")
 
 
 def get_colors(y):
@@ -201,6 +206,56 @@ def model_prediction(all_x, all_y):
     return y_predictions
 
 
+def plot_3d(all_x, y_predictions, all_y):
+    # Plot a 3D scatter plot with the dataset and the final prediction
+    # of the model. The points must be colored following the real class
+    # of the citizen.
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    predicted_colors = get_colors(y_predictions.flatten())
+    real_colors = get_colors(all_y.flatten())
+
+    ax.scatter(
+        all_x[:, 0],
+        all_x[:, 1],
+        all_x[:, 2],
+        c=predicted_colors,
+        marker='o',
+        alpha=0.5,
+    )
+    ax.scatter(
+        all_x[:, 0],
+        all_x[:, 1],
+        all_x[:, 2],
+        c=real_colors,
+        marker='.',
+        alpha=0.5,
+    )
+
+    ax.set_xlabel('weight')
+    ax.set_ylabel('height')
+    ax.set_zlabel('bone_density')
+    ax.set_title('bone_density vs height vs weight')
+
+    fig.legend(
+        handles=[
+            patches.Patch(color='green',
+                          label='True positive'),
+            patches.Patch(color='blue',
+                          label='True negative'),
+            patches.Patch(color='orange',
+                          label='False positive'),
+            patches.Patch(color='red',
+                          label='False negative'),
+        ],
+        loc='lower center', ncol=4, fontsize='small',
+    )
+
+    plt.show()
+
+
+
 if __name__ == "__main__":
 
     # Loads the differents models from models.pickle and
@@ -252,11 +307,12 @@ if __name__ == "__main__":
         print(f"Training model for {origins[i]}")
         mylr = MyLR(np.zeros(theta_shape),
                     alpha=5,
-                    max_iter=50_000,
+                    max_iter=30_000,
                     lambda_=best_model["lambda"])
         current_y_train = np.where(y_train == i, 1, 0)
         theta = mylr.fit_(x_train_poly, current_y_train)
         trained_thetas.append(theta)
+        print()
 
     f1_score(x_test_poly, y_test, trained_thetas, best_model)
 
@@ -269,10 +325,12 @@ if __name__ == "__main__":
                                          labels=[0, 1, 2, 3],
                                          df_option=True
                                          )
-    print(confusion_matrix)
+    print("Confusion matrix for the entire dataset :\n",
+          confusion_matrix)
 
     # Visualize the target values and the predicted values of the best model
     # on the same scatterplot.
     # Make some effort to have a readable figure.
     x = np.concatenate((x_train, x_test))
     plot_prediction(y_hat, y, x)
+    plot_3d(x, y_hat, y)

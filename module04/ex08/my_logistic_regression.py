@@ -426,8 +426,8 @@ class MyLogisticRegression:
         You use the F1 score when want to control both
         False positives and False negatives.
         Args:
-            y:a numpy.ndarray for the correct labels
-            y_hat:a numpy.ndarray for the predicted labels
+            y: a numpy.ndarray for the correct labels
+            y_hat: a numpy.ndarray for the predicted labels
             pos_label: str or int, the class on which to report
                     the precision_score (default=1)
         Returns:
@@ -454,7 +454,8 @@ class MyLogisticRegression:
             recall = self.recall_score_(y, y_hat, pos_label)
             return 2 * (precision * recall) / (precision + recall)
 
-        except Exception:
+        except Exception as e:
+            print(e)
             return None
 
 

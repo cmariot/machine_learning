@@ -207,7 +207,7 @@ if __name__ == "__main__":
     # Split the dataset into a training, a cross-validation and a test sets.
     (x_train, y_train,
      x_val, y_val,
-     x_test, y_test) = split_dataset(dataset, (0.85, 0.15, 0))
+     x_test, y_test) = split_dataset(dataset, (0.5, 0.5, 0))
 
     # Normalize the training features and use the same parameters
     # to normalize the validation and the test features.
@@ -243,7 +243,7 @@ if __name__ == "__main__":
             logistic_regression = MyLogisticRegression(
                 theta=np.zeros(theta_shape),
                 alpha=5,
-                max_iter=50_000,
+                max_iter=30_000,
                 lambda_=lambda_
             )
             current_y = np.where(y_train == current_train, 1, 0)
