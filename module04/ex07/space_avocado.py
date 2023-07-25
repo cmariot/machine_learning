@@ -260,5 +260,4 @@ if __name__ == "__main__":
                            label=model_["name"], marker='.')
             axs[i].legend()
 
-
     plt.show()
