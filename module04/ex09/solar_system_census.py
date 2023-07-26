@@ -65,7 +65,9 @@ def plot_models_scores(models: list):
     try:
         print("Models scores depending on λ (trained during benchmark) :")
         for model in models:
-            print(f"λ = {model['lambda']:.1f} | F1 score = {model['f1_score']:.3f}")
+            print(
+                f"λ = {model['lambda']:.1f} ",
+                f"| F1 score = {model['f1_score']:.3f}")
         plt.bar(
             [model["lambda"] for model in models],
             [model["f1_score"] for model in models],
@@ -135,6 +137,8 @@ def get_colors(y):
 
 def plot_prediction(y_predictions, all_y, all_x_denormalized):
     fig, ax = plt.subplots(1, 3, figsize=(20, 10))
+    plt.suptitle("Planet origin " +
+                 "(real = center, best model predictions = borders)")
 
     features_pairs = [
         ('weight', 'height'),
@@ -253,7 +257,6 @@ def plot_3d(all_x, y_predictions, all_y):
     )
 
     plt.show()
-
 
 
 if __name__ == "__main__":

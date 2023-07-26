@@ -220,7 +220,9 @@ if __name__ == "__main__":
 
     y_hat = ridge.predict_(x_val_degree)
     cost = ridge.loss_(y_val, y_hat)
+    r2 = ridge.r2score_(y_val, y_hat)
     print(f"\nCost: {cost}")
+    print(f"R2-score: {r2}")
 
     # Plot the true price and the predicted price obtain
     # via your best model for each features with the different λ values
@@ -228,6 +230,8 @@ if __name__ == "__main__":
 
     # Subplot for each feature
     fig, axs = plt.subplots(1, 3, figsize=(20, 10))
+
+    plt.suptitle("Regularized linear regression of price with multi-features.")
 
     # Concatenate the validation, test and train x
     x = numpy.concatenate((x_val, x_test, x_train))
@@ -240,25 +244,41 @@ if __name__ == "__main__":
     # Predict the price for the whole dataset with the best model
     y_hat = ridge.predict_(x_norm)
 
+    legends = [
+        "Avocado weight order (in ton)",
+        "Distance from where the avocado ordered is produced (in Mkm)",
+        "Time between the order and the receipt (in days)"
+    ]
+
     # Plot the pre-trained models of the same degree, but different lambda_
     for model_ in trained_models:
-        model_ridge = MyRidge(model_["theta"],
-                              alpha=learning_rate,
-                              max_iter=n_iter,
-                              lambda_=model_["lambda_"])
-        model_y_hat = model_ridge.predict_(x_norm)
+        ridge.set_params_(
+            {
+                "theta": model_["theta"],
+                "lambda_": model_["lambda_"]
+            }
+        )
+        model_y_hat = ridge.predict_(x_norm)
         for i, feature in enumerate(features):
-            axs[i].scatter(x[:, i], model_y_hat, label=model_["name"], marker='.')
+            axs[i].scatter(x[:, i], model_y_hat,
+                           label=model_["name"],
+                           marker='.')
 
     for i, feature in enumerate(features):
 
         # Plot the real values
-        axs[i].scatter(x[:, i], y, label="Dataset", marker='.', color="blue")
+        axs[i].scatter(x[:, i], y, label="Dataset",
+                       marker='.',
+                       color="blue")
 
-        # Plot the trained best model
-        axs[i].scatter(x[:, i], y_hat, label="Prediction", marker='.', color="red")
-        axs[i].set_xlabel(feature)
-        axs[i].set_ylabel("Price")
+        # Plot the predicted best model values
+        axs[i].scatter(x[:, i], y_hat,
+                       label="Prediction",
+                       marker='.',
+                       color="red")
+
+        axs[i].set_xlabel(legends[i])
+        axs[i].set_ylabel("Price of the order (in trantorian unit)")
         axs[i].legend()
 
     plt.show()

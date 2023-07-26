@@ -2,7 +2,7 @@ import pandas
 import numpy
 import yaml
 from ridge import MyRidge
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 def get_dataset(path: str, features: list) -> pandas.DataFrame:
@@ -172,30 +172,30 @@ if __name__ == "__main__":
             models.append(model)
             print()
 
-            # if lambda_ == 0.0:
+            if lambda_ == 0.0:
 
-            #     # ############################ #
-            #     # Plot the model's predictions #
-            #     # ############################ #
+                # ############################ #
+                # Plot the model's predictions #
+                # ############################ #
 
-            #     for i in range(3):
-            #         plt.scatter(x_val[:, i], y_val, color="blue")
-            #         plt.scatter(x_val[:, i], y_hat, color="red")
-            #         plt.title(f"Model {model['name']}")
-            #         plt.xlabel("x")
-            #         plt.ylabel("y")
-            #         plt.legend(["real values", "predicted values"])
-            #         plt.show()
+                for i in range(3):
+                    plt.scatter(x_val[:, i], y_val, color="blue")
+                    plt.scatter(x_val[:, i], y_hat, color="red")
+                    plt.title(f"Model {model['name']}")
+                    plt.xlabel("x")
+                    plt.ylabel("y")
+                    plt.legend(["real values", "predicted values"])
+                    plt.show()
 
-            #     # ############################### #
-            #     # Plot the model's cost evolution #
-            #     # ############################### #
+                # ############################### #
+                # Plot the model's cost evolution #
+                # ############################### #
 
-            #     plt.plot(ridge.losses)
-            #     plt.title(f"Model {model['name']} cost evolution")
-            #     plt.xlabel("iteration")
-            #     plt.ylabel("cost")
-            #     plt.show()
+                plt.plot(ridge.losses)
+                plt.title(f"Model {model['name']} cost evolution")
+                plt.xlabel("iteration")
+                plt.ylabel("cost")
+                plt.show()
 
     # Plot bar chart of the models cost
     # costs = [model["cost"] for model in models]

@@ -19,7 +19,8 @@ class MyLogisticRegression:
         self.max_iter = max_iter
         self.theta = theta
         self.penality = penality
-        self.lambda_ = lambda_ if penality in self.supported_penalities else 0
+        self.lambda_ = lambda_ if penality in self.supported_penalities \
+            else 0.0
         self.losses = []
 
     def checkargs_sigmoid_(func):
@@ -565,3 +566,32 @@ if __name__ == "__main__":
     #     [-2.01756886],
     #     [-2.10071291],
     #     [-3.27257351]])
+
+    theta = np.array([[-2.4], [-1.5], [0.3], [-1.4], [0.7]])
+
+    # Example 1:
+    model1 = MyLogisticRegression(theta, lambda_=5.0)
+    print(model1.penality)
+    # Output
+    # ’l2’
+    print(model1.lambda_)
+    # Output
+    # 5.0
+
+    # Example 2:
+    model2 = MyLogisticRegression(theta, penality=None)
+    print(model2.penality)
+    # Output
+    # None
+    print(model2.lambda_)
+    # Output
+    # 0.0
+
+    # Example 3:
+    model3 = MyLogisticRegression(theta, penality=None, lambda_=2.0)
+    print(model3.penality)
+    # Output
+    # None
+    print(model3.lambda_)
+    # Output
+    # 0.0

@@ -2,7 +2,7 @@ import pickle
 import pandas
 import numpy as np
 from my_logistic_regression import MyLogisticRegression
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 def get_dataset(path, features) -> pandas.DataFrame:
@@ -217,9 +217,14 @@ if __name__ == "__main__":
     # Train different regularized logistic regression models with
     # a polynomial hypothesis of degree 3.
     polynomial_hypothesis = 3
-    x_train_poly = add_polynomial_features(x_train_normalized, polynomial_hypothesis)
-    x_val_poly = add_polynomial_features(x_val_normalized, polynomial_hypothesis)
-
+    x_train_poly = add_polynomial_features(
+        x_train_normalized,
+        polynomial_hypothesis
+    )
+    x_val_poly = add_polynomial_features(
+        x_val_normalized,
+        polynomial_hypothesis
+    )
     theta_shape = (x.shape[1] * polynomial_hypothesis + 1, 1)
 
     models = []

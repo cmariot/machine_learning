@@ -51,13 +51,7 @@ class MyRidge:
         Returns a dictionary containing all parameters of the model.
         """
         try:
-            dict = {
-                "theta": self.theta,
-                "alpha": self.alpha,
-                "max_iter": self.max_iter,
-                "lambda_": self.lambda_
-            }
-            return dict
+            return self.__dict__
         except Exception:
             return None
 
@@ -90,6 +84,8 @@ class MyRidge:
                     self.max_iter = value
                 elif key == "lambda_":
                     self.lambda_ = value
+                elif key == "losses":
+                    self.losses = value
             return self
         except Exception:
             return None
@@ -311,37 +307,41 @@ class MyRidge:
         except Exception:
             return None
 
-    def add_polynomial_features(self, x, power):
-        """
-        Add polynomial features to matrix x by raising its columns
-        to every power in the range of 1 up to the power given in argument.
-        Args:
-            x: has to be an numpy.ndarray, a matrix of shape m * n.
-            power: has to be an int, the power up to which the columns
-                    of matrix x are going to be raised.
-        Returns:
-            The matrix of polynomial features as a numpy.ndarray,
-                of shape m * (np), containg the polynomial feature values
-                for all training examples.
-            None if x is an empty numpy.ndarray.
-        Raises:
-            This function should not raise any Exception.
-        """
-
+    def r2score_elem(self, y, y_hat):
         try:
-            if not isinstance(x, np.ndarray):
-                return None
-            m, n = x.shape
-            if m == 0 or n == 0:
-                return None
-            if not isinstance(power, int) or power < 1:
-                return None
-            polynomial_matrix = x
-            for i in range(2, power + 1):
-                new_column = x ** i
-                polynomial_matrix = np.c_[polynomial_matrix, new_column]
-            return polynomial_matrix
+            m = y.shape[0]
+            mean = y.mean()
+            numerator, denominator = 0., 0.
+            for i in range(m):
+                numerator += (y_hat[i] - y[i]) ** 2
+                denominator += (y[i] - mean) ** 2
+            return numerator / denominator
+        except Exception:
+            return None
 
+    def r2score_(self, y, y_hat):
+        """
+            Description:
+                Calculate the R2score between y_hat and y.
+            Args:
+                y: has to be a numpy.array, a vector of dimension m * 1.
+                y_hat: has to be a numpy.array, a vector of dimension m * 1.
+            Returns:
+                r2score: has to be a float.
+                None if there is a matching dimension problem.
+            Raises:
+                This function should not raise any Exceptions.
+        """
+        try:
+            if any(not isinstance(_, np.ndarray) for _ in [y, y_hat]):
+                return None
+            m, n = y.shape
+            if m == 0 or y_hat.shape != (m, n) or n != 1:
+                return None
+            r2_score_elem = self.r2score_elem(y, y_hat)
+            if r2_score_elem is None:
+                return None
+            return np.sum(1 - r2_score_elem)
         except Exception:
             return None
 

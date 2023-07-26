@@ -34,10 +34,10 @@ def logistic_predict_(x, theta):
       This function should not raise any Exception.
     """
 
-    if not all([isinstance(arr, np.ndarray) for arr in [x, theta]]):
-        return None
-
     try:
+        if not all([isinstance(arr, np.ndarray) for arr in [x, theta]]):
+            return None
+
         m, n = x.shape
 
         if m == 0 or n == 0:
